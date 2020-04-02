@@ -1,8 +1,11 @@
 package service
 
 import (
+	"encoding/hex"
 	"fmt"
 	"net/http"
+
+	"crypto/md5"
 
 	"github.com/zhiqiangxu/ont-gateway/pkg/cicd"
 	"github.com/zhiqiangxu/ont-gateway/pkg/io"
@@ -13,6 +16,13 @@ const (
 	defaultConfigPath = "/data/config"
 	defaultStatePath  = "/data"
 )
+
+// the resultant length should be <= 64 for cicd
+func toDeploymentID(addonID, tenantID string) string {
+	longID := fmt.Sprintf("%s:%s", addonID, tenantID)
+	sum := md5.Sum([]byte(longID))
+	return hex.EncodeToString(sum[:])
+}
 
 // AddonDeploy impl
 func (gw *Gateway) AddonDeploy(input io.AddonDeployInput) (output io.AddonDeployOutput) {
@@ -30,7 +40,7 @@ func (gw *Gateway) AddonDeploy(input io.AddonDeployInput) (output io.AddonDeploy
 		input.StatePath = defaultStatePath
 	}
 
-	deploymentID := fmt.Sprintf("%s:%s", input.AddonID, input.TenantID)
+	deploymentID := toDeploymentID(input.AddonID, input.TenantID)
 	ac, err := model.AddonConfigManager().Get(input.AddonID, input.TenantID)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
