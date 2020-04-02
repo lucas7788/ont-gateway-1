@@ -20,5 +20,9 @@ var config = Value{
 	},
 	MongoConfig: MongoConfig{
 		ConnectionString: "mongodb://172.168.3.46:27017/ont",
+		Timeout:          time.Second * 3,
+	},
+	CICDConfig: CICDConfig{
+		AddonDeployAPI: "",
 	},
 }

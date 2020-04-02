@@ -15,7 +15,7 @@ import (
 )
 
 // MetricLogger middleware
-func MetricLogger(latencyMetric metrics.Histogram, counterMetric metrics.Counter) func(c *gin.Context) {
+func MetricLogger(latencyMetric metrics.Histogram, counterMetric metrics.Counter) func(*gin.Context) {
 
 	return func(c *gin.Context) {
 

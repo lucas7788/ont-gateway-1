@@ -1,7 +1,6 @@
 package forward
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -17,9 +16,9 @@ var (
 	client = &http.Client{Timeout: defaultTimeout, Transport: &http.Transport{IdleConnTimeout: time.Second * 2, MaxIdleConnsPerHost: 200}}
 )
 
-// PostJSONBytes for post marshaled json http request
-func PostJSONBytes(uri string, data []byte) (code int, respBody []byte, err error) {
-	req, err := http.NewRequest("POST", uri, strings.NewReader(string(data)))
+// JSONRequest for send json request
+func JSONRequest(method, uri string, data []byte) (code int, contentType string, respBody []byte, err error) {
+	req, err := http.NewRequest(method, uri, strings.NewReader(string(data)))
 	if err != nil {
 		return
 	}
@@ -37,17 +36,6 @@ func PostJSONBytes(uri string, data []byte) (code int, respBody []byte, err erro
 	}
 	code = resp.StatusCode
 
-	return
-}
-
-// PostJSON for post a json http request
-func PostJSON(uri string, data interface{}) (code int, respBody []byte, err error) {
-	body, err := json.Marshal(data)
-	if err != nil {
-		return
-	}
-
-	code, respBody, err = PostJSONBytes(uri, body)
-
+	contentType = resp.Header.Get("Content-Type")
 	return
 }

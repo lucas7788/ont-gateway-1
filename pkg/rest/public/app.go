@@ -13,7 +13,7 @@ func NewApp() *gin.Engine {
 	biz := r.Group("/biz")
 
 	attestation := biz.Group("/attestation")
-	attestation.POST("/verify", middleware.AddonForward)
-	attestation.POST("/batchAdd", middleware.AddonForward)
+	attestation.POST("/verify", middleware.AddonForward("/verify"))
+	attestation.POST("/batchAdd", middleware.AddonForward("/batchAdd"))
 	return r
 }

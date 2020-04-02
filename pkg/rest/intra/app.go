@@ -1,6 +1,8 @@
 package intra
 
 import (
+	"net/http"
+
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -26,4 +28,12 @@ func NewApp() *gin.Engine {
 	addon.POST("/deploy", AddonDeploy)
 
 	return r
+}
+
+func sendoutput(c *gin.Context, code int, output interface{}) {
+	if code == 0 {
+		code = http.StatusOK
+	}
+
+	c.JSON(code, output)
 }

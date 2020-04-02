@@ -11,6 +11,7 @@ import (
 type Cache interface {
 	Set(k, v string, expire time.Duration) error
 	Get(k string) (string, error)
+	Delete(k string) error
 }
 
 var _ Cache = (*RedisCache)(nil)
@@ -34,5 +35,11 @@ func (cache *RedisCache) Set(k, v string, expire time.Duration) (err error) {
 // Get value
 func (cache *RedisCache) Get(k string) (v string, err error) {
 	v, err = cache.r.Get(k).Result()
+	return
+}
+
+// Delete key
+func (cache *RedisCache) Delete(k string) (err error) {
+	_, err = cache.r.Del(k).Result()
 	return
 }

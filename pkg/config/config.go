@@ -10,6 +10,7 @@ type (
 	// MongoConfig for mongo
 	MongoConfig struct {
 		ConnectionString string
+		Timeout          time.Duration
 	}
 
 	// RedisConfig for redis
@@ -17,6 +18,11 @@ type (
 		Addr     string
 		Password string
 		PoolSize int
+	}
+
+	// CICDConfig for cicd
+	CICDConfig struct {
+		AddonDeployAPI string
 	}
 
 	// RestConfig for rest
@@ -39,6 +45,7 @@ type (
 		LoggerConfig     LoggerConfig
 		RedisCacheConfig RedisConfig
 		MongoConfig      MongoConfig
+		CICDConfig       CICDConfig
 	}
 )
 

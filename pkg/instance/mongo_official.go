@@ -10,20 +10,20 @@ import (
 )
 
 var (
-	instanceMongoOfficialClient *mongo.Database
-	lockMongoOfficialClient     sync.Mutex
+	instanceMongoOfficial *mongo.Database
+	lockMongoOfficial     sync.Mutex
 )
 
-// MongoOfficialClient is singleton for mongo.Database
-func MongoOfficialClient() *mongo.Database {
-	if instanceMongoOfficialClient != nil {
-		return instanceMongoOfficialClient
+// MongoOfficial is singleton for mongo.Database
+func MongoOfficial() *mongo.Database {
+	if instanceMongoOfficial != nil {
+		return instanceMongoOfficial
 	}
 
-	lockMongoOfficialClient.Lock()
-	defer lockMongoOfficialClient.Unlock()
-	if instanceMongoOfficialClient != nil {
-		return instanceMongoOfficialClient
+	lockMongoOfficial.Lock()
+	defer lockMongoOfficial.Unlock()
+	if instanceMongoOfficial != nil {
+		return instanceMongoOfficial
 	}
 
 	config := config.Load().MongoConfig
@@ -31,7 +31,7 @@ func MongoOfficialClient() *mongo.Database {
 	if err != nil {
 		panic(fmt.Sprintf("official mongo instantiate err:%v", err))
 	}
-	instanceMongoOfficialClient = db
+	instanceMongoOfficial = db
 
-	return instanceMongoOfficialClient
+	return instanceMongoOfficial
 }
