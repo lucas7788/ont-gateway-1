@@ -17,14 +17,9 @@ var (
 	client = &http.Client{Timeout: defaultTimeout, Transport: &http.Transport{IdleConnTimeout: time.Second * 2, MaxIdleConnsPerHost: 200}}
 )
 
-// PostJSON for post a json http request
-func PostJSON(uri string, data interface{}) (code int, respBody []byte, err error) {
-	body, err := json.Marshal(data)
-	if err != nil {
-		return
-	}
-
-	req, err := http.NewRequest("POST", uri, strings.NewReader(string(body)))
+// PostJSONBytes for post marshaled json http request
+func PostJSONBytes(uri string, data []byte) (code int, respBody []byte, err error) {
+	req, err := http.NewRequest("POST", uri, strings.NewReader(string(data)))
 	if err != nil {
 		return
 	}
@@ -41,6 +36,18 @@ func PostJSON(uri string, data interface{}) (code int, respBody []byte, err erro
 		return
 	}
 	code = resp.StatusCode
+
+	return
+}
+
+// PostJSON for post a json http request
+func PostJSON(uri string, data interface{}) (code int, respBody []byte, err error) {
+	body, err := json.Marshal(data)
+	if err != nil {
+		return
+	}
+
+	code, respBody, err = PostJSONBytes(uri, body)
 
 	return
 }

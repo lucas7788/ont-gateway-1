@@ -15,5 +15,15 @@ func NewApp() *gin.Engine {
 	// metrics内网展示
 	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
+	addon := r.Group("/addon")
+
+	// per tenant stuff
+
+	addon.POST("/config", PostAddonConfig)
+	addon.GET("/config", GetAddonConfig)
+	addon.DELETE("/config", DeleteAddonConfig)
+
+	addon.POST("/deploy", AddonDeploy)
+
 	return r
 }

@@ -1,6 +1,8 @@
 package main
 
-import "github.com/zhiqiangxu/ont-gateway/pkg/rest"
+import (
+	"github.com/zhiqiangxu/ont-gateway/pkg/rest"
+)
 
 func main() {
 

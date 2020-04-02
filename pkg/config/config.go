@@ -7,6 +7,17 @@ import (
 )
 
 type (
+	// MongoConfig for mongo
+	MongoConfig struct {
+		ConnectionString string
+	}
+
+	// RedisConfig for redis
+	RedisConfig struct {
+		Addr     string
+		Password string
+		PoolSize int
+	}
 
 	// RestConfig for rest
 	RestConfig struct {
@@ -23,9 +34,11 @@ type (
 	}
 	// Value is combined config info
 	Value struct {
-		Prod         bool
-		RestConfig   RestConfig
-		LoggerConfig LoggerConfig
+		Prod             bool
+		RestConfig       RestConfig
+		LoggerConfig     LoggerConfig
+		RedisCacheConfig RedisConfig
+		MongoConfig      MongoConfig
 	}
 )
 

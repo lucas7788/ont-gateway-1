@@ -15,4 +15,10 @@ var config = Value{
 	LoggerConfig: LoggerConfig{
 		LogLevel: "debug",
 	},
+	RedisCacheConfig: RedisConfig{
+		Addr: "172.168.3.46:6379",
+	},
+	MongoConfig: MongoConfig{
+		ConnectionString: "mongodb://172.168.3.46:27017/ont",
+	},
 }
