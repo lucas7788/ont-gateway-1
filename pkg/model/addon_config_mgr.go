@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/x/bsonx"
 )
 
 // AddonConfigMgr for AddonConfig crud
@@ -115,5 +116,19 @@ func (m *AddonConfigMgr) Get(addonID, tenantID string) (ac *AddonConfig, err err
 
 	ac = &AddonConfig{AddonID: addonID, TenantID: tenantID, Config: v}
 
+	return
+}
+
+// EnsureIndex add index for this collection
+func (m *AddonConfigMgr) EnsureIndex() (err error) {
+
+	opts := &options.IndexOptions{}
+	opts.SetName("i_addon_id_tenant_id")
+	index := mongo.IndexModel{
+		Keys:    bsonx.Doc{{Key: "addon_id", Value: bsonx.Int32(1)}, {Key: "tenant_id", Value: bsonx.Int32(1)}},
+		Options: opts,
+	}
+
+	instance.MongoOfficial().Collection(addonConfigCollectionName).Indexes().CreateOne(context.Background(), index)
 	return
 }

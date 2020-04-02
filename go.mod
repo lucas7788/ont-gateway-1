@@ -14,6 +14,7 @@ require (
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/prometheus/client_golang v1.5.1
 	github.com/tidwall/pretty v0.0.0-20190325153808-1166b9ac2b65 // indirect
+	github.com/urfave/cli/v2 v2.2.0
 	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c // indirect
 	github.com/xdg/stringprep v1.0.0 // indirect
 	github.com/zhiqiangxu/tableflip v0.0.0-20190122113937-cebf5858b483
