@@ -10,9 +10,9 @@ import (
 func NewApp() *gin.Engine {
 	r := g.New()
 
-	biz := r.Group("/biz")
+	addon := r.Group("/addon")
 
-	attestation := biz.Group("/attestation")
+	attestation := addon.Group("/attestation")
 	attestation.POST("/verify", middleware.AddonForward("/verify"))
 	attestation.POST("/batchAdd", middleware.AddonForward("/batchAdd"))
 	return r
