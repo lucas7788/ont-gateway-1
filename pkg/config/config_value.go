@@ -23,6 +23,6 @@ var config = Value{
 		Timeout:          time.Second * 3,
 	},
 	CICDConfig: CICDConfig{
-		AddonDeployAPI: "",
+		AddonDeployAPI: "http://a0d771952588111ea89590659513bb5d-1585432770.ap-southeast-1.elb.amazonaws.com:8000/api/v1/ss",
 	},
 }

@@ -39,3 +39,8 @@ func JSONRequest(method, uri string, data []byte) (code int, contentType string,
 	contentType = resp.Header.Get("Content-Type")
 	return
 }
+
+// PostJSONRequest for post json request
+func PostJSONRequest(uri string, data []byte) (int, string, []byte, error) {
+	return JSONRequest("POST", uri, data)
+}
