@@ -26,6 +26,7 @@ func NewApp() *gin.Engine {
 	addon.DELETE("/config", DeleteAddonConfig)
 
 	addon.POST("/deploy", AddonDeploy)
+	addon.GET("/deploy/check", CheckDeploy)
 
 	return r
 }
