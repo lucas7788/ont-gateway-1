@@ -15,7 +15,7 @@ require (
 	github.com/urfave/cli/v2 v2.2.0
 	github.com/xdg/stringprep v1.0.0 // indirect
 	github.com/zhiqiangxu/tableflip v0.0.0-20190122113937-cebf5858b483
-	github.com/zhiqiangxu/util v0.0.0-20200326155850-055ba0ba8d22
+	github.com/zhiqiangxu/util v0.0.0-20200407035924-e5d3ba5199c0
 	go.mongodb.org/mongo-driver v1.3.1
 	go.uber.org/zap v1.14.1
 	gotest.tools v2.2.0+incompatible

@@ -358,6 +358,8 @@ github.com/zhiqiangxu/tableflip v0.0.0-20190122113937-cebf5858b483 h1:vhRInHvRlH
 github.com/zhiqiangxu/tableflip v0.0.0-20190122113937-cebf5858b483/go.mod h1:h7KsQjpBWo+wY48I4XM/xq1HdD4R5/LqNYRSq5i3Iu0=
 github.com/zhiqiangxu/util v0.0.0-20200326155850-055ba0ba8d22 h1:2iL/1m378aIgU2VYLagsaqnb9Elo/VJLAec3tc+v9vM=
 github.com/zhiqiangxu/util v0.0.0-20200326155850-055ba0ba8d22/go.mod h1:0Eqnw5K5QFsjDGi4uNCd4spauD26I4RNoPkocgQaViA=
+github.com/zhiqiangxu/util v0.0.0-20200407035924-e5d3ba5199c0 h1:MueCcByQN4msNYsepWB/BucGAGAIF+KoD2a+od7vjHA=
+github.com/zhiqiangxu/util v0.0.0-20200407035924-e5d3ba5199c0/go.mod h1:0Eqnw5K5QFsjDGi4uNCd4spauD26I4RNoPkocgQaViA=
 go.etcd.io/bbolt v1.3.3/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.etcd.io/etcd v0.0.0-20191023171146-3cf2f69b5738/go.mod h1:dnLIgRNXwCJa5e+c6mIZCrds/GIG4ncV9HhK5PX7jPg=
 go.mongodb.org/mongo-driver v1.0.1 h1:r2xNB8juGGrZVcIjX2TpY7HUfz+pNYq+GIuC9h6URZg=

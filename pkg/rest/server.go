@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"os"
+	"syscall"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -128,7 +129,7 @@ func (s *Server) Start() {
 		logger.Instance().Error("upgrade start")
 		err := upg.Upgrade()
 		logger.Instance().Error("upgrade end", zap.Error(err))
-	})
+	}, os.Interrupt, os.Kill, syscall.SIGTERM, syscall.SIGUSR1, syscall.SIGQUIT)
 
 	// ready to exit
 	select {
