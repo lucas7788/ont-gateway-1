@@ -20,4 +20,13 @@ func TestGateway(t *testing.T) {
 		assert.Assert(t, output.Code == 0)
 	}
 
+	{
+		input := io.DeleteAddonConfigInput{
+			AddonID:  "addon_id",
+			TenantID: "tenant_id",
+		}
+		output := gw.DeleteAddonConfig(input)
+		assert.Assert(t, output.Code == 0)
+	}
+
 }
