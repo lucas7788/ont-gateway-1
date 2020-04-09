@@ -16,8 +16,8 @@ github.com/gin-gonic/gin/internal/json
 github.com/gin-gonic/gin/render
 # github.com/go-kit/kit v0.10.0
 github.com/go-kit/kit/metrics
-github.com/go-kit/kit/metrics/internal/lv
 github.com/go-kit/kit/metrics/prometheus
+github.com/go-kit/kit/metrics/internal/lv
 # github.com/go-playground/locales v0.13.0
 github.com/go-playground/locales
 github.com/go-playground/locales/currency
@@ -38,9 +38,9 @@ github.com/go-stack/stack
 # github.com/golang/protobuf v1.3.3
 github.com/golang/protobuf/proto
 github.com/golang/protobuf/ptypes
+github.com/golang/protobuf/ptypes/timestamp
 github.com/golang/protobuf/ptypes/any
 github.com/golang/protobuf/ptypes/duration
-github.com/golang/protobuf/ptypes/timestamp
 # github.com/golang/snappy v0.0.1
 github.com/golang/snappy
 # github.com/google/go-cmp v0.4.0
@@ -52,13 +52,20 @@ github.com/google/go-cmp/cmp/internal/value
 # github.com/json-iterator/go v1.1.9
 github.com/json-iterator/go
 # github.com/klauspost/compress v1.9.5
-github.com/klauspost/compress/fse
+github.com/klauspost/compress/zstd
 github.com/klauspost/compress/huff0
 github.com/klauspost/compress/snappy
-github.com/klauspost/compress/zstd
 github.com/klauspost/compress/zstd/internal/xxhash
+github.com/klauspost/compress/fse
+# github.com/konsorten/go-windows-terminal-sequences v1.0.2
+github.com/konsorten/go-windows-terminal-sequences
 # github.com/leodido/go-urn v1.2.0
 github.com/leodido/go-urn
+# github.com/lestrrat-go/file-rotatelogs v2.2.0+incompatible
+github.com/lestrrat-go/file-rotatelogs
+github.com/lestrrat-go/file-rotatelogs/internal/option
+# github.com/lestrrat-go/strftime v1.0.1
+github.com/lestrrat-go/strftime
 # github.com/mattn/go-isatty v0.0.12
 github.com/mattn/go-isatty
 # github.com/matttproud/golang_protobuf_extensions v1.0.1
@@ -72,23 +79,27 @@ github.com/oklog/run
 # github.com/pkg/errors v0.8.1
 github.com/pkg/errors
 # github.com/prometheus/client_golang v1.5.1
+github.com/prometheus/client_golang/prometheus/promhttp
 github.com/prometheus/client_golang/prometheus
 github.com/prometheus/client_golang/prometheus/internal
-github.com/prometheus/client_golang/prometheus/promhttp
 # github.com/prometheus/client_model v0.2.0
 github.com/prometheus/client_model/go
 # github.com/prometheus/common v0.9.1
 github.com/prometheus/common/expfmt
-github.com/prometheus/common/internal/bitbucket.org/ww/goautoneg
 github.com/prometheus/common/model
+github.com/prometheus/common/internal/bitbucket.org/ww/goautoneg
 # github.com/prometheus/procfs v0.0.8
 github.com/prometheus/procfs
 github.com/prometheus/procfs/internal/fs
 github.com/prometheus/procfs/internal/util
+# github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
+github.com/rifflock/lfshook
 # github.com/russross/blackfriday/v2 v2.0.1
 github.com/russross/blackfriday/v2
 # github.com/shurcooL/sanitized_anchor_name v1.0.0
 github.com/shurcooL/sanitized_anchor_name
+# github.com/sirupsen/logrus v1.4.2
+github.com/sirupsen/logrus
 # github.com/ugorji/go/codec v1.1.7
 github.com/ugorji/go/codec
 # github.com/urfave/cli/v2 v2.2.0
@@ -97,6 +108,12 @@ github.com/urfave/cli/v2
 github.com/xdg/scram
 # github.com/xdg/stringprep v1.0.0
 github.com/xdg/stringprep
+# github.com/zhiqiangxu/go-reuseport v0.2.1
+github.com/zhiqiangxu/go-reuseport
+# github.com/zhiqiangxu/qchat-api v0.0.0-20200313034647-ab8769b7fb11
+github.com/zhiqiangxu/qchat-api/pkg/misc
+# github.com/zhiqiangxu/qrpc v0.0.0-20200131123812-954f67c2567e
+github.com/zhiqiangxu/qrpc
 # github.com/zhiqiangxu/tableflip v0.0.0-20190122113937-cebf5858b483
 github.com/zhiqiangxu/tableflip
 # github.com/zhiqiangxu/util v0.0.0-20200407035924-e5d3ba5199c0
@@ -104,48 +121,51 @@ github.com/zhiqiangxu/util/logger
 github.com/zhiqiangxu/util/metrics
 github.com/zhiqiangxu/util/signal
 # go.mongodb.org/mongo-driver v1.3.1
+go.mongodb.org/mongo-driver/mongo
 go.mongodb.org/mongo-driver/bson
+go.mongodb.org/mongo-driver/mongo/options
+go.mongodb.org/mongo-driver/x/bsonx
+go.mongodb.org/mongo-driver/mongo/readpref
+go.mongodb.org/mongo-driver/x/mongo/driver/connstring
 go.mongodb.org/mongo-driver/bson/bsoncodec
-go.mongodb.org/mongo-driver/bson/bsonoptions
-go.mongodb.org/mongo-driver/bson/bsonrw
 go.mongodb.org/mongo-driver/bson/bsontype
 go.mongodb.org/mongo-driver/bson/primitive
 go.mongodb.org/mongo-driver/event
-go.mongodb.org/mongo-driver/internal
-go.mongodb.org/mongo-driver/mongo
-go.mongodb.org/mongo-driver/mongo/options
 go.mongodb.org/mongo-driver/mongo/readconcern
-go.mongodb.org/mongo-driver/mongo/readpref
 go.mongodb.org/mongo-driver/mongo/writeconcern
-go.mongodb.org/mongo-driver/tag
-go.mongodb.org/mongo-driver/version
-go.mongodb.org/mongo-driver/x/bsonx
 go.mongodb.org/mongo-driver/x/bsonx/bsoncore
 go.mongodb.org/mongo-driver/x/mongo/driver
-go.mongodb.org/mongo-driver/x/mongo/driver/address
 go.mongodb.org/mongo-driver/x/mongo/driver/auth
-go.mongodb.org/mongo-driver/x/mongo/driver/auth/internal/gssapi
-go.mongodb.org/mongo-driver/x/mongo/driver/connstring
 go.mongodb.org/mongo-driver/x/mongo/driver/description
-go.mongodb.org/mongo-driver/x/mongo/driver/dns
 go.mongodb.org/mongo-driver/x/mongo/driver/mongocrypt
 go.mongodb.org/mongo-driver/x/mongo/driver/mongocrypt/options
 go.mongodb.org/mongo-driver/x/mongo/driver/operation
 go.mongodb.org/mongo-driver/x/mongo/driver/session
 go.mongodb.org/mongo-driver/x/mongo/driver/topology
 go.mongodb.org/mongo-driver/x/mongo/driver/uuid
+go.mongodb.org/mongo-driver/bson/bsonrw
+go.mongodb.org/mongo-driver/tag
 go.mongodb.org/mongo-driver/x/mongo/driver/wiremessage
+go.mongodb.org/mongo-driver/internal
+go.mongodb.org/mongo-driver/x/mongo/driver/dns
+go.mongodb.org/mongo-driver/bson/bsonoptions
+go.mongodb.org/mongo-driver/x/mongo/driver/address
+go.mongodb.org/mongo-driver/x/mongo/driver/auth/internal/gssapi
+go.mongodb.org/mongo-driver/version
 # go.uber.org/atomic v1.6.0
 go.uber.org/atomic
 # go.uber.org/multierr v1.5.0
 go.uber.org/multierr
+# go.uber.org/ratelimit v0.1.0
+go.uber.org/ratelimit
+go.uber.org/ratelimit/internal/clock
 # go.uber.org/zap v1.14.1
 go.uber.org/zap
-go.uber.org/zap/buffer
+go.uber.org/zap/zapcore
 go.uber.org/zap/internal/bufferpool
+go.uber.org/zap/buffer
 go.uber.org/zap/internal/color
 go.uber.org/zap/internal/exit
-go.uber.org/zap/zapcore
 # golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
 golang.org/x/crypto/pbkdf2
 # golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a
@@ -154,13 +174,15 @@ golang.org/x/sync/semaphore
 golang.org/x/sys/unix
 golang.org/x/sys/windows
 # golang.org/x/text v0.3.2
-golang.org/x/text/transform
 golang.org/x/text/unicode/norm
+golang.org/x/text/transform
+# gopkg.in/dgrijalva/jwt-go.v3 v3.2.0
+gopkg.in/dgrijalva/jwt-go.v3
 # gopkg.in/yaml.v2 v2.2.8
 gopkg.in/yaml.v2
 # gotest.tools v2.2.0+incompatible
 gotest.tools/assert
 gotest.tools/assert/cmp
-gotest.tools/internal/difflib
 gotest.tools/internal/format
 gotest.tools/internal/source
+gotest.tools/internal/difflib
