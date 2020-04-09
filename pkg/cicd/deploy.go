@@ -41,6 +41,7 @@ func Deploy(deploymentID, img, spec, path, conf, statePath string) (sip string, 
 	}
 	code, _, outputBytes, err := forward.PostJSONRequest(config.Load().CICDConfig.AddonDeployAPI, inputBytes)
 	if err != nil {
+		logger.Instance().Error("PostJSONRequest", zap.String("json", string(inputBytes)), zap.Error(err))
 		return
 	}
 	if code != 200 {
