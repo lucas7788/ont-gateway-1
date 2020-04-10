@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"net/http"
+	"time"
 
 	"crypto/md5"
 
@@ -59,7 +60,7 @@ func (gw *Gateway) AddonDeploy(input io.AddonDeployInput) (output io.AddonDeploy
 		return
 	}
 
-	ad := model.AddonDeployment{AddonID: input.AddonID, TenantID: input.TenantID, SIP: sip}
+	ad := model.AddonDeployment{AddonID: input.AddonID, TenantID: input.TenantID, SIP: sip, UpdatedAt: time.Now()}
 	err = model.AddonDeploymentManager().Upsert(ad)
 	if err != nil {
 		output.Code = http.StatusInternalServerError

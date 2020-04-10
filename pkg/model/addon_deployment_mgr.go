@@ -52,8 +52,9 @@ func (m *AddonDeploymentMgr) Upsert(ad AddonDeployment) (err error) {
 	filter := bson.M{"addonID": ad.AddonID, "tenantID": ad.TenantID}
 	update := bson.D{
 		bson.E{Key: "$set", Value: bson.D{
-			bson.E{Key: "sip", Value: ad.SIP}},
-		}}
+			bson.E{Key: "sip", Value: ad.SIP},
+			bson.E{Key: "updated_at", Value: ad.UpdatedAt},
+		}}}
 
 	opt := options.Update().SetUpsert(true)
 
