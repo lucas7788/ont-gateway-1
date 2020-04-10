@@ -8,6 +8,7 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 	"github.com/zhiqiangxu/ont-gateway/pkg/logger"
+	"github.com/zhiqiangxu/util"
 	"go.uber.org/zap"
 )
 
@@ -39,9 +40,10 @@ func Deploy(deploymentID, img, spec, path, conf, statePath string) (sip string, 
 	if err != nil {
 		return
 	}
+	logger.Instance().Debug("Deploy", zap.String("url", config.Load().CICDConfig.AddonDeployAPI), zap.String("input", util.String(inputBytes)))
 	code, _, outputBytes, err := forward.PostJSONRequest(config.Load().CICDConfig.AddonDeployAPI, inputBytes)
 	if err != nil {
-		logger.Instance().Error("PostJSONRequest", zap.String("json", string(inputBytes)), zap.Error(err))
+		logger.Instance().Error("PostJSONRequest", zap.String("json", util.String(inputBytes)), zap.Error(err))
 		return
 	}
 	if code != 200 {

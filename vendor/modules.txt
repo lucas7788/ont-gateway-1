@@ -57,15 +57,8 @@ github.com/klauspost/compress/huff0
 github.com/klauspost/compress/snappy
 github.com/klauspost/compress/zstd/internal/xxhash
 github.com/klauspost/compress/fse
-# github.com/konsorten/go-windows-terminal-sequences v1.0.2
-github.com/konsorten/go-windows-terminal-sequences
 # github.com/leodido/go-urn v1.2.0
 github.com/leodido/go-urn
-# github.com/lestrrat-go/file-rotatelogs v2.2.0+incompatible
-github.com/lestrrat-go/file-rotatelogs
-github.com/lestrrat-go/file-rotatelogs/internal/option
-# github.com/lestrrat-go/strftime v1.0.1
-github.com/lestrrat-go/strftime
 # github.com/mattn/go-isatty v0.0.12
 github.com/mattn/go-isatty
 # github.com/matttproud/golang_protobuf_extensions v1.0.1
@@ -92,14 +85,10 @@ github.com/prometheus/common/internal/bitbucket.org/ww/goautoneg
 github.com/prometheus/procfs
 github.com/prometheus/procfs/internal/fs
 github.com/prometheus/procfs/internal/util
-# github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
-github.com/rifflock/lfshook
 # github.com/russross/blackfriday/v2 v2.0.1
 github.com/russross/blackfriday/v2
 # github.com/shurcooL/sanitized_anchor_name v1.0.0
 github.com/shurcooL/sanitized_anchor_name
-# github.com/sirupsen/logrus v1.4.2
-github.com/sirupsen/logrus
 # github.com/ugorji/go/codec v1.1.7
 github.com/ugorji/go/codec
 # github.com/urfave/cli/v2 v2.2.0
@@ -108,15 +97,10 @@ github.com/urfave/cli/v2
 github.com/xdg/scram
 # github.com/xdg/stringprep v1.0.0
 github.com/xdg/stringprep
-# github.com/zhiqiangxu/go-reuseport v0.2.1
-github.com/zhiqiangxu/go-reuseport
-# github.com/zhiqiangxu/qchat-api v0.0.0-20200313034647-ab8769b7fb11
-github.com/zhiqiangxu/qchat-api/pkg/misc
-# github.com/zhiqiangxu/qrpc v0.0.0-20200131123812-954f67c2567e
-github.com/zhiqiangxu/qrpc
 # github.com/zhiqiangxu/tableflip v0.0.0-20190122113937-cebf5858b483
 github.com/zhiqiangxu/tableflip
 # github.com/zhiqiangxu/util v0.0.0-20200407035924-e5d3ba5199c0
+github.com/zhiqiangxu/util
 github.com/zhiqiangxu/util/logger
 github.com/zhiqiangxu/util/metrics
 github.com/zhiqiangxu/util/signal
@@ -156,9 +140,6 @@ go.mongodb.org/mongo-driver/version
 go.uber.org/atomic
 # go.uber.org/multierr v1.5.0
 go.uber.org/multierr
-# go.uber.org/ratelimit v0.1.0
-go.uber.org/ratelimit
-go.uber.org/ratelimit/internal/clock
 # go.uber.org/zap v1.14.1
 go.uber.org/zap
 go.uber.org/zap/zapcore
