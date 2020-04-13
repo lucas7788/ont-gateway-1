@@ -27,6 +27,7 @@ func NewApp() *gin.Engine {
 
 	addon.POST("/deploy", AddonDeploy)
 	addon.GET("/deploy/check", CheckDeploy)
+	addon.POST("/shell", Shell)
 
 	return r
 }

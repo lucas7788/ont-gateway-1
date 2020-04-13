@@ -29,4 +29,11 @@ func TestGateway(t *testing.T) {
 		assert.Assert(t, output.Code == 0)
 	}
 
+	{
+		input := io.ShellInput{
+			Shell: "echo -n 43",
+		}
+		output := gw.Shell(input)
+		assert.Assert(t, output.Out == "43", output)
+	}
 }
