@@ -13,7 +13,7 @@ import (
 )
 
 // AddonForward for forward addon request
-func AddonForward(forwardURI string) func(*gin.Context) {
+func AddonForward(prefix string) func(*gin.Context) {
 	return func(c *gin.Context) {
 		addonID := c.GetHeader("addonID")
 		tenantID := c.GetHeader("tenantID")
@@ -30,16 +30,23 @@ func AddonForward(forwardURI string) func(*gin.Context) {
 			return
 		}
 
-		reqBody, _ := ioutil.ReadAll(c.Request.Body)
-		url := "http://" + ad.SIP + forwardURI
-		code, contentType, respBytes, err := forward.JSONRequest(c.Request.Method, url, reqBody)
+		resp, err := forward.Forward(c.Request, prefix, ad.SIP, "http")
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-			logger.Instance().Error("JSONRequest", zap.String("url", url), zap.Error(err))
+			logger.Instance().Error("JSONRequest", zap.String("url", c.Request.URL.Path), zap.Error(err))
 			return
 		}
 
-		c.DataFromReader(code, int64(len(respBytes)), contentType, bytes.NewReader(respBytes), nil)
+		defer resp.Body.Close()
+		respBody, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+			logger.Instance().Error("JSONRequest", zap.String("url", c.Request.URL.Path), zap.Error(err))
+			return
+		}
+
+		contentType := resp.Header.Get("Content-Type")
+		c.DataFromReader(resp.StatusCode, int64(len(respBody)), contentType, bytes.NewReader(respBody), nil)
 	}
 
 }

@@ -1,10 +1,13 @@
 package forward
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/zhiqiangxu/ont-gateway/pkg/metrics"
 )
 
 const (
@@ -65,5 +68,50 @@ func Get(url string) (code int, contentType string, respBody []byte, err error) 
 	code = resp.StatusCode
 
 	contentType = resp.Header.Get("Content-Type")
+	return
+}
+
+var (
+	hopHeaders = map[string]bool{
+		"Connection":          true,
+		"Keep-Alive":          true,
+		"Proxy-Authenticate":  true,
+		"Proxy-Authorization": true,
+		"Te":                  true, // canonicalized version of "TE"
+		"Trailers":            true,
+		"Transfer-Encoding":   true,
+		"Upgrade":             true,
+	}
+)
+
+// Forward an arbitory request
+func Forward(req *http.Request, prefix, remoteAddr, schema string) (resp *http.Response, err error) {
+	path := req.URL.Path
+	if req.URL.RawQuery != "" {
+		path += "?" + req.URL.RawQuery
+	}
+	httpReq, err := http.NewRequest(req.Method, strings.TrimPrefix(path, prefix), req.Body)
+	if err != nil {
+		return
+	}
+
+	httpReq.URL.Host = remoteAddr
+	httpReq.URL.Scheme = schema
+
+	for header, values := range req.Header {
+		if !hopHeaders[header] {
+			for _, value := range values {
+				httpReq.Header.Set(header, value)
+			}
+		}
+	}
+
+	begin := time.Now()
+	resp, err = client.Do(httpReq)
+
+	errStr := fmt.Sprintf("%v", err)
+	lvs := []string{"method", "forward", "error", errStr}
+	metrics.RequestLatencyMetric.With(lvs...).Observe(time.Since(begin).Seconds())
+
 	return
 }

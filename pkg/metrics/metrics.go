@@ -1,6 +1,9 @@
 package metrics
 
-import m "github.com/zhiqiangxu/util/metrics"
+import (
+	kitmetrics "github.com/go-kit/kit/metrics"
+	m "github.com/zhiqiangxu/util/metrics"
+)
 
 const (
 	// RequestCount is name for request count
@@ -9,8 +12,16 @@ const (
 	RequestLatency = "request_latency"
 )
 
-// Register all metrics here
-func Register() {
+var (
+	// RequestLatencyMetric for RequestLatency
+	RequestLatencyMetric kitmetrics.Histogram
+	// RequestCountMetric for RequestCount
+	RequestCountMetric kitmetrics.Counter
+)
+
+func init() {
 	m.RegisterCounter(RequestCount, []string{"method", "error"})
 	m.RegisterHist(RequestLatency, []string{"method", "error"})
+	RequestLatencyMetric = m.GetHist(RequestLatency)
+	RequestCountMetric = m.GetCounter(RequestCount)
 }
