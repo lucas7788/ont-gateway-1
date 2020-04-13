@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	defaultConfigPath = "/data/config.json"
+	defaultConfigPath = "/appconfig/config.json"
 	defaultStatePath  = "/data"
 )
 
