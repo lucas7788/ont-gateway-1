@@ -33,7 +33,7 @@ func AddonForward(prefix string) func(*gin.Context) {
 		resp, err := forward.Forward(c.Request, prefix, ad.SIP, "http")
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-			logger.Instance().Error("JSONRequest", zap.String("url", c.Request.URL.Path), zap.Error(err))
+			logger.Instance().Error("JSONRequest", zap.String("addonID", addonID), zap.String("tenantID", tenantID), zap.String("url", c.Request.URL.Path), zap.Error(err))
 			return
 		}
 
