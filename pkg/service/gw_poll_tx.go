@@ -5,6 +5,7 @@ import (
 	"time"
 
 	sdk "github.com/ontio/ontology-go-sdk"
+	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/logger"
 	"github.com/zhiqiangxu/ont-gateway/pkg/model"
@@ -18,6 +19,15 @@ const (
 // PollTx impl
 func (gw *Gateway) PollTx(ctx context.Context) (output io.PollTxOutput) {
 	kit := sdk.NewOntologySdk()
+	{
+		var addr string
+		if config.Load().Prod {
+			addr = "http://dappnode1.ont.io:20336"
+		} else {
+			addr = "http://polaris1.ont.io:20336"
+		}
+		kit.NewRpcClient().SetAddress(addr)
+	}
 
 	for {
 		select {

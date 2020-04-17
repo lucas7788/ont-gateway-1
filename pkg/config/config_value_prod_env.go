@@ -5,6 +5,7 @@ package config
 import "time"
 
 var config = Value{
+	Prod: true,
 	RestConfig: RestConfig{
 		PublicAddr:      ":2020",
 		IntraAddr:       ":2021",
