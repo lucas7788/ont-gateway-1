@@ -115,6 +115,35 @@ func (m *AppMgr) GetAllFromDB() (apps []App, err error) {
 	return
 }
 
+// GetMaxAppIDFromDB returns max app id from db
+func (m *AppMgr) GetMaxAppIDFromDB() (id int, err error) {
+	timeout := config.Load().MongoConfig.Timeout
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	filter := bson.M{}
+	options := options.Find()
+	// sort by id desc
+	options.SetSort(bson.D{bson.E{Key: "id", Value: -1}})
+	options.SetLimit(1)
+
+	cursor, err := instance.MongoOfficial().Collection(appCollectionName).Find(ctx, filter, options)
+	if err != nil {
+		return
+	}
+
+	var apps []App
+	err = cursor.All(ctx, &apps)
+	if err != nil {
+		return
+	}
+
+	if len(apps) > 0 {
+		id = apps[0].ID
+	}
+	return
+}
+
 // EnsureIndex add index for this collection
 func (m *AppMgr) EnsureIndex() (err error) {
 

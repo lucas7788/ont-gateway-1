@@ -17,6 +17,8 @@ func AddMongoIndex(c *cli.Context) error {
 
 	err = model.TxManager().EnsureIndex()
 	fmt.Println("TxManager.EnsureIndex", err)
+	err = model.AppManager().EnsureIndex()
+	fmt.Println("AppManager.EnsureIndex", err)
 
 	return nil
 }

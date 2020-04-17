@@ -50,7 +50,7 @@ func (m *AddonConfigMgr) Upsert(ac AddonConfig) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	filter := bson.M{"addonID": ac.AddonID, "tenantID": ac.TenantID}
+	filter := bson.M{"addon_id": ac.AddonID, "tenant_id": ac.TenantID}
 
 	update := bson.D{
 		bson.E{Key: "$set", Value: bson.D{
@@ -74,7 +74,7 @@ func (m *AddonConfigMgr) Delete(addonID, tenantID string) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	filter := bson.M{"addonID": addonID, "tenantID": tenantID}
+	filter := bson.M{"addon_id": addonID, "tenant_id": tenantID}
 	_, err = instance.MongoOfficial().Collection(addonConfigCollectionName).DeleteOne(ctx, filter)
 	if err != nil {
 		return
@@ -90,7 +90,7 @@ func (m *AddonConfigMgr) getNoCache(addonID, tenantID string) (ac *AddonConfig, 
 	defer cancel()
 
 	ac = &AddonConfig{}
-	filter := bson.M{"addonID": addonID, "tenantID": tenantID}
+	filter := bson.M{"addon_id": addonID, "tenant_id": tenantID}
 	err = instance.MongoOfficial().Collection(addonConfigCollectionName).FindOne(ctx, filter).Decode(ac)
 	if err == mongo.ErrNoDocuments {
 		err = nil
@@ -123,12 +123,13 @@ func (m *AddonConfigMgr) Get(addonID, tenantID string) (ac *AddonConfig, err err
 func (m *AddonConfigMgr) EnsureIndex() (err error) {
 
 	opts := &options.IndexOptions{}
-	opts.SetName("i_addon_id_tenant_id")
+	opts.SetName("u_addon_id_tenant_id")
+	opts.SetUnique(true)
 	index := mongo.IndexModel{
 		Keys:    bsonx.Doc{{Key: "addon_id", Value: bsonx.Int32(1)}, {Key: "tenant_id", Value: bsonx.Int32(1)}},
 		Options: opts,
 	}
 
-	instance.MongoOfficial().Collection(addonConfigCollectionName).Indexes().CreateOne(context.Background(), index)
+	_, err = instance.MongoOfficial().Collection(addonConfigCollectionName).Indexes().CreateOne(context.Background(), index)
 	return
 }

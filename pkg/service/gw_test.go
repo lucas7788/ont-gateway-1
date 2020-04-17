@@ -1,13 +1,20 @@
 package service
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/zhiqiangxu/ont-gateway/pkg/io"
+	"github.com/zhiqiangxu/ont-gateway/pkg/model"
 	"gotest.tools/assert"
 )
 
 func TestGateway(t *testing.T) {
+
+	id, err := model.AppManager().GetMaxAppIDFromDB()
+
+	fmt.Println("id", id, "err", err)
+
 	gw := Instance()
 
 	{

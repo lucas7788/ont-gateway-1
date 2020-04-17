@@ -49,7 +49,7 @@ func (m *AddonDeploymentMgr) Upsert(ad AddonDeployment) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	filter := bson.M{"addonID": ad.AddonID, "tenantID": ad.TenantID}
+	filter := bson.M{"addon_id": ad.AddonID, "tenant_id": ad.TenantID}
 	update := bson.D{
 		bson.E{Key: "$set", Value: bson.D{
 			bson.E{Key: "sip", Value: ad.SIP},
@@ -73,7 +73,7 @@ func (m *AddonDeploymentMgr) getNoCache(addonID, tenantID string) (ad *AddonDepl
 	defer cancel()
 
 	ad = &AddonDeployment{}
-	filter := bson.M{"addonID": addonID, "tenantID": tenantID}
+	filter := bson.M{"addon_id": addonID, "tenant_id": tenantID}
 	err = instance.MongoOfficial().Collection(addonDeploymentCollectionName).FindOne(ctx, filter).Decode(ad)
 	if err == mongo.ErrNoDocuments {
 		err = nil
@@ -109,11 +109,12 @@ func (m *AddonDeploymentMgr) EnsureIndex() (err error) {
 
 	opts := &options.IndexOptions{}
 	opts.SetName("u_addon_id_tenant_id")
+	opts.SetUnique(true)
 	index := mongo.IndexModel{
 		Keys:    bsonx.Doc{{Key: "addon_id", Value: bsonx.Int32(1)}, {Key: "tenant_id", Value: bsonx.Int32(1)}},
 		Options: opts,
 	}
 
-	instance.MongoOfficial().Collection(addonDeploymentCollectionName).Indexes().CreateOne(context.Background(), index)
+	_, err = instance.MongoOfficial().Collection(addonDeploymentCollectionName).Indexes().CreateOne(context.Background(), index)
 	return
 }
