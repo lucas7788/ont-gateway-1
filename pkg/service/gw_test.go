@@ -11,12 +11,12 @@ func TestGateway(t *testing.T) {
 	gw := Instance()
 
 	{
-		input := io.PostAddonConfigInput{
+		input := io.UpsertAddonConfigInput{
 			AddonID:  "addon_id",
 			TenantID: "tenant_id",
 			Config:   "config",
 		}
-		output := gw.PostAddonConfig(input)
+		output := gw.UpsertAddonConfig(input)
 		assert.Assert(t, output.Code == 0)
 	}
 
@@ -36,4 +36,23 @@ func TestGateway(t *testing.T) {
 		output := gw.Shell(input)
 		assert.Assert(t, output.Out == "43", output)
 	}
+
+	{
+		txHash := "txh123"
+		{
+
+			input := io.EnqueTxInput{App: 1, TxHash: txHash}
+			output := gw.EnqueTx(input)
+			assert.Assert(t, output.Code == 0)
+
+		}
+
+		{
+			input := io.DequeTxInput{App: 1, TxHash: txHash}
+			output := gw.DequeTx(input)
+			assert.Assert(t, output.Code == 0 && output.Exists)
+		}
+
+	}
+
 }

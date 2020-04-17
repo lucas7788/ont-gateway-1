@@ -21,13 +21,17 @@ func NewApp() *gin.Engine {
 
 	// per tenant stuff
 
-	addon.POST("/config", PostAddonConfig)
+	addon.POST("/config", UpsertAddonConfig)
 	addon.GET("/config", GetAddonConfig)
 	addon.DELETE("/config", DeleteAddonConfig)
 
-	addon.POST("/deploy", AddonDeploy)
+	addon.POST("/deploy", DeployAddon)
 	addon.GET("/deploy/check", CheckDeploy)
 	addon.POST("/shell", Shell)
+
+	tx := r.Group("/tx")
+	tx.POST("/poll", EnqueTx)
+	tx.DELETE("/poll", DequeTx)
 
 	return r
 }

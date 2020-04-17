@@ -16,6 +16,11 @@ func main() {
 				Usage:  "add mongo index",
 				Action: cmd.AddMongoIndex,
 			},
+			{
+				Name:   "poll_notify_tx",
+				Usage:  "poll and notify for transactions",
+				Action: cmd.PollNotifyTx,
+			},
 		},
 	}
 

@@ -108,7 +108,7 @@ func (m *AddonDeploymentMgr) Get(addonID, tenantID string) (ad *AddonDeployment,
 func (m *AddonDeploymentMgr) EnsureIndex() (err error) {
 
 	opts := &options.IndexOptions{}
-	opts.SetName("i_addon_id_tenant_id")
+	opts.SetName("u_addon_id_tenant_id")
 	index := mongo.IndexModel{
 		Keys:    bsonx.Doc{{Key: "addon_id", Value: bsonx.Int32(1)}, {Key: "tenant_id", Value: bsonx.Int32(1)}},
 		Options: opts,
