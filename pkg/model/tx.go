@@ -39,3 +39,8 @@ type Tx struct {
 	ExpireAt       time.Time    `bson:"expire_at" json:"expire_at"`
 	UpdatedAt      time.Time    `bson:"updated_at" json:"updated_at"`
 }
+
+// IsExpired tells whether Tx is expired
+func (tx *Tx) IsExpired() bool {
+	return tx.ExpireAt.Before(time.Now())
+}

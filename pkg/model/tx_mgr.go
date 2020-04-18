@@ -113,19 +113,30 @@ func (m *TxMgr) UpdatePollError(txHash string, msg string) (exists bool, err err
 	return
 }
 
-// UpdateResultAndState only updates TxPollResult and TxState (and updated_at)
-func (m *TxMgr) UpdateResultAndState(txHash string, result TxPollResult, state TxState) (exists bool, err error) {
+// FinishPoll is called when poll finish, whether succeed or fail
+func (m *TxMgr) FinishPoll(txHash string, result TxPollResult, errMsg string) (exists bool, err error) {
 	timeout := config.Load().MongoConfig.Timeout
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
 	filter := bson.M{"hash": txHash}
-	update := bson.D{
-		bson.E{Key: "$set", Value: bson.D{
-			bson.E{Key: "state", Value: state},
-			bson.E{Key: "result", Value: result},
-			bson.E{Key: "updated_at", Value: time.Now()},
-		}}}
+	setV := bson.D{
+		bson.E{Key: "state", Value: TxStateToNotify},
+		bson.E{Key: "result", Value: result},
+		bson.E{Key: "updated_at", Value: time.Now()},
+	}
+	var update bson.D
+	if errMsg != "" {
+		setV = append(setV, bson.E{Key: "poll_err_msg", Value: errMsg})
+		update = bson.D{
+			bson.E{Key: "$set", Value: setV},
+			bson.E{Key: "$inc", Value: bson.D{
+				bson.E{Key: "poll_err_count", Value: 1},
+			}}}
+	} else {
+		update = bson.D{
+			bson.E{Key: "$set", Value: setV}}
+	}
 
 	updateResult, err := instance.MongoOfficial().Collection(txCollectionName).UpdateOne(ctx, filter, update)
 	if err != nil {
