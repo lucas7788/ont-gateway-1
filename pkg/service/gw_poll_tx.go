@@ -18,17 +18,19 @@ const (
 	batch = 50
 )
 
+func (gw *Gateway) getOntNode() string {
+	if config.Load().Prod {
+		return "http://dappnode1.ont.io:20336"
+	}
+
+	return "http://polaris1.ont.io:20336"
+}
+
 // PollTx impl
 func (gw *Gateway) PollTx(ctx context.Context) (output io.PollTxOutput) {
 	kit := sdk.NewOntologySdk()
 	{
-		var addr string
-		if config.Load().Prod {
-			addr = "http://dappnode1.ont.io:20336"
-		} else {
-			addr = "http://polaris1.ont.io:20336"
-		}
-		kit.NewRpcClient().SetAddress(addr)
+		kit.NewRpcClient().SetAddress(gw.getOntNode())
 	}
 
 	var wg sync.WaitGroup

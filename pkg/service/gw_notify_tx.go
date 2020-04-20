@@ -59,13 +59,14 @@ func (gw *Gateway) NotifyTx(ctx context.Context) (output io.NotifyTxOutput) {
 }
 
 type notifyTxInput struct {
-	TxHash string
-	Result model.TxPollResult
+	TxHash   string             `json:"tx_hash"`
+	NodeAddr string             `json:"node_addr"`
+	Result   model.TxPollResult `json:"result"`
 }
 
 func (gw *Gateway) notifyTx(url, txHash string, result model.TxPollResult) (err error) {
 
-	input := notifyTxInput{TxHash: txHash, Result: result}
+	input := notifyTxInput{TxHash: txHash, NodeAddr: gw.getOntNode(), Result: result}
 	jsonBytes, err := json.Marshal(input)
 	if err != nil {
 		return
