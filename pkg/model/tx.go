@@ -30,6 +30,7 @@ const (
 type Tx struct {
 	Hash           string       `bson:"hash" json:"hash"`
 	App            int          `bson:"app" json:"app"`
+	PollAmount     bool         `bson:"poll_amount" json:"poll_amount"`
 	State          TxState      `bson:"state" json:"state"`
 	Result         TxPollResult `bson:"result" json:"result"`
 	PollErrCount   int          `bson:"poll_err_count" json:"poll_err_count"`

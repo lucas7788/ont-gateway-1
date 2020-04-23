@@ -28,7 +28,7 @@ func (gw *Gateway) EnqueTx(input io.EnqueTxInput) (output io.EnqueTxOutput) {
 	}
 
 	now := time.Now()
-	tx := model.Tx{Hash: input.TxHash, App: input.App, UpdatedAt: now, ExpireAt: now.Add(time.Second * time.Duration(expireSeconds))}
+	tx := model.Tx{Hash: input.TxHash, App: input.App, PollAmount: input.PollAmount, UpdatedAt: now, ExpireAt: now.Add(time.Second * time.Duration(expireSeconds))}
 	err = model.TxManager().Upsert(tx)
 	if err != nil {
 		output.Code = http.StatusInternalServerError

@@ -93,6 +93,7 @@ func (m *AddonConfigMgr) getNoCache(addonID, tenantID string) (ac *AddonConfig, 
 	filter := bson.M{"addon_id": addonID, "tenant_id": tenantID}
 	err = instance.MongoOfficial().Collection(addonConfigCollectionName).FindOne(ctx, filter).Decode(ac)
 	if err == mongo.ErrNoDocuments {
+		ac = nil
 		err = nil
 		return
 	}

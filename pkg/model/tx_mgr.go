@@ -217,7 +217,7 @@ func (m *TxMgr) update(tx Tx, upsert bool) (result *mongo.UpdateResult, err erro
 }
 
 // QueryToPoll for query topoll tx
-func (m *TxMgr) QueryToPoll(n int) (txlist []Tx, err error) {
+func (m *TxMgr) QueryToPoll(batch int64) (txlist []Tx, err error) {
 	timeout := config.Load().MongoConfig.Timeout
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -226,6 +226,7 @@ func (m *TxMgr) QueryToPoll(n int) (txlist []Tx, err error) {
 	options := options.Find()
 	// sort by poll_err_count asc, updated_at asc
 	options.SetSort(bson.D{bson.E{Key: "poll_err_count", Value: 1}, bson.E{Key: "updated_at", Value: 1}})
+	options.SetLimit(batch)
 	cursor, err := instance.MongoOfficial().Collection(txCollectionName).Find(ctx, filter, options)
 	if err != nil {
 		return
@@ -236,7 +237,7 @@ func (m *TxMgr) QueryToPoll(n int) (txlist []Tx, err error) {
 }
 
 // QueryToNotify for query tonotify tx
-func (m *TxMgr) QueryToNotify(n int) (txlist []Tx, err error) {
+func (m *TxMgr) QueryToNotify(batch int64) (txlist []Tx, err error) {
 	timeout := config.Load().MongoConfig.Timeout
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -245,6 +246,7 @@ func (m *TxMgr) QueryToNotify(n int) (txlist []Tx, err error) {
 	options := options.Find()
 	// sort by notify_err_count asc, updated_at asc
 	options.SetSort(bson.D{bson.E{Key: "notify_err_count", Value: 1}, bson.E{Key: "updated_at", Value: 1}})
+	options.SetLimit(batch)
 	cursor, err := instance.MongoOfficial().Collection(txCollectionName).Find(ctx, filter, options)
 	if err != nil {
 		return

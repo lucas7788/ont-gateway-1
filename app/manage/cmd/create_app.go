@@ -17,7 +17,7 @@ func CreateApp(c *cli.Context) error {
 	apps, _ := model.AppManager().GetAllFromDB()
 	fmt.Println("id", id, "err", err, "apps", apps)
 
-	input := io.CreateAppInput{ID: id + 1, Name: c.String("name"), TxNotifyURL: c.String("txNotifyUrl")}
+	input := io.CreateAppInput{ID: id + 1, Name: c.String("name"), TxNotifyURL: c.String("txNotifyUrl"), PaymentNotifyURL: c.String("paymentNotifyUrl")}
 	output := service.Instance().CreateApp(input)
 	return output.Error()
 }

@@ -20,5 +20,12 @@ func AddMongoIndex(c *cli.Context) error {
 	err = model.AppManager().EnsureIndex()
 	fmt.Println("AppManager.EnsureIndex", err)
 
+	err = model.PaymentConfigManager().EnsureIndex()
+	fmt.Println("PaymentConfigManager.EnsureIndex", err)
+	err = model.PaymentManager().EnsureIndex()
+	fmt.Println("PaymentManager.EnsureIndex", err)
+	err = model.PaymentOrderManager().EnsureIndex()
+	fmt.Println("PaymentOrderManager.EnsureIndex", err)
+
 	return nil
 }

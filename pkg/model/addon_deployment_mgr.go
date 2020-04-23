@@ -67,7 +67,7 @@ func (m *AddonDeploymentMgr) Upsert(ad AddonDeployment) (err error) {
 	return
 }
 
-func (m *AddonDeploymentMgr) getNoCache(addonID, tenantID string) (ad *AddonDeployment, exists bool, err error) {
+func (m *AddonDeploymentMgr) getNoCache(addonID, tenantID string) (ad *AddonDeployment, err error) {
 	timeout := config.Load().MongoConfig.Timeout
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
@@ -76,10 +76,10 @@ func (m *AddonDeploymentMgr) getNoCache(addonID, tenantID string) (ad *AddonDepl
 	filter := bson.M{"addon_id": addonID, "tenant_id": tenantID}
 	err = instance.MongoOfficial().Collection(addonDeploymentCollectionName).FindOne(ctx, filter).Decode(ad)
 	if err == mongo.ErrNoDocuments {
+		ad = nil
 		err = nil
 		return
 	}
-	exists = true
 	return
 }
 
@@ -89,8 +89,8 @@ func (m *AddonDeploymentMgr) Get(addonID, tenantID string) (ad *AddonDeployment,
 	v, err := instance.RedisCache().Get(key)
 	if err != nil {
 		if err == redis.Nil {
-			ad, exists, err = m.getNoCache(addonID, tenantID)
-			if exists {
+			ad, err = m.getNoCache(addonID, tenantID)
+			if ad != nil {
 				err = instance.RedisCache().Set(key, ad.SIP, cacheTimeout)
 			}
 			return

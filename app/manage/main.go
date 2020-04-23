@@ -26,7 +26,8 @@ func main() {
 				Usage: "create an app for tx polling etc",
 				Flags: []cli.Flag{
 					&cli.StringFlag{Name: "name", Aliases: []string{"n"}},
-					&cli.StringFlag{Name: "txNotifyUrl", Aliases: []string{"u"}},
+					&cli.StringFlag{Name: "txNotifyUrl", Aliases: []string{"tu"}},
+					&cli.StringFlag{Name: "paymentNotifyUrl", Aliases: []string{"pu"}},
 				},
 				Action: cmd.CreateApp,
 			},

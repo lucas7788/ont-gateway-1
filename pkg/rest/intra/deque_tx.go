@@ -16,6 +16,11 @@ func DequeTx(c *gin.Context) {
 		return
 	}
 
+	if input.Admin {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "admin denied"})
+		return
+	}
+
 	output := service.Instance().DequeTx(input)
 	sendoutput(c, output.Code, output)
 }

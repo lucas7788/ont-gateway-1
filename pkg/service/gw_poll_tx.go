@@ -5,8 +5,7 @@ import (
 	"sync"
 	"time"
 
-	sdk "github.com/ontio/ontology-go-sdk"
-	"github.com/zhiqiangxu/ont-gateway/pkg/config"
+	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"github.com/zhiqiangxu/ont-gateway/pkg/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/logger"
 	"github.com/zhiqiangxu/ont-gateway/pkg/model"
@@ -18,20 +17,10 @@ const (
 	batch = 50
 )
 
-func (gw *Gateway) getOntNode() string {
-	if config.Load().Prod {
-		return "http://dappnode1.ont.io:20336"
-	}
-
-	return "http://polaris1.ont.io:20336"
-}
-
 // PollTx impl
 func (gw *Gateway) PollTx(ctx context.Context) (output io.PollTxOutput) {
-	kit := sdk.NewOntologySdk()
-	{
-		kit.NewRpcClient().SetAddress(gw.getOntNode())
-	}
+
+	kit := instance.OntSdkInstance().GetKit()
 
 	var wg sync.WaitGroup
 
