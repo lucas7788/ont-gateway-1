@@ -33,6 +33,11 @@ func NewApp() *gin.Engine {
 	tx.POST("/poll", EnqueTx)
 	tx.DELETE("/poll", DequeTx)
 
+	payment := r.Group("/payment")
+	payment.POST("/config", CreatePaymentConfig)
+	payment.DELETE("/config", DeletePaymentConfig)
+	payment.POST("/order", CreatePaymentOrder)
+
 	return r
 }
 

@@ -7,8 +7,7 @@ import (
 )
 
 // CreatePaymentOrderInput for input
-type 
-CreatePaymentOrderInput struct {
+type CreatePaymentOrderInput struct {
 	App             int             `bson:"app" json:"app"`
 	PaymentConfigID string          `json:"payment_config_id"`
 	PaymentID       string          `json:"payment_id"`
