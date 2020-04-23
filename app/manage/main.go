@@ -22,6 +22,11 @@ func main() {
 				Action: cmd.PollNotifyTx,
 			},
 			{
+				Name:   "update_notify_payment",
+				Usage:  "update payment balance and notify payment recharge",
+				Action: cmd.UpdateNotifyPayment,
+			},
+			{
 				Name:  "create_app",
 				Usage: "create an app for tx polling etc",
 				Flags: []cli.Flag{
