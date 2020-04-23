@@ -48,8 +48,12 @@ func (gw *Gateway) CreatePaymentOrder(input io.CreatePaymentOrderInput) (output 
 			return
 		}
 
-		if paymentConfig.CoinType != input.CoinType {
-			err = fmt.Errorf("cross token not supported yet")
+		if !paymentConfig.HasCoinType(input.CoinType) {
+			err = fmt.Errorf("coin type %v not supported", input.CoinType)
+			return
+		}
+		if !paymentConfig.HasPayMethod(input.PayMethod) {
+			err = fmt.Errorf("pay method %v not supported", input.PayMethod)
 			return
 		}
 

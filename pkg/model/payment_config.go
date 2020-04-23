@@ -30,8 +30,29 @@ type PaymentConfig struct {
 	PaymentConfigID string      `bson:"payment_config_id" json:"payment_config_id"`
 	AmountOptions   []int       `bson:"amount_options" json:"amount_options"`
 	PeriodOptions   []PayPeriod `bson:"period_options" json:"period_options"`
-	CoinType        CoinType    `bson:"coin_type" json:"coin_type"`
+	CoinTypes       []CoinType  `bson:"coin_types" json:"coin_types"`
+	PayMethods      []PayMethod `bson:"pay_methods" json:"pay_methods"`
 	p2a             map[PayPeriod]int
+}
+
+// HasCoinType checks whether CoinType is allowed
+func (config *PaymentConfig) HasCoinType(ct CoinType) bool {
+	for _, coinType := range config.CoinTypes {
+		if coinType == ct {
+			return true
+		}
+	}
+	return false
+}
+
+// HasPayMethod checks whether PayMethod is allowed
+func (config *PaymentConfig) HasPayMethod(pm PayMethod) bool {
+	for _, payMethod := range config.PayMethods {
+		if payMethod == pm {
+			return true
+		}
+	}
+	return false
 }
 
 // AmountForPeriod returns the amount for period
