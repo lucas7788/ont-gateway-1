@@ -18,6 +18,7 @@ func TestGateway(t *testing.T) {
 
 	gw := Instance()
 
+	// addon
 	{
 		input := io.UpsertAddonConfigInput{
 			AddonID:  "addon_id",
@@ -37,6 +38,7 @@ func TestGateway(t *testing.T) {
 		assert.Assert(t, output.Code == 0)
 	}
 
+	// shell
 	{
 		input := io.ShellInput{
 			Shell: "echo -n 43",
@@ -45,6 +47,7 @@ func TestGateway(t *testing.T) {
 		assert.Assert(t, output.Out == "43", output)
 	}
 
+	// tx
 	{
 		txHash := "txh123"
 		{
@@ -62,6 +65,7 @@ func TestGateway(t *testing.T) {
 		}
 	}
 
+	// payment
 	{
 		test = true
 
@@ -111,6 +115,33 @@ func TestGateway(t *testing.T) {
 			assert.Assert(t, exists && err == nil)
 			exists, err = model.PaymentConfigManager().DeleteOne(0, paymentConfigID)
 			assert.Assert(t, exists && err == nil)
+		}
+
+	}
+
+	// wallet
+	walletName := "testw"
+	walletContent := "text content"
+	{
+		input := io.ImportWalletInput{
+			WalletName: walletName,
+			Content:    walletContent,
+		}
+
+		output := gw.ImportWallet(input)
+		assert.Assert(t, output.Error() == nil, output)
+	}
+	{
+		input := io.GetWalletInput{
+			WalletName: walletName,
+		}
+
+		output := gw.GetWallet(input)
+		assert.Assert(t, output.Exists && output.Content == walletContent)
+
+		{
+			output := gw.DeleteWallet(io.DeleteWalletInput{WalletName: walletName})
+			assert.Assert(t, output.Error() == nil)
 		}
 
 	}

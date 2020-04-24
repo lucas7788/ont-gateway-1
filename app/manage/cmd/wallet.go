@@ -1,9 +1,11 @@
 package cmd
 
 import (
-	"fmt"
+	"io/ioutil"
 
 	"github.com/urfave/cli/v2"
+	"github.com/zhiqiangxu/ont-gateway/pkg/io"
+	"github.com/zhiqiangxu/ont-gateway/pkg/service"
 )
 
 // WalletCmd for manage wallet
@@ -21,8 +23,14 @@ var WalletCmd = cli.Command{
 	},
 }
 
-func importWallet(c *cli.Context) error {
+func importWallet(c *cli.Context) (err error) {
 
-	fmt.Println(c.Args().Get(0), c.Args().Get(1))
-	return nil
+	data, err := ioutil.ReadFile(c.Args().Get(1))
+	if err != nil {
+		return
+	}
+
+	output := service.Instance().ImportWallet(io.ImportWalletInput{WalletName: c.Args().Get(0), Content: string(data)})
+	err = output.Error()
+	return
 }

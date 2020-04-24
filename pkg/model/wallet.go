@@ -14,7 +14,7 @@ type Wallet struct {
 }
 
 var (
-	passWd = []byte("!ont-gateway-wallet!")
+	passWd = []byte("!!ont-gw-wallet!")
 )
 
 // SetPlainContent will convert plain text to cipher text

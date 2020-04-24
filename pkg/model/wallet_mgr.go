@@ -53,6 +53,18 @@ func (m *WalletMgr) Insert(w Wallet) (err error) {
 	return
 }
 
+// DeleteOne for delete a Wallet
+func (m *WalletMgr) DeleteOne(name string) (err error) {
+	timeout := config.Load().MongoConfig.Timeout
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	filter := bson.M{"name": name}
+	_, err = instance.MongoOfficial().Collection(walletCollectionName).DeleteOne(ctx, filter)
+
+	return
+}
+
 // GetOne returns a Wallet by name
 func (m *WalletMgr) GetOne(name string) (w *Wallet, err error) {
 	timeout := config.Load().MongoConfig.Timeout
