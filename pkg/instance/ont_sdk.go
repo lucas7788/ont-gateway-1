@@ -11,8 +11,8 @@ var (
 	ontSdkLock sync.Mutex
 )
 
-// OntSdkInstance is singleton for OntSdk
-func OntSdkInstance() *misc.OntSdk {
+// OntSdk is singleton for misc.OntSdk
+func OntSdk() *misc.OntSdk {
 	if ontSdk != nil {
 		return ontSdk
 	}

@@ -38,6 +38,9 @@ func NewApp() *gin.Engine {
 	payment.DELETE("/config", DeletePaymentConfig)
 	payment.POST("/order", CreatePaymentOrder)
 
+	wallet := r.Group("/wallet")
+	wallet.GET("/", GetWallet)
+
 	return r
 }
 

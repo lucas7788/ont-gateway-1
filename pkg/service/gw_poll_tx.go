@@ -20,7 +20,7 @@ const (
 // PollTx impl
 func (gw *Gateway) PollTx(ctx context.Context) (output io.PollTxOutput) {
 
-	kit := instance.OntSdkInstance().GetKit()
+	kit := instance.OntSdk().GetKit()
 
 	var wg sync.WaitGroup
 

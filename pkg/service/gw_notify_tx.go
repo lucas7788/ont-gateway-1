@@ -82,10 +82,10 @@ func (gw *Gateway) notifyAdminTx(hash string, result model.TxPollResult, pollAmo
 
 func (gw *Gateway) notifyTx(url, txHash string, result model.TxPollResult, pollAmount bool) (err error) {
 
-	input := notifyTxInput{TxHash: txHash, NodeAddr: instance.OntSdkInstance().GetOntNode(), Result: result}
+	input := notifyTxInput{TxHash: txHash, NodeAddr: instance.OntSdk().GetOntNode(), Result: result}
 	if result == model.TxPollResultExists && pollAmount {
 		var amount uint64
-		amount, err = instance.OntSdkInstance().GetAmountTransferred(txHash)
+		amount, err = instance.OntSdk().GetAmountTransferred(txHash)
 		if err != nil {
 			return
 		}

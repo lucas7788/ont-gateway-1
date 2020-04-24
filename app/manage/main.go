@@ -26,6 +26,7 @@ func main() {
 				Usage:  "update payment balance and notify payment recharge",
 				Action: cmd.UpdateNotifyPayment,
 			},
+			&cmd.WalletCmd,
 			{
 				Name:  "create_app",
 				Usage: "create an app for tx polling etc",
