@@ -124,7 +124,7 @@ func (m *AddonConfigMgr) Get(addonID, tenantID string) (ac *AddonConfig, err err
 func (m *AddonConfigMgr) Init() (err error) {
 
 	opts := &options.IndexOptions{}
-	opts.SetName("u_addon_id_tenant_id")
+	opts.SetName("u-addon_id-tenant_id")
 	opts.SetUnique(true)
 	index := mongo.IndexModel{
 		Keys:    bsonx.Doc{{Key: "addon_id", Value: bsonx.Int32(1)}, {Key: "tenant_id", Value: bsonx.Int32(1)}},

@@ -129,7 +129,7 @@ func (m *PaymentConfigMgr) DeleteOneWithTx(sessionContext mongo.SessionContext, 
 func (m *PaymentConfigMgr) Init() (err error) {
 
 	opts := &options.IndexOptions{}
-	opts.SetName("u_app_payment_config_id")
+	opts.SetName("u-app-payment_config_id")
 	opts.SetUnique(true)
 	index := mongo.IndexModel{
 		Keys:    bsonx.Doc{{Key: "app", Value: bsonx.Int32(1)}, {Key: "payment_config_id", Value: bsonx.Int32(1)}},

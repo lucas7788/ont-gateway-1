@@ -305,7 +305,7 @@ func (m *PaymentMgr) DeleteOne(app int, paymentID string) (exists bool, err erro
 func (m *PaymentMgr) Init() (err error) {
 
 	opts := &options.IndexOptions{}
-	opts.SetName("u_app_payment_id")
+	opts.SetName("u-app-payment_id")
 	opts.SetUnique(true)
 	appPaymentIDIndex := mongo.IndexModel{
 		Keys:    bsonx.Doc{{Key: "app", Value: bsonx.Int32(1)}, {Key: "payment_id", Value: bsonx.Int32(1)}},

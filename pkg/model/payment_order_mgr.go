@@ -106,7 +106,7 @@ func (m *PaymentOrderMgr) DeletePaymentOrders(app int, paymentID string) (n int6
 func (m *PaymentOrderMgr) Init() (err error) {
 
 	opts := &options.IndexOptions{}
-	opts.SetName("u_app_order_id")
+	opts.SetName("u-app-order_id")
 	opts.SetUnique(true)
 	index := mongo.IndexModel{
 		Keys:    bsonx.Doc{{Key: "app", Value: bsonx.Int32(1)}, {Key: "order_id", Value: bsonx.Int32(1)}},

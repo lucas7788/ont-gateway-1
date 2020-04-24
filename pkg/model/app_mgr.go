@@ -173,7 +173,7 @@ func (m *AppMgr) GenerateAkSk() (ak, sk string) {
 func (m *AppMgr) Init() (err error) {
 
 	idOpts := &options.IndexOptions{}
-	idOpts.SetName("u_app_id")
+	idOpts.SetName("u-id")
 	idOpts.SetUnique(true)
 	idIndex := mongo.IndexModel{
 		Keys:    bsonx.Doc{{Key: "id", Value: bsonx.Int32(1)}},
@@ -181,7 +181,7 @@ func (m *AppMgr) Init() (err error) {
 	}
 
 	nameOpts := &options.IndexOptions{}
-	nameOpts.SetName("u_app_name")
+	nameOpts.SetName("u-name")
 	nameOpts.SetUnique(true)
 	nameIndex := mongo.IndexModel{
 		Keys:    bsonx.Doc{{Key: "name", Value: bsonx.Int32(1)}},
