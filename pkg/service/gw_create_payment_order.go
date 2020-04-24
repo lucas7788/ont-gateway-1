@@ -48,12 +48,8 @@ func (gw *Gateway) CreatePaymentOrder(input io.CreatePaymentOrderInput) (output 
 			return
 		}
 
-		if !paymentConfig.HasCoinType(input.CoinType) {
+		if paymentConfig.CoinType != input.CoinType {
 			err = fmt.Errorf("coin type %v not supported", input.CoinType)
-			return
-		}
-		if !paymentConfig.HasPayMethod(input.PayMethod) {
-			err = fmt.Errorf("pay method %v not supported", input.PayMethod)
 			return
 		}
 
@@ -70,13 +66,22 @@ func (gw *Gateway) CreatePaymentOrder(input io.CreatePaymentOrderInput) (output 
 		var toBillAmount int
 		if payment == nil {
 
-			unitAmount, exists := paymentConfig.AmountForPeriod(input.PayPeriod)
-			if !exists {
-				err = fmt.Errorf("non existing PayPeriod %v for PaymentConfig %v ||", input.PayPeriod, paymentConfig.PaymentConfigID)
+			if input.PaymentInfo == nil {
+				err = fmt.Errorf("payment_info empty for the first payment order")
+				return
+			}
+			if !paymentConfig.HasPayMethod(input.PaymentInfo.PayMethod) {
+				err = fmt.Errorf("pay method %v not supported", input.PaymentInfo.PayMethod)
 				return
 			}
 
-			payment := model.Payment{App: input.App, PaymentID: input.PaymentID, PaymentConfigID: input.PaymentConfigID, PayPeriod: input.PayPeriod, PayMethod: input.PayMethod, UnitAmount: unitAmount}
+			unitAmount, exists := paymentConfig.AmountForPeriod(input.PaymentInfo.PayPeriod)
+			if !exists {
+				err = fmt.Errorf("non existing PayPeriod %v for PaymentConfig %v ||", input.PaymentInfo.PayPeriod, paymentConfig.PaymentConfigID)
+				return
+			}
+
+			payment := model.Payment{App: input.App, PaymentID: input.PaymentID, PaymentConfigID: input.PaymentConfigID, PayPeriod: input.PaymentInfo.PayPeriod, PayMethod: input.PaymentInfo.PayMethod, UnitAmount: unitAmount}
 			toBillAmount, err = payment.AmountForNth(0, paymentConfig)
 			if err != nil {
 				return

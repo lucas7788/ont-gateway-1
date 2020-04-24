@@ -6,17 +6,22 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/model"
 )
 
+// PaymentInfo for rest
+type PaymentInfo struct {
+	PayPeriod model.PayPeriod `json:"pay_period"`
+	PayMethod model.PayMethod `json:"pay_method"`
+}
+
 // CreatePaymentOrderInput for input
 type CreatePaymentOrderInput struct {
-	App             int             `bson:"app" json:"app"`
-	PaymentConfigID string          `json:"payment_config_id"`
-	PaymentID       string          `json:"payment_id"`
-	OrderID         string          `json:"order_id"`
-	PayPeriod       model.PayPeriod `json:"pay_period"`
-	PayMethod       model.PayMethod `json:"pay_method"`
-	Amount          int             `json:"amount"`
-	CoinType        model.CoinType  `json:"coin_type"`
-	OrderInfo       string          `json:"order_info"`
+	App             int            `bson:"app" json:"app"`
+	PaymentConfigID string         `json:"payment_config_id"`
+	PaymentID       string         `json:"payment_id"`
+	OrderID         string         `json:"order_id"`
+	PaymentInfo     *PaymentInfo   `json:"payment_info"`
+	Amount          int            `json:"amount"`
+	CoinType        model.CoinType `json:"coin_type"`
+	OrderInfo       string         `json:"order_info"`
 }
 
 // CreatePaymentOrderOutput for output
@@ -39,7 +44,7 @@ func (input *CreatePaymentOrderInput) Validate() error {
 		return fmt.Errorf("payment_id empty")
 	case input.OrderID == "":
 		return fmt.Errorf("order_id empty")
-	case input.PayPeriod == 0:
+	case input.PaymentInfo != nil && input.PaymentInfo.PayPeriod == 0:
 		return fmt.Errorf("pay_period empty")
 	default:
 		return model.VerifyOrderInfo(input.Amount, input.CoinType, input.OrderInfo)

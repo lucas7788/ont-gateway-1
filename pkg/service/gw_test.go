@@ -73,7 +73,8 @@ func TestGateway(t *testing.T) {
 				PaymentConfigID: paymentConfigID,
 				AmountOptions:   []int{100, 200},
 				PeriodOptions:   []model.PayPeriod{model.PayPeriodMonthly, model.PayPeriodSeasonly},
-				CoinType:        model.CoinTypeONG}
+				CoinType:        model.CoinTypeONG,
+				PayMethods:      []model.PayMethod{model.PayMethodBeforeUse}}
 			output := gw.CreatePaymentConfig(input)
 			assert.Assert(t, output.Code == 0)
 		}
@@ -82,17 +83,19 @@ func TestGateway(t *testing.T) {
 				PaymentConfigID: paymentConfigID,
 				PaymentID:       paymentID,
 				OrderID:         orderID,
-				PayPeriod:       model.PayPeriodMonthly,
-				PayMethod:       model.PayMethodBeforeUse,
-				Amount:          150,
-				CoinType:        model.CoinTypeONG,
+				PaymentInfo: &io.PaymentInfo{
+					PayPeriod: model.PayPeriodMonthly,
+					PayMethod: model.PayMethodBeforeUse,
+				},
+				Amount:   150,
+				CoinType: model.CoinTypeONG,
 			}
 			output := gw.CreatePaymentOrder(input)
 			assert.Assert(t, output.Code == 0 && output.Balance == 50)
 		}
 
 		{
-			input := io.GetPaymentInfoInput{PaymentID: paymentID}
+			input := io.GetPaymentInfoInput{PaymentID: paymentID, WithOrders: true}
 			output := gw.GetPaymentInfo(input)
 			assert.Assert(t,
 				output.Code == 0 &&
@@ -101,14 +104,14 @@ func TestGateway(t *testing.T) {
 					len(output.PaymentOrders) == 1)
 		}
 
-		// {
-		// 	n, err := model.PaymentOrderManager().DeletePaymentOrders(0, paymentID)
-		// 	assert.Assert(t, n == 1 && err == nil)
-		// 	exists, err := model.PaymentManager().DeleteOne(0, paymentID)
-		// 	assert.Assert(t, exists && err == nil)
-		// 	exists, err = model.PaymentConfigManager().DeleteOne(0, paymentConfigID)
-		// 	assert.Assert(t, exists && err == nil)
-		// }
+		{
+			n, err := model.PaymentOrderManager().DeletePaymentOrders(0, paymentID)
+			assert.Assert(t, n == 1 && err == nil)
+			exists, err := model.PaymentManager().DeleteOne(0, paymentID)
+			assert.Assert(t, exists && err == nil)
+			exists, err = model.PaymentConfigManager().DeleteOne(0, paymentConfigID)
+			assert.Assert(t, exists && err == nil)
+		}
 
 	}
 
