@@ -19,6 +19,15 @@ var WalletCmd = cli.Command{
 			Usage:     "import a new wallet",
 			Action:    importWallet,
 			ArgsUsage: "wallet_name wallet_address",
+			Flags: []cli.Flag{
+				&cli.BoolFlag{Name: "ciphered", Aliases: []string{"c"}},
+			},
+		},
+		{
+			Name:      "delete",
+			Usage:     "delete a wallet",
+			Action:    deleteWallet,
+			ArgsUsage: "wallet_name",
 		},
 	},
 }
@@ -30,7 +39,22 @@ func importWallet(c *cli.Context) (err error) {
 		return
 	}
 
-	output := service.Instance().ImportWallet(io.ImportWalletInput{WalletName: c.Args().Get(0), Content: string(data)})
+	input := io.ImportWalletInput{WalletName: c.Args().Get(0)}
+	if c.Bool("ciphered") {
+		input.CipherContent = string(data)
+	} else {
+		input.Content = string(data)
+	}
+
+	output := service.Instance().ImportWallet(input)
+	err = output.Error()
+	return
+}
+
+func deleteWallet(c *cli.Context) (err error) {
+
+	input := io.DeleteWalletInput{WalletName: c.Args().Get(0)}
+	output := service.Instance().DeleteWallet(input)
 	err = output.Error()
 	return
 }

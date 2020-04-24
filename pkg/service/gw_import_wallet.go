@@ -17,12 +17,17 @@ func (gw *Gateway) ImportWallet(input io.ImportWalletInput) (output io.ImportWal
 	}
 
 	w := model.Wallet{Name: input.WalletName}
-	err = w.SetPlainContent(input.Content)
-	if err != nil {
-		output.Code = http.StatusBadRequest
-		output.Msg = err.Error()
-		return
+	if input.CipherContent != "" {
+		w.CipherContent = input.CipherContent
+	} else {
+		err = w.SetPlainContent(input.Content)
+		if err != nil {
+			output.Code = http.StatusBadRequest
+			output.Msg = err.Error()
+			return
+		}
 	}
+
 	err = model.WalletManager().Insert(w)
 	if err != nil {
 		output.Code = http.StatusBadRequest
