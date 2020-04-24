@@ -17,6 +17,7 @@ require (
 	github.com/ontio/ontology-go-sdk v1.11.1
 	github.com/ontio/wagon v0.4.2 // indirect
 	github.com/prometheus/client_golang v1.5.1
+	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/pflag v1.0.3 // indirect
 	github.com/urfave/cli/v2 v2.2.0
 	github.com/xdg/stringprep v1.0.0 // indirect

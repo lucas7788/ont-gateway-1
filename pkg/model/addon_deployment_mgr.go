@@ -104,8 +104,8 @@ func (m *AddonDeploymentMgr) Get(addonID, tenantID string) (ad *AddonDeployment,
 	return
 }
 
-// EnsureIndex add index for this collection
-func (m *AddonDeploymentMgr) EnsureIndex() (err error) {
+// Init for this collection
+func (m *AddonDeploymentMgr) Init() (err error) {
 
 	opts := &options.IndexOptions{}
 	opts.SetName("u_addon_id_tenant_id")

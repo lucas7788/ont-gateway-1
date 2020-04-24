@@ -10,22 +10,22 @@ import (
 // AddMongoIndex for add mongo index
 func AddMongoIndex(c *cli.Context) error {
 
-	err := model.AddonConfigManager().EnsureIndex()
-	fmt.Println("AddonConfigManager.EnsureIndex", err)
-	err = model.AddonDeploymentManager().EnsureIndex()
-	fmt.Println("AddonDeploymentManager.EnsureIndex", err)
+	err := model.AddonConfigManager().Init()
+	fmt.Println("AddonConfigManager.Init", err)
+	err = model.AddonDeploymentManager().Init()
+	fmt.Println("AddonDeploymentManager.Init", err)
 
-	err = model.TxManager().EnsureIndex()
-	fmt.Println("TxManager.EnsureIndex", err)
-	err = model.AppManager().EnsureIndex()
-	fmt.Println("AppManager.EnsureIndex", err)
+	err = model.TxManager().Init()
+	fmt.Println("TxManager.Init", err)
+	err = model.AppManager().Init()
+	fmt.Println("AppManager.Init", err)
 
-	err = model.PaymentConfigManager().EnsureIndex()
-	fmt.Println("PaymentConfigManager.EnsureIndex", err)
-	err = model.PaymentManager().EnsureIndex()
-	fmt.Println("PaymentManager.EnsureIndex", err)
-	err = model.PaymentOrderManager().EnsureIndex()
-	fmt.Println("PaymentOrderManager.EnsureIndex", err)
+	err = model.PaymentConfigManager().Init()
+	fmt.Println("PaymentConfigManager.Init", err)
+	err = model.PaymentManager().Init()
+	fmt.Println("PaymentManager.Init", err)
+	err = model.PaymentOrderManager().Init()
+	fmt.Println("PaymentOrderManager.Init", err)
 
 	return nil
 }

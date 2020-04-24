@@ -272,8 +272,8 @@ func (m *TxMgr) Delete(txHash string) (exists bool, err error) {
 	return
 }
 
-// EnsureIndex add index for this collection
-func (m *TxMgr) EnsureIndex() (err error) {
+// Init for this collection
+func (m *TxMgr) Init() (err error) {
 
 	hashOpts := &options.IndexOptions{}
 	hashOpts.SetName("u-tx-hash")

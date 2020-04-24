@@ -6,6 +6,7 @@ import (
 	"sync"
 	"sync/atomic"
 
+	uuid "github.com/satori/go.uuid"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"github.com/zhiqiangxu/ont-gateway/pkg/logger"
@@ -91,6 +92,19 @@ func (m *AppMgr) GetAll() (apps []App) {
 	return
 }
 
+// GetByName returns App by name
+func (m *AppMgr) GetByName(name string) (app App, exists bool) {
+	appMap := m.latest.Load().(map[int]App)
+	for id := range appMap {
+		app = appMap[id]
+		if app.Name == name {
+			exists = true
+			return
+		}
+	}
+	return
+}
+
 // GetApp returns App info from memory
 func (m *AppMgr) GetApp(id int) (app App, exists bool) {
 	appMap := m.latest.Load().(map[int]App)
@@ -144,8 +158,19 @@ func (m *AppMgr) GetMaxAppIDFromDB() (id int, err error) {
 	return
 }
 
-// EnsureIndex add index for this collection
-func (m *AppMgr) EnsureIndex() (err error) {
+// GenerateAkSk genereates ak sk
+func (m *AppMgr) GenerateAkSk() (ak, sk string) {
+	u1 := uuid.NewV4()
+	ak = u1.String()
+
+	u2 := uuid.NewV4()
+	sk = u2.String()
+
+	return
+}
+
+// Init for this collection
+func (m *AppMgr) Init() (err error) {
 
 	idOpts := &options.IndexOptions{}
 	idOpts.SetName("u_app_id")
@@ -155,8 +180,32 @@ func (m *AppMgr) EnsureIndex() (err error) {
 		Options: idOpts,
 	}
 
-	models := []mongo.IndexModel{idIndex}
+	nameOpts := &options.IndexOptions{}
+	nameOpts.SetName("u_app_name")
+	nameOpts.SetUnique(true)
+	nameIndex := mongo.IndexModel{
+		Keys:    bsonx.Doc{{Key: "name", Value: bsonx.Int32(1)}},
+		Options: nameOpts,
+	}
+
+	models := []mongo.IndexModel{idIndex, nameIndex}
 
 	_, err = instance.MongoOfficial().Collection(appCollectionName).Indexes().CreateMany(context.Background(), models)
+
+	apps, err := m.GetAllFromDB()
+	if err != nil {
+		return
+	}
+
+	exists := false
+	for _, app := range apps {
+		if app.Name == GWAppName {
+			exists = true
+		}
+	}
+	if !exists {
+		ak, sk := m.GenerateAkSk()
+		err = m.Insert(App{Name: GWAppName, Ak: ak, Sk: sk})
+	}
 	return
 }

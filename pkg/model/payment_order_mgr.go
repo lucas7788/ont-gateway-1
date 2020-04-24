@@ -102,8 +102,8 @@ func (m *PaymentOrderMgr) DeletePaymentOrders(app int, paymentID string) (n int6
 	return
 }
 
-// EnsureIndex add index for this collection
-func (m *PaymentOrderMgr) EnsureIndex() (err error) {
+// Init for this collection
+func (m *PaymentOrderMgr) Init() (err error) {
 
 	opts := &options.IndexOptions{}
 	opts.SetName("u_app_order_id")

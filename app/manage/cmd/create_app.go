@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/urfave/cli/v2"
 	"github.com/zhiqiangxu/ont-gateway/pkg/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/model"
@@ -13,11 +11,20 @@ import (
 func CreateApp(c *cli.Context) error {
 
 	id, err := model.AppManager().GetMaxAppIDFromDB()
+	if err != nil {
+		return err
+	}
 
-	apps, _ := model.AppManager().GetAllFromDB()
-	fmt.Println("id", id, "err", err, "apps", apps)
+	ak, sk := model.AppManager().GenerateAkSk()
 
-	input := io.CreateAppInput{ID: id + 1, Name: c.String("name"), TxNotifyURL: c.String("txNotifyUrl"), PaymentNotifyURL: c.String("paymentNotifyUrl")}
+	input := io.CreateAppInput{
+		ID:               id + 1,
+		Name:             c.String("name"),
+		TxNotifyURL:      c.String("txNotifyUrl"),
+		PaymentNotifyURL: c.String("paymentNotifyUrl"),
+		Ak:               ak,
+		Sk:               sk,
+	}
 	output := service.Instance().CreateApp(input)
 	return output.Error()
 }

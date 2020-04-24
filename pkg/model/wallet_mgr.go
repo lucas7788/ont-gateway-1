@@ -83,8 +83,8 @@ func (m *WalletMgr) GetOne(name string) (w *Wallet, err error) {
 	return
 }
 
-// EnsureIndex add index for this collection
-func (m *WalletMgr) EnsureIndex() (err error) {
+// Init for this collection
+func (m *WalletMgr) Init() (err error) {
 	hashOpts := &options.IndexOptions{}
 	hashOpts.SetName("u-wallet-name")
 	hashOpts.SetUnique(true)

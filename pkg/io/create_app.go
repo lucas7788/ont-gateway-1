@@ -16,8 +16,6 @@ func (input *CreateAppInput) Validate() (err error) {
 		err = fmt.Errorf("id empty")
 	case input.Name == "":
 		err = fmt.Errorf("name empty")
-	case input.TxNotifyURL == "":
-		err = fmt.Errorf("tx_notify_url empty")
 
 	}
 	return

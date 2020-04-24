@@ -125,8 +125,8 @@ func (m *PaymentConfigMgr) DeleteOneWithTx(sessionContext mongo.SessionContext, 
 	return
 }
 
-// EnsureIndex add index for this collection
-func (m *PaymentConfigMgr) EnsureIndex() (err error) {
+// Init for this collection
+func (m *PaymentConfigMgr) Init() (err error) {
 
 	opts := &options.IndexOptions{}
 	opts.SetName("u_app_payment_config_id")

@@ -12,8 +12,8 @@ func main() {
 	app := &cli.App{
 		Commands: []*cli.Command{
 			{
-				Name:   "add_mongo_index",
-				Usage:  "add mongo index",
+				Name:   "init_gw",
+				Usage:  "add mongo index and bootstrap data etc",
 				Action: cmd.AddMongoIndex,
 			},
 			{

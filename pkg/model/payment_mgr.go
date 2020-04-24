@@ -301,8 +301,8 @@ func (m *PaymentMgr) DeleteOne(app int, paymentID string) (exists bool, err erro
 	return
 }
 
-// EnsureIndex add index for this collection
-func (m *PaymentMgr) EnsureIndex() (err error) {
+// Init for this collection
+func (m *PaymentMgr) Init() (err error) {
 
 	opts := &options.IndexOptions{}
 	opts.SetName("u_app_payment_id")
