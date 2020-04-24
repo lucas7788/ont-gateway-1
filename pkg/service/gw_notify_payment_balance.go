@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
+	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"github.com/zhiqiangxu/ont-gateway/pkg/io"
-	"github.com/zhiqiangxu/ont-gateway/pkg/logger"
 	"github.com/zhiqiangxu/ont-gateway/pkg/model"
 	"github.com/zhiqiangxu/util"
 	"go.uber.org/zap"
@@ -33,7 +33,7 @@ func (gw *Gateway) NotifyPaymentBalance(ctx context.Context) (output io.NotifyPa
 
 		payments, err := model.PaymentManager().QueryToNotifyPreRecharging(paymentBatch)
 		if err != nil {
-			logger.Instance().Error("QueryToNotifyPreRecharging", zap.Error(err))
+			instance.Logger().Error("QueryToNotifyPreRecharging", zap.Error(err))
 			time.Sleep(time.Second)
 			continue
 		}
@@ -49,7 +49,7 @@ func (gw *Gateway) NotifyPaymentBalance(ctx context.Context) (output io.NotifyPa
 				if err != nil {
 					_, err = model.PaymentManager().UpdateNotifyError(payment.App, payment.PaymentID, err.Error())
 					if err != nil {
-						logger.Instance().Error("UpdateNotifyError", zap.Error(err))
+						instance.Logger().Error("UpdateNotifyError", zap.Error(err))
 					}
 				}
 			})
@@ -58,7 +58,7 @@ func (gw *Gateway) NotifyPaymentBalance(ctx context.Context) (output io.NotifyPa
 
 		payments, err = model.PaymentManager().QueryToNotifyRecharging(paymentBatch)
 		if err != nil {
-			logger.Instance().Error("QueryToNotifyRecharging", zap.Error(err))
+			instance.Logger().Error("QueryToNotifyRecharging", zap.Error(err))
 			time.Sleep(time.Second)
 			continue
 		}
@@ -74,7 +74,7 @@ func (gw *Gateway) NotifyPaymentBalance(ctx context.Context) (output io.NotifyPa
 				if err != nil {
 					_, err = model.PaymentManager().UpdateNotifyError(payment.App, payment.PaymentID, err.Error())
 					if err != nil {
-						logger.Instance().Error("UpdateNotifyError", zap.Error(err))
+						instance.Logger().Error("UpdateNotifyError", zap.Error(err))
 					}
 				}
 			})
@@ -82,7 +82,7 @@ func (gw *Gateway) NotifyPaymentBalance(ctx context.Context) (output io.NotifyPa
 		wg.Wait()
 
 		if nothing2do {
-			logger.Instance().Info("NotifyPaymentBalance nothing to do")
+			instance.Logger().Info("NotifyPaymentBalance nothing to do")
 			time.Sleep(time.Second * 5)
 			continue
 		}
@@ -102,7 +102,7 @@ type notifyPaymentBalanceInput struct {
 func (gw *Gateway) notifyPaymentBalance(payment *model.Payment) (err error) {
 	app, exists := model.AppManager().GetApp(payment.App)
 	if !exists {
-		logger.Instance().Error("notifyPaymentBalance App not exists", zap.String("paymentID", payment.PaymentID), zap.Int("app", payment.App))
+		instance.Logger().Error("notifyPaymentBalance App not exists", zap.String("paymentID", payment.PaymentID), zap.Int("app", payment.App))
 		err = fmt.Errorf("App not exists")
 		return
 	}

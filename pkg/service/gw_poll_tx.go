@@ -7,7 +7,6 @@ import (
 
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"github.com/zhiqiangxu/ont-gateway/pkg/io"
-	"github.com/zhiqiangxu/ont-gateway/pkg/logger"
 	"github.com/zhiqiangxu/ont-gateway/pkg/model"
 	"github.com/zhiqiangxu/util"
 	"go.uber.org/zap"
@@ -34,13 +33,13 @@ func (gw *Gateway) PollTx(ctx context.Context) (output io.PollTxOutput) {
 
 		txlist, err := model.TxManager().QueryToPoll(batch)
 		if err != nil {
-			logger.Instance().Error("QueryToPoll", zap.Error(err))
+			instance.Logger().Error("QueryToPoll", zap.Error(err))
 			time.Sleep(time.Second)
 			continue
 		}
 
 		if len(txlist) == 0 {
-			logger.Instance().Info("PollTx txlist empty")
+			instance.Logger().Info("PollTx txlist empty")
 			time.Sleep(time.Second * 5)
 			continue
 		}
@@ -51,7 +50,7 @@ func (gw *Gateway) PollTx(ctx context.Context) (output io.PollTxOutput) {
 			util.GoFunc(&wg, func() {
 				event, err := kit.GetSmartContractEvent(tx.Hash)
 				if err != nil {
-					logger.Instance().Error("GetSmartContractEvent", zap.Error(err))
+					instance.Logger().Error("GetSmartContractEvent", zap.Error(err))
 
 					if tx.IsExpired() {
 						model.TxManager().FinishPoll(tx.Hash, model.TxPollResultExpired, err.Error())
@@ -60,7 +59,7 @@ func (gw *Gateway) PollTx(ctx context.Context) (output io.PollTxOutput) {
 					}
 				}
 				if event == nil {
-					logger.Instance().Error("GetSmartContractEvent returns nil event")
+					instance.Logger().Error("GetSmartContractEvent returns nil event")
 
 					errMsg := "nil event"
 					if tx.IsExpired() {
@@ -72,7 +71,7 @@ func (gw *Gateway) PollTx(ctx context.Context) (output io.PollTxOutput) {
 
 				_, err = model.TxManager().FinishPoll(tx.Hash, model.TxPollResultExists, "")
 				if err != nil {
-					logger.Instance().Error("FinishPoll", zap.Error(err))
+					instance.Logger().Error("FinishPoll", zap.Error(err))
 				}
 			})
 

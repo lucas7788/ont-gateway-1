@@ -11,7 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-kit/kit/metrics"
-	"github.com/zhiqiangxu/ont-gateway/pkg/logger"
+	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 )
 
 // MetricLogger middleware
@@ -57,7 +57,7 @@ func MetricLogger(latencyMetric metrics.Histogram, counterMetric metrics.Counter
 				path = path + "?" + raw
 			}
 
-			logger.Instance().Info(
+			instance.Logger().Info(
 				fmt.Sprintf("[ont-gateway] %3d | %13v | %15s | %-7s %s %s%s %s",
 					statusCode,
 					latency,
@@ -73,7 +73,7 @@ func MetricLogger(latencyMetric metrics.Histogram, counterMetric metrics.Counter
 				if latency.Seconds() > 1 {
 					slowLog = "slowlog"
 				}
-				logger.Instance().Error(
+				instance.Logger().Error(
 					fmt.Sprintf("[ont-gateway] %3d | %13v | %15s | %-7s %s  %s%s %s %s",
 						statusCode,
 						latency,

@@ -9,7 +9,6 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
-	"github.com/zhiqiangxu/ont-gateway/pkg/logger"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -43,7 +42,7 @@ func AppManager() *AppMgr {
 	m := &AppMgr{}
 	err := m.reload()
 	if err != nil {
-		logger.Instance().Error("AppMgr.reload", zap.Error(err))
+		instance.Logger().Error("AppMgr.reload", zap.Error(err))
 		panic(fmt.Sprintf("AppMgr.reload err:%v", err))
 	}
 

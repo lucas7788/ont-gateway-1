@@ -6,7 +6,6 @@ import (
 
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"github.com/zhiqiangxu/ont-gateway/pkg/io"
-	"github.com/zhiqiangxu/ont-gateway/pkg/logger"
 	"github.com/zhiqiangxu/ont-gateway/pkg/model"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.uber.org/zap"
@@ -31,12 +30,12 @@ func (gw *Gateway) UpdatePaymentBalance(ctx context.Context) (output io.UpdatePa
 
 		payments, err := model.PaymentManager().QueryBalanceExpired(paymentBatch)
 		if err != nil {
-			logger.Instance().Error("QueryBalanceExpired", zap.Error(err))
+			instance.Logger().Error("QueryBalanceExpired", zap.Error(err))
 			time.Sleep(time.Second)
 			continue
 		}
 		if len(payments) == 0 {
-			logger.Instance().Info("QueryBalanceExpired payments empty")
+			instance.Logger().Info("QueryBalanceExpired payments empty")
 			time.Sleep(time.Second * 5)
 			continue
 		}
@@ -59,7 +58,7 @@ func (gw *Gateway) UpdatePaymentBalance(ctx context.Context) (output io.UpdatePa
 				return
 			})
 			if err != nil {
-				logger.Instance().Error("UseSession", zap.Error(err))
+				instance.Logger().Error("UseSession", zap.Error(err))
 				time.Sleep(time.Second)
 				continue
 			}

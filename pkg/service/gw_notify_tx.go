@@ -10,7 +10,6 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"github.com/zhiqiangxu/ont-gateway/pkg/io"
-	"github.com/zhiqiangxu/ont-gateway/pkg/logger"
 	"github.com/zhiqiangxu/ont-gateway/pkg/model"
 	"github.com/zhiqiangxu/util"
 	"go.uber.org/zap"
@@ -28,13 +27,13 @@ func (gw *Gateway) NotifyTx(ctx context.Context) (output io.NotifyTxOutput) {
 
 		txlist, err := model.TxManager().QueryToNotify(batch)
 		if err != nil {
-			logger.Instance().Error("QueryToNotify", zap.Error(err))
+			instance.Logger().Error("QueryToNotify", zap.Error(err))
 			time.Sleep(time.Second)
 			continue
 		}
 
 		if len(txlist) == 0 {
-			logger.Instance().Info("NotifyTx txlist empty")
+			instance.Logger().Info("NotifyTx txlist empty")
 			time.Sleep(time.Second * 5)
 			continue
 		}
@@ -42,21 +41,21 @@ func (gw *Gateway) NotifyTx(ctx context.Context) (output io.NotifyTxOutput) {
 			if tx.App == 0 {
 				err = gw.notifyAdminTx(tx.Hash, tx.Result, tx.PollAmount)
 				if err != nil {
-					logger.Instance().Error("notifyAdminTx", zap.Int("app", tx.App), zap.String("txHash", tx.Hash), zap.Error(err))
+					instance.Logger().Error("notifyAdminTx", zap.Int("app", tx.App), zap.String("txHash", tx.Hash), zap.Error(err))
 					model.TxManager().UpdateNotifyError(tx.Hash, err.Error())
 					continue
 				}
 			} else {
 				app, exists := model.AppManager().GetApp(tx.App)
 				if !exists {
-					logger.Instance().Error("NotifyTx App not exists", zap.String("txHash", tx.Hash), zap.Int("app", tx.App))
+					instance.Logger().Error("NotifyTx App not exists", zap.String("txHash", tx.Hash), zap.Int("app", tx.App))
 					model.TxManager().UpdateState(tx.Hash, model.TxStateDone)
 					continue
 				}
 
 				err = gw.notifyTx(app.TxNotifyURL, tx.Hash, tx.Result, tx.PollAmount)
 				if err != nil {
-					logger.Instance().Error("notifyTx", zap.Int("app", tx.App), zap.String("txHash", tx.Hash), zap.Error(err))
+					instance.Logger().Error("notifyTx", zap.Int("app", tx.App), zap.String("txHash", tx.Hash), zap.Error(err))
 					model.TxManager().UpdateNotifyError(tx.Hash, err.Error())
 					continue
 				}

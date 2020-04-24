@@ -5,7 +5,7 @@ import (
 
 	"github.com/oklog/run"
 	"github.com/urfave/cli/v2"
-	"github.com/zhiqiangxu/ont-gateway/pkg/logger"
+	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"github.com/zhiqiangxu/ont-gateway/pkg/service"
 	"go.uber.org/zap"
 )
@@ -19,19 +19,19 @@ func PollNotifyTx(c *cli.Context) error {
 
 	g.Add(func() error {
 		output := service.Instance().PollTx(ctx)
-		logger.Instance().Error("PollTx output", zap.Any("output", output))
+		instance.Logger().Error("PollTx output", zap.Any("output", output))
 		return nil
 	}, func(err error) {
-		logger.Instance().Error("PollTx interrupt", zap.Error(err))
+		instance.Logger().Error("PollTx interrupt", zap.Error(err))
 		cancelFunc()
 	})
 
 	g.Add(func() error {
 		output := service.Instance().NotifyTx(ctx)
-		logger.Instance().Error("NotifyTx output", zap.Any("output", output))
+		instance.Logger().Error("NotifyTx output", zap.Any("output", output))
 		return nil
 	}, func(err error) {
-		logger.Instance().Error("NotifyTx interrupt", zap.Error(err))
+		instance.Logger().Error("NotifyTx interrupt", zap.Error(err))
 		cancelFunc()
 	})
 

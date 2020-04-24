@@ -5,7 +5,7 @@ import (
 
 	"github.com/oklog/run"
 	"github.com/urfave/cli/v2"
-	"github.com/zhiqiangxu/ont-gateway/pkg/logger"
+	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"github.com/zhiqiangxu/ont-gateway/pkg/service"
 	"go.uber.org/zap"
 )
@@ -19,19 +19,19 @@ func UpdateNotifyPayment(c *cli.Context) error {
 
 	g.Add(func() error {
 		output := service.Instance().UpdatePaymentBalance(ctx)
-		logger.Instance().Error("UpdatePaymentBalance output", zap.Any("output", output))
+		instance.Logger().Error("UpdatePaymentBalance output", zap.Any("output", output))
 		return nil
 	}, func(err error) {
-		logger.Instance().Error("UpdatePaymentBalance interrupt", zap.Error(err))
+		instance.Logger().Error("UpdatePaymentBalance interrupt", zap.Error(err))
 		cancelFunc()
 	})
 
 	g.Add(func() error {
 		output := service.Instance().NotifyPaymentBalance(ctx)
-		logger.Instance().Error("NotifyPaymentBalance output", zap.Any("output", output))
+		instance.Logger().Error("NotifyPaymentBalance output", zap.Any("output", output))
 		return nil
 	}, func(err error) {
-		logger.Instance().Error("NotifyPaymentBalance interrupt", zap.Error(err))
+		instance.Logger().Error("NotifyPaymentBalance interrupt", zap.Error(err))
 		cancelFunc()
 	})
 

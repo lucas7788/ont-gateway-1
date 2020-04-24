@@ -7,7 +7,7 @@ import (
 
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
-	"github.com/zhiqiangxu/ont-gateway/pkg/logger"
+	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"github.com/zhiqiangxu/util"
 	"go.uber.org/zap"
 )
@@ -40,31 +40,31 @@ func Deploy(deploymentID, img, spec, path, conf, statePath string) (sip string, 
 	if err != nil {
 		return
 	}
-	logger.Instance().Debug("Deploy", zap.String("url", config.Load().CICDConfig.AddonDeployAPI), zap.String("input", util.String(inputBytes)))
+	instance.Logger().Debug("Deploy", zap.String("url", config.Load().CICDConfig.AddonDeployAPI), zap.String("input", util.String(inputBytes)))
 	code, _, outputBytes, err := forward.PostJSONRequest(config.Load().CICDConfig.AddonDeployAPI, inputBytes)
 	if err != nil {
-		logger.Instance().Error("PostJSONRequest", zap.String("json", util.String(inputBytes)), zap.Error(err))
+		instance.Logger().Error("PostJSONRequest", zap.String("json", util.String(inputBytes)), zap.Error(err))
 		return
 	}
 	if code != 200 {
-		logger.Instance().Error("deploy error", zap.Int("code", code), zap.String("body", string(outputBytes)), zap.Error(err))
+		instance.Logger().Error("deploy error", zap.Int("code", code), zap.String("body", string(outputBytes)), zap.Error(err))
 		err = fmt.Errorf("PostJSONRequest not 200: %d", code)
 		return
 	}
 	if err != nil {
-		logger.Instance().Error("PostJSONRequest error", zap.Any("input", input))
+		instance.Logger().Error("PostJSONRequest error", zap.Any("input", input))
 		return
 	}
 
 	var output DeployOutput
 	err = json.Unmarshal(outputBytes, &output)
 	if err != nil {
-		logger.Instance().Error("deploy error body", zap.String("body", string(outputBytes)), zap.Error(err))
+		instance.Logger().Error("deploy error body", zap.String("body", string(outputBytes)), zap.Error(err))
 		return
 	}
 
 	if output.URL == "" {
-		logger.Instance().Error("deploy error empty url")
+		instance.Logger().Error("deploy error empty url")
 		err = errDeployURLEmpty
 		return
 	}

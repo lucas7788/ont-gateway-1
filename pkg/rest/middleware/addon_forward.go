@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
-	"github.com/zhiqiangxu/ont-gateway/pkg/logger"
+	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"github.com/zhiqiangxu/ont-gateway/pkg/model"
 	"go.uber.org/zap"
 )
@@ -21,19 +21,19 @@ func AddonForward(prefix string) func(*gin.Context) {
 		ad, exists, err := model.AddonDeploymentManager().Get(addonID, tenantID)
 		if !exists {
 			c.JSON(http.StatusBadRequest, gin.H{"message": "ad not found"})
-			logger.Instance().Error("ad not found", zap.String("addonID", addonID), zap.String("tenantID", tenantID))
+			instance.Logger().Error("ad not found", zap.String("addonID", addonID), zap.String("tenantID", tenantID))
 			return
 		}
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-			logger.Instance().Error("AddonDeploymentManager.Get", zap.String("addonID", addonID), zap.String("tenantID", tenantID), zap.Error(err))
+			instance.Logger().Error("AddonDeploymentManager.Get", zap.String("addonID", addonID), zap.String("tenantID", tenantID), zap.Error(err))
 			return
 		}
 
 		resp, err := forward.Forward(c.Request, prefix, ad.SIP, "http")
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-			logger.Instance().Error("JSONRequest", zap.String("addonID", addonID), zap.String("tenantID", tenantID), zap.String("url", c.Request.URL.Path), zap.Error(err))
+			instance.Logger().Error("JSONRequest", zap.String("addonID", addonID), zap.String("tenantID", tenantID), zap.String("url", c.Request.URL.Path), zap.Error(err))
 			return
 		}
 
@@ -41,7 +41,7 @@ func AddonForward(prefix string) func(*gin.Context) {
 		respBody, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-			logger.Instance().Error("JSONRequest", zap.String("url", c.Request.URL.Path), zap.Error(err))
+			instance.Logger().Error("JSONRequest", zap.String("url", c.Request.URL.Path), zap.Error(err))
 			return
 		}
 

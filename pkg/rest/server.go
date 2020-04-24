@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/oklog/run"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
-	"github.com/zhiqiangxu/ont-gateway/pkg/logger"
+	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"github.com/zhiqiangxu/ont-gateway/pkg/rest/intra"
 	"github.com/zhiqiangxu/ont-gateway/pkg/rest/public"
 	"github.com/zhiqiangxu/tableflip"
@@ -45,7 +45,7 @@ func (s *Server) Start() {
 
 	upg, err := tableflip.New(tableflip.Options{PIDFile: conf.RestConfig.PIDFile})
 	if err != nil {
-		logger.Instance().Error("tableflip", zap.Error(err))
+		instance.Logger().Error("tableflip", zap.Error(err))
 		return
 	}
 	defer upg.Stop()
@@ -55,12 +55,12 @@ func (s *Server) Start() {
 
 	lnIntra, err := upg.Fds.Listen("tcp", conf.RestConfig.IntraAddr)
 	if err != nil {
-		logger.Instance().Error("Listen IntraAddr", zap.Error(err))
+		instance.Logger().Error("Listen IntraAddr", zap.Error(err))
 		return
 	}
 	lnPublic, err := upg.Fds.Listen("tcp", conf.RestConfig.PublicAddr)
 	if err != nil {
-		logger.Instance().Error("Listen PublicAddr", zap.Error(err))
+		instance.Logger().Error("Listen PublicAddr", zap.Error(err))
 		return
 	}
 
@@ -80,16 +80,16 @@ func (s *Server) Start() {
 	go func() {
 		err := g.Run()
 		if err != nil {
-			logger.Instance().Error("Group.Run", zap.Error(err))
+			instance.Logger().Error("Group.Run", zap.Error(err))
 		}
 		close(groupDoneCh)
 	}()
 
 	if err := upg.Ready(); err != nil {
-		logger.Instance().Error("upg.Ready", zap.Error(err))
+		instance.Logger().Error("upg.Ready", zap.Error(err))
 		return
 	}
-	logger.Instance().Error("child ready to serve")
+	instance.Logger().Error("child ready to serve")
 
 	shutdownServers := func() (err error) {
 		closeTimeout := time.Second * 2
@@ -98,7 +98,7 @@ func (s *Server) Start() {
 			defer cancel()
 			err = intraServer.Shutdown(ctx)
 			if err != nil {
-				logger.Instance().Error("shutdownServers intraServer.Shutdown", zap.Error(err))
+				instance.Logger().Error("shutdownServers intraServer.Shutdown", zap.Error(err))
 			}
 		}
 
@@ -107,7 +107,7 @@ func (s *Server) Start() {
 			defer cancel()
 			err2 := publicServer.Shutdown(ctx)
 			if err2 != nil {
-				logger.Instance().Error("shutdownServers publicServer.Shutdown", zap.Error(err2))
+				instance.Logger().Error("shutdownServers publicServer.Shutdown", zap.Error(err2))
 				err = err2
 			}
 		}
@@ -116,19 +116,19 @@ func (s *Server) Start() {
 
 	signal.SetupHandler(func(s os.Signal) {
 		// upgrade on signal
-		logger.Instance().Error("on upgrade", zap.Bool("GracefulUpgrade", config.Load().RestConfig.GracefulUpgrade))
+		instance.Logger().Error("on upgrade", zap.Bool("GracefulUpgrade", config.Load().RestConfig.GracefulUpgrade))
 
 		if !config.Load().RestConfig.GracefulUpgrade {
 			err := shutdownServers()
 			if err != nil {
-				logger.Instance().Error("shutdownServers", zap.Error(err))
+				instance.Logger().Error("shutdownServers", zap.Error(err))
 			}
 			os.Exit(1)
 		}
 
-		logger.Instance().Error("upgrade start")
+		instance.Logger().Error("upgrade start")
 		err := upg.Upgrade()
-		logger.Instance().Error("upgrade end", zap.Error(err))
+		instance.Logger().Error("upgrade end", zap.Error(err))
 	}, os.Interrupt, os.Kill, syscall.SIGTERM, syscall.SIGUSR1, syscall.SIGQUIT)
 
 	// ready to exit
@@ -136,13 +136,13 @@ func (s *Server) Start() {
 	case <-upg.Exit():
 	case <-groupDoneCh:
 	}
-	logger.Instance().Error("parent prepare for exit")
+	instance.Logger().Error("parent prepare for exit")
 
 	err = shutdownServers()
 	if err != nil {
-		logger.Instance().Error("shutdownServers err", zap.Error(err))
+		instance.Logger().Error("shutdownServers err", zap.Error(err))
 	}
 
-	logger.Instance().Error("parent quit ok")
+	instance.Logger().Error("parent quit ok")
 
 }

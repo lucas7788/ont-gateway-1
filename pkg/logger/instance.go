@@ -2,7 +2,6 @@ package logger
 
 import (
 	"fmt"
-	"sync"
 
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 	l "github.com/zhiqiangxu/util/logger"
@@ -10,22 +9,8 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-var (
-	logger *zap.Logger
-	mu     sync.Mutex
-)
-
-// Instance is singleton for zap.Logger
-func Instance() *zap.Logger {
-	if logger != nil {
-		return logger
-	}
-
-	mu.Lock()
-	defer mu.Unlock()
-	if logger != nil {
-		return logger
-	}
+// New is ctor for zap.Logger
+func New() *zap.Logger {
 
 	conf := config.Load()
 	var lvl zap.AtomicLevel
@@ -54,7 +39,7 @@ func Instance() *zap.Logger {
 		ErrorOutputPaths:  []string{"stderr"},
 	}
 
-	logger, err = l.New(zconf)
+	logger, err := l.New(zconf)
 	if err != nil {
 		panic(fmt.Sprintf("Build:%v", err))
 	}
