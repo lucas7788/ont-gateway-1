@@ -23,7 +23,7 @@ func NewApp() *gin.Engine {
 	aksk.Use(middleware.AkSk)
 	aksk.POST("/hello", AkSkHello)
 
-	addon := r.Group("/addon")
+	addon := aksk.Group("/addon")
 
 	// per tenant stuff
 
@@ -35,16 +35,16 @@ func NewApp() *gin.Engine {
 	addon.GET("/deploy/check", CheckDeploy)
 	addon.POST("/shell", Shell)
 
-	tx := r.Group("/tx")
+	tx := aksk.Group("/tx")
 	tx.POST("/poll", EnqueTx)
 	tx.DELETE("/poll", DequeTx)
 
-	payment := r.Group("/payment")
+	payment := aksk.Group("/payment")
 	payment.POST("/config", CreatePaymentConfig)
 	payment.DELETE("/config", DeletePaymentConfig)
 	payment.POST("/order", CreatePaymentOrder)
 
-	wallet := r.Group("/wallet")
+	wallet := aksk.Group("/wallet")
 	wallet.GET("/", GetWallet)
 
 	return r
