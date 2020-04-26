@@ -104,8 +104,8 @@ func (m *AppMgr) GetByName(name string) (ret *App) {
 	return
 }
 
-// GetApp returns App info from memory
-func (m *AppMgr) GetApp(id int) (app *App) {
+// GetByID returns App info by id
+func (m *AppMgr) GetByID(id int) (app *App) {
 	appMap := m.latest.Load().(map[int]*App)
 
 	app = appMap[id]
