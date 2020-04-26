@@ -73,7 +73,7 @@ func AkSk(c *gin.Context) {
 	c.Set(AppKey, app.ID)
 
 	// verify
-	sign, err := aksk.SignRequest(c.Request)
+	sign, err := app.SignRequest(c.Request)
 	if err != nil {
 		c.JSON(http.StatusForbidden, gin.H{"message": "SignRequest err"})
 		c.Abort()

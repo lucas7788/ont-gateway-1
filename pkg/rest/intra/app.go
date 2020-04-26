@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	g "github.com/zhiqiangxu/ont-gateway/pkg/rest/gin"
+	"github.com/zhiqiangxu/ont-gateway/pkg/rest/middleware"
 )
 
 // NewApp for intra app
@@ -16,6 +17,11 @@ func NewApp() *gin.Engine {
 	pprof.Register(r)
 	// metrics内网展示
 	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
+
+	// this api is for test purpose
+	aksk := r.Group("/aksk")
+	aksk.Use(middleware.AkSk)
+	aksk.POST("/hello", AkSkHello)
 
 	addon := r.Group("/addon")
 
