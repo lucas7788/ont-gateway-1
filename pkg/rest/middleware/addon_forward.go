@@ -30,7 +30,7 @@ func AddonForward(prefix string) func(*gin.Context) {
 			return
 		}
 
-		resp, err := forward.Forward(c.Request, prefix, ad.SIP, "http")
+		resp, err := forward.GenericForward(c.Request, prefix, ad.SIP, "http")
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			instance.Logger().Error("JSONRequest", zap.String("addonID", addonID), zap.String("tenantID", tenantID), zap.String("url", c.Request.URL.Path), zap.Error(err))

@@ -46,8 +46,8 @@ func (gw *Gateway) NotifyTx(ctx context.Context) (output io.NotifyTxOutput) {
 					continue
 				}
 			} else {
-				app, exists := model.AppManager().GetApp(tx.App)
-				if !exists {
+				app := model.AppManager().GetApp(tx.App)
+				if app == nil {
 					instance.Logger().Error("NotifyTx App not exists", zap.String("txHash", tx.Hash), zap.Int("app", tx.App))
 					model.TxManager().UpdateState(tx.Hash, model.TxStateDone)
 					continue

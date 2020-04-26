@@ -19,14 +19,7 @@ var (
 	client = &http.Client{Timeout: defaultTimeout, Transport: &http.Transport{IdleConnTimeout: time.Second * 2, MaxIdleConnsPerHost: 200}}
 )
 
-// JSONRequest for send json request
-func JSONRequest(method, uri string, data []byte) (code int, contentType string, respBody []byte, err error) {
-	req, err := http.NewRequest(method, uri, strings.NewReader(string(data)))
-	if err != nil {
-		return
-	}
-
-	req.Header.Set("Content-Type", "application/json")
+func httpRequest(req *http.Request) (code int, contentType string, respBody []byte, err error) {
 	resp, err := client.Do(req)
 	if err != nil {
 		return
@@ -40,6 +33,19 @@ func JSONRequest(method, uri string, data []byte) (code int, contentType string,
 	code = resp.StatusCode
 
 	contentType = resp.Header.Get("Content-Type")
+	return
+}
+
+// JSONRequest for send json request
+func JSONRequest(method, uri string, data []byte) (code int, contentType string, respBody []byte, err error) {
+	req, err := http.NewRequest(method, uri, strings.NewReader(string(data)))
+	if err != nil {
+		return
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	code, contentType, respBody, err = httpRequest(req)
 	return
 }
 
@@ -84,8 +90,8 @@ var (
 	}
 )
 
-// Forward an arbitory request
-func Forward(req *http.Request, prefix, remoteAddr, schema string) (resp *http.Response, err error) {
+// GenericForward forwards an arbitory request
+func GenericForward(req *http.Request, prefix, remoteAddr, schema string) (resp *http.Response, err error) {
 	path := req.URL.Path
 	if req.URL.RawQuery != "" {
 		path += "?" + req.URL.RawQuery

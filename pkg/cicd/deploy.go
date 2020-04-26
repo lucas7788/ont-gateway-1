@@ -8,7 +8,7 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
-	"github.com/zhiqiangxu/util"
+	"github.com/zhiqiangxu/ont-gateway/pkg/model"
 	"go.uber.org/zap"
 )
 
@@ -36,14 +36,10 @@ var (
 func Deploy(deploymentID, img, spec, path, conf, statePath string) (sip string, err error) {
 
 	input := DeployInput{ID: deploymentID, Image: img, Path: path, Config: conf, StatePath: statePath}
-	inputBytes, err := json.Marshal(input)
+	instance.Logger().Debug("Deploy", zap.Any("url", config.Load().CICDConfig.AddonDeployAPI), zap.Any("input", input))
+	code, _, outputBytes, err := forward.PostAkSkRequestByName(model.GWAppName, config.Load().CICDConfig.AddonDeployAPI.Host, config.Load().CICDConfig.AddonDeployAPI.URI, input)
 	if err != nil {
-		return
-	}
-	instance.Logger().Debug("Deploy", zap.String("url", config.Load().CICDConfig.AddonDeployAPI), zap.String("input", util.String(inputBytes)))
-	code, _, outputBytes, err := forward.PostJSONRequest(config.Load().CICDConfig.AddonDeployAPI, inputBytes)
-	if err != nil {
-		instance.Logger().Error("PostJSONRequest", zap.String("json", util.String(inputBytes)), zap.Error(err))
+		instance.Logger().Error("PostJSONRequest", zap.Any("input", input), zap.Error(err))
 		return
 	}
 	if code != 200 {

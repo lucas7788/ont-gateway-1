@@ -54,8 +54,8 @@ const (
 	appCollectionName = "app"
 )
 
-func (m *AppMgr) updateLatest(apps []App) {
-	latest := make(map[int]App)
+func (m *AppMgr) updateLatest(apps []*App) {
+	latest := make(map[int]*App)
 	for _, app := range apps {
 		latest[app.ID] = app
 	}
@@ -83,8 +83,8 @@ func (m *AppMgr) reload() (err error) {
 }
 
 // GetAll returns all App from memory
-func (m *AppMgr) GetAll() (apps []App) {
-	appMap := m.latest.Load().(map[int]App)
+func (m *AppMgr) GetAll() (apps []*App) {
+	appMap := m.latest.Load().(map[int]*App)
 	for _, app := range appMap {
 		apps = append(apps, app)
 	}
@@ -92,12 +92,12 @@ func (m *AppMgr) GetAll() (apps []App) {
 }
 
 // GetByName returns App by name
-func (m *AppMgr) GetByName(name string) (app App, exists bool) {
-	appMap := m.latest.Load().(map[int]App)
+func (m *AppMgr) GetByName(name string) (ret *App) {
+	appMap := m.latest.Load().(map[int]*App)
 	for id := range appMap {
-		app = appMap[id]
+		app := appMap[id]
 		if app.Name == name {
-			exists = true
+			ret = app
 			return
 		}
 	}
@@ -105,15 +105,15 @@ func (m *AppMgr) GetByName(name string) (app App, exists bool) {
 }
 
 // GetApp returns App info from memory
-func (m *AppMgr) GetApp(id int) (app App, exists bool) {
-	appMap := m.latest.Load().(map[int]App)
+func (m *AppMgr) GetApp(id int) (app *App) {
+	appMap := m.latest.Load().(map[int]*App)
 
-	app, exists = appMap[id]
+	app = appMap[id]
 	return
 }
 
 // GetAllFromDB returns all App from db
-func (m *AppMgr) GetAllFromDB() (apps []App, err error) {
+func (m *AppMgr) GetAllFromDB() (apps []*App, err error) {
 	timeout := config.Load().MongoConfig.Timeout
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()

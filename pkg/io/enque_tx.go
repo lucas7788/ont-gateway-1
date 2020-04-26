@@ -18,8 +18,8 @@ type EnqueTxInput struct {
 // Validate impl
 func (input *EnqueTxInput) Validate() (err error) {
 	if !input.Admin {
-		app, exists := model.AppManager().GetApp(input.App)
-		if !exists {
+		app := model.AppManager().GetApp(input.App)
+		if app == nil {
 			return fmt.Errorf("app not exists")
 		}
 		if app.TxNotifyURL == "" {

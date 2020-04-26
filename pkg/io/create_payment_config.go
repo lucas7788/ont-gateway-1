@@ -16,8 +16,8 @@ type CreatePaymentConfigOutput struct {
 
 // Validate CreatePaymentConfigInput
 func (input *CreatePaymentConfigInput) Validate() error {
-	app, exists := model.AppManager().GetApp(input.App)
-	if !exists {
+	app := model.AppManager().GetApp(input.App)
+	if app == nil {
 		return fmt.Errorf("app not exists")
 	}
 	if app.PaymentNotifyURL == "" {

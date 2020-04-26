@@ -20,9 +20,14 @@ type (
 		PoolSize int
 	}
 
+	// AkSkURL is protected with aksk
+	AkSkURL struct {
+		Host string
+		URI  string
+	}
 	// CICDConfig for cicd
 	CICDConfig struct {
-		AddonDeployAPI string
+		AddonDeployAPI AkSkURL
 	}
 
 	// RestConfig for rest

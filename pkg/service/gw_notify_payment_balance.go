@@ -100,8 +100,8 @@ type notifyPaymentBalanceInput struct {
 }
 
 func (gw *Gateway) notifyPaymentBalance(payment *model.Payment) (err error) {
-	app, exists := model.AppManager().GetApp(payment.App)
-	if !exists {
+	app := model.AppManager().GetApp(payment.App)
+	if app == nil {
 		instance.Logger().Error("notifyPaymentBalance App not exists", zap.String("paymentID", payment.PaymentID), zap.Int("app", payment.App))
 		err = fmt.Errorf("App not exists")
 		return

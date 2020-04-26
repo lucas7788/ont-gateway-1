@@ -32,8 +32,8 @@ type CreatePaymentOrderOutput struct {
 
 // Validate CreatePaymentOrderInput
 func (input *CreatePaymentOrderInput) Validate() error {
-	_, exists := model.AppManager().GetApp(input.App)
-	if !exists {
+	app := model.AppManager().GetApp(input.App)
+	if app == nil {
 		return fmt.Errorf("app not exists")
 	}
 
