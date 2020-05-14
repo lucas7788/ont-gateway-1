@@ -11,5 +11,5 @@ type UpdateResourceInput struct {
 // UpdateResourceOutput ...
 type UpdateResourceOutput struct {
 	BaseResp
-	Exists bool
+	Exists bool `json:"exists"`
 }

@@ -37,6 +37,11 @@ func main() {
 				},
 				Action: cmd.CreateApp,
 			},
+			{
+				Name:   "print",
+				Usage:  "print structs",
+				Action: cmd.Print,
+			},
 		},
 	}
 
