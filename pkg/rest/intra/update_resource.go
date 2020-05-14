@@ -9,16 +9,16 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/service"
 )
 
-// CreatePaymentConfig for create payment config
-func CreatePaymentConfig(c *gin.Context) {
-	var input io.CreatePaymentConfigInput
+// UpdateResource ...
+func UpdateResource(c *gin.Context) {
+	var input io.UpdateResourceInput
 	if err := c.ShouldBind(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
-	input.App = c.GetInt(middleware.AppKey)
+	input.RV.App = c.GetInt(middleware.AppKey)
 
-	output := service.Instance().CreatePaymentConfig(input)
+	output := service.Instance().UpdateResource(input)
 	sendoutput(c, output.Code, output)
 }

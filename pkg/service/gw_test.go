@@ -5,8 +5,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/zhiqiangxu/ddxf"
 	"github.com/zhiqiangxu/ont-gateway/pkg/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/model"
+	"github.com/zhiqiangxu/util"
 	"gotest.tools/assert"
 )
 
@@ -144,6 +146,36 @@ func TestGateway(t *testing.T) {
 			assert.Assert(t, output.Error() == nil)
 		}
 
+	}
+
+	{
+		id := "testID"
+		desc := "test desc"
+		block := uint32(1)
+		hash := ddxf.Sha256Bytes(util.Slice(desc))
+		input := io.UpdateResourceInput{
+			RV: model.ResourceVersion{ID: id, Block: block, Desc: desc, Hash: hash},
+		}
+		output := gw.UpdateResource(input)
+		assert.Assert(t, output.Error() == nil)
+
+		output = gw.UpdateResource(input)
+		assert.Assert(t, output.Error() != nil)
+
+		input.Force = true
+		output = gw.UpdateResource(input)
+		assert.Assert(t, output.Error() == nil && output.Exists)
+
+		{
+			output := gw.GetResource(io.GetResourceInput{ID: id, Block: block})
+			assert.Assert(t, output.Error() == nil && output.Desc == desc && output.DescHash == hash)
+
+			output = gw.GetResource(io.GetResourceInput{ID: id, Hash: hash})
+			assert.Assert(t, output.Error() == nil && output.Desc == desc && output.DescHash == hash)
+		}
+
+		n, err := model.ResourceVersionManager().DeleteResourceByID(0, id)
+		assert.Assert(t, err == nil && n == 1)
 	}
 
 }

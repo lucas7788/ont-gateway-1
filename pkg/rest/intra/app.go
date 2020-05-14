@@ -47,6 +47,10 @@ func NewApp() *gin.Engine {
 	wallet := aksk.Group("/wallet")
 	wallet.GET("/", GetWallet)
 
+	resourceVersion := aksk.Group("/rv")
+	resourceVersion.POST("/", UpdateResource)
+	resourceVersion.GET("/", GetResource)
+
 	return r
 }
 

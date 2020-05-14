@@ -26,6 +26,8 @@ func AddMongoIndex(c *cli.Context) error {
 	fmt.Println("PaymentManager.Init", err)
 	err = model.PaymentOrderManager().Init()
 	fmt.Println("PaymentOrderManager.Init", err)
+	err = model.ResourceVersionManager().Init()
+	fmt.Println("ResourceVersionManager.Init", err)
 
 	return nil
 }
