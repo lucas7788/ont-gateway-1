@@ -12,6 +12,8 @@ func AddMongoIndex(c *cli.Context) error {
 
 	err := model.AddonConfigManager().Init()
 	fmt.Println("AddonConfigManager.Init", err)
+	err = model.AppManager().Init()
+	fmt.Println("AppManager.Init", err)
 	err = model.AddonDeploymentManager().Init()
 	fmt.Println("AddonDeploymentManager.Init", err)
 
