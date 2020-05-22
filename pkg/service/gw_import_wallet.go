@@ -17,10 +17,10 @@ func (gw *Gateway) ImportWallet(input io.ImportWalletInput) (output io.ImportWal
 	}
 
 	w := model.Wallet{Name: input.WalletName}
-	if input.CipherContent != "" {
-		w.CipherContent = input.CipherContent
+	if /*input.CipherContent != "" &&*/ false {
+		// w.CipherContent = input.CipherContent
 	} else {
-		err = w.SetPlainContent(input.Content)
+		err = w.SetPlain(input.Content, input.Content)
 		if err != nil {
 			output.Code = http.StatusBadRequest
 			output.Msg = err.Error()

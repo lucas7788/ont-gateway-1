@@ -8,6 +8,7 @@ type GetWalletInput struct {
 // GetWalletOutput for output
 type GetWalletOutput struct {
 	BaseResp
+	PSW     string `json:"psw"`
 	Content string `json:"content"`
 	Exists  bool   `json:"exists"`
 }

@@ -20,7 +20,7 @@ func (gw *Gateway) GetWallet(input io.GetWalletInput) (output io.GetWalletOutput
 		return
 	}
 
-	content, err := w.GetPlainContent()
+	psw, content, err := w.GetPlain()
 	if err != nil {
 		output.Code = http.StatusBadRequest
 		output.Msg = err.Error()
@@ -28,6 +28,7 @@ func (gw *Gateway) GetWallet(input io.GetWalletInput) (output io.GetWalletOutput
 	}
 
 	output.Exists = true
+	output.PSW = psw
 	output.Content = content
 
 	return
