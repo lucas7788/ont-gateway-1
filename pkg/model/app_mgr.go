@@ -190,6 +190,9 @@ func (m *AppMgr) Init() (err error) {
 	models := []mongo.IndexModel{idIndex, nameIndex}
 
 	_, err = instance.MongoOfficial().Collection(appCollectionName).Indexes().CreateMany(context.Background(), models)
+	if err != nil {
+		return
+	}
 
 	apps, err := m.GetAllFromDB()
 	if err != nil {
