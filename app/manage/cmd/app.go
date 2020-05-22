@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/urfave/cli/v2"
@@ -54,8 +55,21 @@ func createApp(c *cli.Context) error {
 	return output.Error()
 }
 
-func listApp(c *cli.Context) error {
+func listApp(c *cli.Context) (err error) {
 	output := service.Instance().ListApp()
-	fmt.Println("apps", output.Apps)
-	return output.Error()
+	err = output.Error()
+	if err != nil {
+		return
+	}
+	var bytes []byte
+	fmt.Println("apps")
+	for _, app := range output.Apps {
+		bytes, err = json.Marshal(app)
+		if err != nil {
+			return
+		}
+		fmt.Println(string(bytes))
+	}
+
+	return
 }
