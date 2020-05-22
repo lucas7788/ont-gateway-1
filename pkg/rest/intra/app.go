@@ -49,7 +49,7 @@ func NewApp() *gin.Engine {
 	payment.POST("/order", CreatePaymentOrder)
 
 	wallet := aksk.Group("/wallet")
-	wallet.GET("/", GetWallet)
+	wallet.POST("/", GetWallet)
 
 	resourceVersion := aksk.Group("/rv")
 	resourceVersion.POST("/", UpdateResource)
