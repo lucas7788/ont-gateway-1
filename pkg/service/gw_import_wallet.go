@@ -20,7 +20,7 @@ func (gw *Gateway) ImportWallet(input io.ImportWalletInput) (output io.ImportWal
 	if /*input.CipherContent != "" &&*/ false {
 		// w.CipherContent = input.CipherContent
 	} else {
-		err = w.SetPlain(input.Content, input.Content)
+		err = w.SetPlain(input.PSW, input.Content)
 		if err != nil {
 			output.Code = http.StatusBadRequest
 			output.Msg = err.Error()
