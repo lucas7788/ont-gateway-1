@@ -20,7 +20,7 @@ var config = Value{
 		Addr: "master.sagamarket-prod.pbcbnm.apne1.cache.amazonaws.com:6379",
 	},
 	MongoConfig: MongoConfig{
-		ConnectionString: "mongodb://sagamarket:S+n7eL1+rSZKtxzC@sagemarket-prod-mongo.cluster-cburg362yfls.ap-northeast-1.docdb.amazonaws.com:27017/ont",
+		ConnectionString: "mongodb://sagamarket:S+n7eL1+rSZKtxzC@sagemarket-prod-mongo.cluster-cburg362yfls.ap-northeast-1.docdb.amazonaws.com:27017/ont?authSource=admin&maxidletimems=3000",
 		Timeout:          time.Second * 3,
 	},
 	CICDConfig: CICDConfig{
