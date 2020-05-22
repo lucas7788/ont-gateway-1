@@ -18,6 +18,10 @@ func NewApp() *gin.Engine {
 	// metrics内网展示
 	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
+	// jsonld
+	jsonld := r.Group("/jsonld")
+	jsonld.POST("/align", JSONLDAlign)
+
 	// this api is for test purpose
 	aksk := r.Group("/aksk")
 	aksk.Use(middleware.AkSk)

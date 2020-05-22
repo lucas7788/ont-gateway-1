@@ -200,8 +200,13 @@ github.com/ontio/wagon/wasm/internal/readpos
 github.com/ontio/wagon/internal/stack
 # github.com/orcaman/concurrent-map v0.0.0-20190826125027-8c72a8bb44f6
 github.com/orcaman/concurrent-map
+# github.com/piprate/json-gold v0.3.0
+github.com/piprate/json-gold/ld
 # github.com/pkg/errors v0.8.1
 github.com/pkg/errors
+# github.com/pquerna/cachecontrol v0.0.0-20180517163645-1555304b9b35
+github.com/pquerna/cachecontrol
+github.com/pquerna/cachecontrol/cacheobject
 # github.com/prometheus/client_golang v1.5.1
 github.com/prometheus/client_golang/prometheus/promhttp
 github.com/prometheus/client_golang/prometheus

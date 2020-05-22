@@ -8,5 +8,6 @@ type JSONLDAlignInput struct {
 
 // JSONLDAlignOutput ...
 type JSONLDAlignOutput struct {
+	BaseResp
 	A2B map[string]interface{}
 }

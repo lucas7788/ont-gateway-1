@@ -9,6 +9,7 @@ require (
 	github.com/go-redis/redis v6.15.7+incompatible
 	github.com/oklog/run v1.0.0
 	github.com/ontio/ontology-go-sdk v1.11.1
+	github.com/piprate/json-gold v0.3.0
 	github.com/prometheus/client_golang v1.5.1
 	github.com/satori/go.uuid v1.2.0
 	github.com/urfave/cli/v2 v2.2.0
