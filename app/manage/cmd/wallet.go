@@ -18,7 +18,7 @@ var WalletCmd = cli.Command{
 			Name:      "import",
 			Usage:     "import a new wallet",
 			Action:    importWallet,
-			ArgsUsage: "wallet_name wallet_address",
+			ArgsUsage: "wallet_name wallet_psw wallet_address",
 			Flags: []cli.Flag{
 				&cli.BoolFlag{Name: "ciphered", Aliases: []string{"c"}},
 			},
@@ -34,14 +34,14 @@ var WalletCmd = cli.Command{
 
 func importWallet(c *cli.Context) (err error) {
 
-	data, err := ioutil.ReadFile(c.Args().Get(1))
+	data, err := ioutil.ReadFile(c.Args().Get(2))
 	if err != nil {
 		return
 	}
 
-	input := io.ImportWalletInput{WalletName: c.Args().Get(0)}
-	if c.Bool("ciphered") {
-		input.CipherContent = string(data)
+	input := io.ImportWalletInput{PSW: c.Args().Get(1), WalletName: c.Args().Get(0)}
+	if false && c.Bool("ciphered") {
+		// input.CipherContent = string(data)
 	} else {
 		input.Content = string(data)
 	}
