@@ -27,16 +27,7 @@ func main() {
 				Action: cmd.UpdateNotifyPayment,
 			},
 			&cmd.WalletCmd,
-			{
-				Name:  "create_app",
-				Usage: "create an app for tx polling etc",
-				Flags: []cli.Flag{
-					&cli.StringFlag{Name: "name", Aliases: []string{"n"}},
-					&cli.StringFlag{Name: "txNotifyUrl", Aliases: []string{"tu"}},
-					&cli.StringFlag{Name: "paymentNotifyUrl", Aliases: []string{"pu"}},
-				},
-				Action: cmd.CreateApp,
-			},
+			&cmd.AppCmd,
 			{
 				Name:   "print",
 				Usage:  "print structs",
