@@ -12,7 +12,7 @@ import (
 
 const (
 	// defaultTimeout is default timeout for api request
-	defaultTimeout = 5 * time.Second
+	defaultTimeout = 15 * time.Second
 )
 
 var (
