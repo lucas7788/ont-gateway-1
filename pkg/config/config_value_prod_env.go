@@ -7,8 +7,8 @@ import "time"
 var config = Value{
 	Prod: true,
 	RestConfig: RestConfig{
-		PublicAddr:      ":2020",
-		IntraAddr:       ":2021",
+		PublicAddr:      "0.0.0.0:2020",
+		IntraAddr:       "0.0.0.0:2021",
 		GracefulUpgrade: false,
 		PIDFile:         "/tmp/ont-gateway.pid",
 		ReadTimeout:     time.Second * 3,
