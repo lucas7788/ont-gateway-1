@@ -24,6 +24,12 @@ var WalletCmd = cli.Command{
 			},
 		},
 		{
+			Name:      "get",
+			Usage:     "get a wallet",
+			Action:    getWallet,
+			ArgsUsage: "wallet_name",
+		},
+		{
 			Name:      "delete",
 			Usage:     "delete a wallet",
 			Action:    deleteWallet,
@@ -47,6 +53,13 @@ func importWallet(c *cli.Context) (err error) {
 	}
 
 	output := service.Instance().ImportWallet(input)
+	err = output.Error()
+	return
+}
+
+func getWallet(c *cli.Context) (err error) {
+	input := io.GetWalletInput{WalletName: c.Args().Get(0)}
+	output := service.Instance().GetWallet(input)
 	err = output.Error()
 	return
 }
