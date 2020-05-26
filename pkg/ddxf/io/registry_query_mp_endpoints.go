@@ -2,8 +2,8 @@ package io
 
 import io2 "github.com/zhiqiangxu/ont-gateway/pkg/io"
 
-// RegistryQueryMPEndpointsInput ...
-type RegistryQueryMPEndpointsInput struct {
+// RegistryQueryEndpointsInput ...
+type RegistryQueryEndpointsInput struct {
 }
 
 // MPEndpoint ...
@@ -12,8 +12,8 @@ type MPEndpoint struct {
 	Endpoint string
 }
 
-// RegistryQueryMPEndpointsOutput ...
-type RegistryQueryMPEndpointsOutput struct {
+// RegistryQueryEndpointsOutput ...
+type RegistryQueryEndpointsOutput struct {
 	io2.BaseResp
 	Endpoints []MPEndpoint
 }
