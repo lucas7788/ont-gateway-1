@@ -17,6 +17,7 @@ type (
 	RedisConfig struct {
 		Addr     string
 		Password string
+		TLS      bool
 		PoolSize int
 	}
 

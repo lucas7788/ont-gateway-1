@@ -1,6 +1,8 @@
 package storage
 
 import (
+	"crypto/tls"
+
 	"github.com/go-redis/redis"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 )
@@ -14,6 +16,13 @@ func NewRedis(conf *config.RedisConfig) *redis.Client {
 	if conf.Password != "" {
 		o.Password = conf.Password
 	}
+
+	if conf.TLS {
+		o.TLSConfig = &tls.Config{
+			InsecureSkipVerify: true,
+		}
+	}
+
 	if conf.PoolSize > 0 {
 		o.PoolSize = conf.PoolSize
 	}
