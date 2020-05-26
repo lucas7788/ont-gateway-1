@@ -26,7 +26,7 @@ var config = Value{
 	},
 	CICDConfig: CICDConfig{
 		AddonDeployAPI: AkSkURL{
-			Host: "a0d771952588111ea89590659513bb5d-1585432770.ap-southeast-1.elb.amazonaws.com:8000",
+			Host: "af9a305da83ae11ea809406ad1589d0c-1615907691.ap-northeast-1.elb.amazonaws.com:8000",
 			URI:  "/api/v1/ss",
 		},
 	},
