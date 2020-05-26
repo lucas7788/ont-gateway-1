@@ -8,5 +8,6 @@ type Browser interface {
 	EditTokenMeta(io.BrowserEditTokenMetaInput) io.BrowserEditTokenMetaOutput
 	VerifyDataAndToken(io.BrowserVerifyDataAndTokenInput) io.BrowserVerifyDataAndTokenOutput
 
+	ConstructPublishDtokenTx(io.BrowserConstructPublishDtokenTxInput) io.BrowserConstructPublishDtokenTxOutput
 	ConstructBuyDtokenTx(io.BrowserConstructBuyDtokenTxInput) io.BrowserConstructBuyDtokenTxOutput
 }
