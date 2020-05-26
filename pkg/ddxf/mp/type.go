@@ -4,8 +4,8 @@ import "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 
 // Marketplace ...
 type Marketplace interface {
-	PublishRegistry(io.MPPublishRegistryInput) io.MPPublishRegistryOutput
-	UnPublishRegistry(io.MPUnPublishRegistryInput) io.MPUnPublishRegistryOutput
+	AddRegistry(io.MPAddRegistryInput) io.MPAddRegistryOutput
+	RemoveRegistry(io.MPRemoveRegistryInput) io.MPRemoveRegistryOutput
 
 	Endpoint() Endpoint
 }
