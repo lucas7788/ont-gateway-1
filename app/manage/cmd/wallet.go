@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"io/ioutil"
 
 	"github.com/urfave/cli/v2"
@@ -61,6 +62,11 @@ func getWallet(c *cli.Context) (err error) {
 	input := io.GetWalletInput{WalletName: c.Args().Get(0)}
 	output := service.Instance().GetWallet(input)
 	err = output.Error()
+	if err != nil {
+		return
+	}
+
+	fmt.Println(output)
 	return
 }
 
