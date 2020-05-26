@@ -17,7 +17,8 @@ var config = Value{
 		LogLevel: "info",
 	},
 	RedisCacheConfig: RedisConfig{
-		Addr: "master.sagamarket-prod.pbcbnm.apne1.cache.amazonaws.com:6379",
+		Addr:     "master.sagamarket-prod.pbcbnm.apne1.cache.amazonaws.com:6379",
+		Password: "E062AB4QL+g9eo2RNrajw6LjcDc=",
 	},
 	MongoConfig: MongoConfig{
 		ConnectionString: "mongodb://sagamarket:QvJ4ikuhNcZperMhDd8v@sagemarket-prod-mongo.cluster-cburg362yfls.ap-northeast-1.docdb.amazonaws.com:27017/ont?authSource=admin&maxidletimems=3000",
