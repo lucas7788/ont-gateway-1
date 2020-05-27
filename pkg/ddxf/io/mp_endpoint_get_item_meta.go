@@ -2,6 +2,7 @@ package io
 
 // MPEndpointGetItemMetaInput ...
 type MPEndpointGetItemMetaInput struct {
+	ItemMetaID string
 }
 
 // MPEndpointGetItemMetaOutput ...
