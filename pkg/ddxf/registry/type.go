@@ -7,5 +7,4 @@ type Registry interface {
 	AddEndpoint(io.RegistryAddEndpointInput) io.RegistryAddEndpointOutput
 	RemoveEndpoint(io.RegistryRemoveEndpointOutput) io.RegistryRemoveEndpointOutput
 	QueryEndpoints(io.RegistryQueryEndpointsInput) io.RegistryQueryEndpointsOutput
-	Sdk() Registry
 }
