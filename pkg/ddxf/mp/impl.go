@@ -146,20 +146,30 @@ func (this *EndpointImpl) GetFee(io.MPEndpointGetFeeInput) (output io.MPEndpoint
 }
 
 func (this *EndpointImpl) GetChallengePeriod(io.MPEndpointGetChallengePeriodInput) (output io.MPEndpointGetChallengePeriodOutput) {
-	timeout := config.Load().MongoConfig.Timeout
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-	ou := &io.MPEndpointGetChallengePeriodOutput{}
-	err := instance.MongoOfficial().Collection(endpointCollectionName).FindOne(ctx, nil).Decode(ou)
-	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-	}
+	output.Period = 7 * 24 * 3600 * time.Second
 	return
 }
 
 func (this *EndpointImpl) GetItemMetaSchema(io.MPEndpointGetItemMetaSchemaInput) (output io.MPEndpointGetItemMetaSchemaOutput) {
-
+	output.ItemMetaSchema = map[string]interface{}{
+		"@context": map[string]interface{}{
+			"sec":        "http://purl.org/security#",
+			"xsd":        "http://www.w3.org/2001/XMLSchema#",
+			"rdf":        "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+			"dc":         "http://purl.org/dc/terms/",
+			"sec:signer": map[string]interface{}{"@type": "@id"},
+			"dc:created": map[string]interface{}{"@type": "xsd:dateTime"},
+		},
+		"@id":                "http://example.org/sig1",
+		"@type":              []interface{}{"rdf:Graph", "sec:SignedGraph"},
+		"dc:created":         "2011-09-23T20:21:34Z",
+		"sec:signer":         "http://payswarm.example.com/i/john/keys/5",
+		"sec:signatureValue": "doc1",
+		"@graph": map[string]interface{}{
+			"@id":      "http://example.org/fact1",
+			"dc:title": "Hello World!",
+		},
+	}
 	return
 }
 
