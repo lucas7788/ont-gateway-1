@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"github.com/ontio/ontology-crypto/keypair"
 	"github.com/ontio/ontology-go-sdk"
-	"github.com/ontio/ontology/core/signature"
+	signature2 "github.com/ontio/ontology/core/signature"
 	"github.com/ontio/ontology/core/types"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
@@ -83,13 +83,15 @@ func (this *MarketplaceImpl) RemoveRegistry(input io.MPRemoveRegistryInput) (out
 		output.Msg = err.Error()
 		return
 	}
-	err = signature.Verify(pk, []byte(""), input.Sign)
+
+	err = signature2.Verify(pk, []byte(input.MP), input.Sign)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
 		return
 	}
-	_, err = instance.MongoOfficial().Collection(mpCollectionName).DeleteOne(ctx, input)
+	filter = bson.M{"mp": input.MP}
+	_, err = instance.MongoOfficial().Collection(mpCollectionName).DeleteOne(ctx, filter)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
