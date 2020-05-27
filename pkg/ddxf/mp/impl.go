@@ -184,11 +184,24 @@ func (this *EndpointImpl) GetItemMeta(input io.MPEndpointGetItemMetaInput) (outp
 	return
 }
 
-func (this *EndpointImpl) QueryItemMetas(io.MPEndpointQueryItemMetasInput) (output io.MPEndpointQueryItemMetasOutput) {
+func (this *EndpointImpl) QueryItemMetas(input io.MPEndpointQueryItemMetasInput) (output io.MPEndpointQueryItemMetasOutput) {
+	pageNum := input.PageNum
+	if pageNum < 1 {
+		pageNum = 1
+	}
+	pageSize := input.PageSize
+	if pageSize < 0 {
+		pageSize = 0
+	}
+	if pageSize > 100 {
+		pageSize = 100
+	}
+	skip := (pageNum - 1) * pageSize
 	opts := options.Find()
-	// Sort by `_id` field descending
-	opts.SetSort(bson.D{bson.E{Key: "_id", Value: -1}})
-	cursor, err := instance.MongoOfficial().Collection(endpointCollectionName).Find(context.Background(), nil, opts)
+	opts.Limit = &pageSize
+	opts.Skip = &skip
+	filter := bson.D{}
+	cursor, err := instance.MongoOfficial().Collection(endpointCollectionName).Find(context.Background(), filter, opts)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -196,7 +209,7 @@ func (this *EndpointImpl) QueryItemMetas(io.MPEndpointQueryItemMetasInput) (outp
 	}
 
 	itemMetas := make([]map[string]interface{}, 0)
-	err = cursor.All(context.Background(), itemMetas)
+	err = cursor.All(context.Background(), &itemMetas)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()

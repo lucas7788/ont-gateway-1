@@ -66,3 +66,13 @@ func TestEndpointImpl_GetAuditRule(t *testing.T) {
 	fmt.Println(output2)
 	assert.NotEqual(t, output2.Code, http.StatusInternalServerError)
 }
+
+func TestEndpointImpl_QueryItemMetas(t *testing.T) {
+	en := mp.Endpoint()
+	in2 := io.MPEndpointQueryItemMetasInput{
+		PageNum:  1,
+		PageSize: 10,
+	}
+	output3 := en.QueryItemMetas(in2)
+	assert.Equal(t, output3.Msg, "")
+}
