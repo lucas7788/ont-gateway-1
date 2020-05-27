@@ -27,8 +27,20 @@ type MarketplaceImpl struct {
 	endpointImpl Endpoint
 }
 
+func NewMarketplaceImpl(acc *ontology_go_sdk.Account) *MarketplaceImpl {
+	return &MarketplaceImpl{
+		endpointImpl: NewEndpointImpl(acc),
+	}
+}
+
 type EndpointImpl struct {
 	mpAccount *ontology_go_sdk.Account
+}
+
+func NewEndpointImpl(acc *ontology_go_sdk.Account) *EndpointImpl {
+	return &EndpointImpl{
+		mpAccount: acc,
+	}
 }
 
 func (this *MarketplaceImpl) AddRegistry(input io.MPAddRegistryInput) (output io.MPAddRegistryOutput) {
@@ -71,13 +83,7 @@ func (this *MarketplaceImpl) RemoveRegistry(input io.MPRemoveRegistryInput) (out
 		output.Msg = err.Error()
 		return
 	}
-	signBs, err := hex.DecodeString(input.Sign)
-	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-		return
-	}
-	err = signature.Verify(pk, []byte(""), signBs)
+	err = signature.Verify(pk, []byte(""), input.Sign)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
