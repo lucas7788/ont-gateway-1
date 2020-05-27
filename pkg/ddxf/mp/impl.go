@@ -171,15 +171,6 @@ func (this *EndpointImpl) QueryItemMetas(io.MPEndpointQueryItemMetasInput) (outp
 }
 
 func (this *EndpointImpl) PublishItemMeta(input io.MPEndpointPublishItemMetaInput) (output io.MPEndpointPublishItemMetaOutput) {
-	timeout := config.Load().MongoConfig.Timeout
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-	_, err := instance.MongoOfficial().Collection(endpointCollectionName).InsertOne(ctx, input)
-	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-		return
-	}
 	txBs, err := hex.DecodeString(input.SignedDDXFTx)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
@@ -193,6 +184,15 @@ func (this *EndpointImpl) PublishItemMeta(input io.MPEndpointPublishItemMetaInpu
 		return
 	}
 	muTx, err := tx.IntoMutable()
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	timeout := config.Load().MongoConfig.Timeout
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	_, err = instance.MongoOfficial().Collection(endpointCollectionName).InsertOne(ctx, input)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
