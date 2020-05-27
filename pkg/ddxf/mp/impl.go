@@ -69,7 +69,13 @@ func (this *MarketplaceImpl) RemoveRegistry(input io.MPRemoveRegistryInput) (out
 		output.Msg = err.Error()
 		return
 	}
-	err = signature.Verify(pk, []byte(""), []byte(input.Sign))
+	signBs, err := hex.DecodeString(input.Sign)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	err = signature.Verify(pk, []byte(""), signBs)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
