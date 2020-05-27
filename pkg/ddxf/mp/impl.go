@@ -47,7 +47,13 @@ func (this *MarketplaceImpl) AddRegistry(input io.MPAddRegistryInput) (output io
 	timeout := config.Load().MongoConfig.Timeout
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
-	_, err := hex.DecodeString(input.PubKey)
+	pkBs, err := hex.DecodeString(input.PubKey)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	_, err = keypair.DeserializePublicKey(pkBs)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
