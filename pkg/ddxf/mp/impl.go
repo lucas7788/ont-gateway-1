@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"github.com/ontio/ontology-crypto/keypair"
+	"github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology/core/signature"
 	"github.com/ontio/ontology/core/types"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
@@ -27,6 +28,7 @@ type MarketplaceImpl struct {
 }
 
 type EndpointImpl struct {
+	mpAccount *ontology_go_sdk.Account
 }
 
 func (this *MarketplaceImpl) AddRegistry(input io.MPAddRegistryInput) (output io.MPAddRegistryOutput) {
@@ -183,6 +185,12 @@ func (this *EndpointImpl) PublishItemMeta(input io.MPEndpointPublishItemMetaInpu
 		return
 	}
 	muTx, err := tx.IntoMutable()
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	err = instance.OntSdk().GetKit().SignToTransaction(muTx, this.mpAccount)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
