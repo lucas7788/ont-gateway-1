@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -42,7 +43,7 @@ func AkSk(c *gin.Context) {
 
 	app := model.AppManager().GetByID(appInt)
 	if app == nil {
-		c.JSON(http.StatusForbidden, gin.H{"message": "App not found"})
+		c.JSON(http.StatusForbidden, gin.H{"message": fmt.Sprintf("App not found:%v", appInt)})
 		c.Abort()
 		return
 	}
