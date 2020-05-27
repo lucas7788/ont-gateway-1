@@ -49,13 +49,13 @@ func (this *MarketplaceImpl) AddRegistry(input io.MPAddRegistryInput) (output io
 	defer cancel()
 	pkBs, err := hex.DecodeString(input.PubKey)
 	if err != nil {
-		output.Code = http.StatusInternalServerError
+		output.Code = http.StatusBadRequest
 		output.Msg = err.Error()
 		return
 	}
 	_, err = keypair.DeserializePublicKey(pkBs)
 	if err != nil {
-		output.Code = http.StatusInternalServerError
+		output.Code = http.StatusBadRequest
 		output.Msg = err.Error()
 		return
 	}
@@ -81,18 +81,16 @@ func (this *MarketplaceImpl) RemoveRegistry(input io.MPRemoveRegistryInput) (out
 	}
 	pkBs, err := hex.DecodeString(ad.PubKey)
 	if err != nil {
-		panic("")
+		panic(err)
 	}
 	pk, err := keypair.DeserializePublicKey(pkBs)
 	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-		return
+		panic(err)
 	}
 
 	err = signature2.Verify(pk, []byte(input.MP), input.Sign)
 	if err != nil {
-		output.Code = http.StatusInternalServerError
+		output.Code = http.StatusBadRequest
 		output.Msg = err.Error()
 		return
 	}
@@ -111,7 +109,6 @@ func (this *MarketplaceImpl) Endpoint() Endpoint {
 
 // Init for this collection
 func (m *MarketplaceImpl) Init() (err error) {
-
 	opts := &options.IndexOptions{}
 	opts.SetName("u-mp")
 	opts.SetUnique(true)
@@ -121,6 +118,20 @@ func (m *MarketplaceImpl) Init() (err error) {
 	}
 
 	_, err = instance.MongoOfficial().Collection(mpCollectionName).Indexes().CreateOne(context.Background(), index)
+	return
+}
+
+// Init for this collection
+func (m *EndpointImpl) Init() (err error) {
+	opts := &options.IndexOptions{}
+	opts.SetName("u-item-meta_id")
+	opts.SetUnique(true)
+	index := mongo.IndexModel{
+		Keys:    bsonx.Doc{{Key: "item-meta_id", Value: bsonx.Int32(1)}},
+		Options: opts,
+	}
+
+	_, err = instance.MongoOfficial().Collection(endpointCollectionName).Indexes().CreateOne(context.Background(), index)
 	return
 }
 
@@ -152,8 +163,14 @@ func (this *EndpointImpl) GetItemMetaSchema(io.MPEndpointGetItemMetaSchemaInput)
 	return
 }
 
-func (this *EndpointImpl) GetItemMeta(io.MPEndpointGetItemMetaInput) (output io.MPEndpointGetItemMetaOutput) {
-	instance.MongoOfficial().Collection(endpointCollectionName).FindOne(context.Background(), nil)
+func (this *EndpointImpl) GetItemMeta(input io.MPEndpointGetItemMetaInput) (output io.MPEndpointGetItemMetaOutput) {
+	filter := bson.M{"mp": input.ItemMetaID}
+	output = io.MPEndpointGetItemMetaOutput{}
+	err := instance.MongoOfficial().Collection(endpointCollectionName).FindOne(context.Background(), filter).Decode(&output)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+	}
 	return
 }
 
@@ -163,6 +180,8 @@ func (this *EndpointImpl) QueryItemMetas(io.MPEndpointQueryItemMetasInput) (outp
 	opts.SetSort(bson.D{bson.E{Key: "_id", Value: -1}})
 	cursor, err := instance.MongoOfficial().Collection(endpointCollectionName).Find(context.Background(), nil, opts)
 	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
 		return
 	}
 
@@ -171,6 +190,7 @@ func (this *EndpointImpl) QueryItemMetas(io.MPEndpointQueryItemMetasInput) (outp
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
+		return
 	}
 	output.ItemMetas = itemMetas
 	return
