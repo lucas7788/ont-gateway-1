@@ -43,7 +43,7 @@ func AkSk(c *gin.Context) {
 
 	app := model.AppManager().GetByID(appInt)
 	if app == nil {
-		c.JSON(http.StatusForbidden, gin.H{"message": fmt.Sprintf("App not found:%v", appInt)})
+		c.JSON(http.StatusForbidden, gin.H{"message": fmt.Sprintf("App not found: appStr %s appInt %v", appStr, appInt)})
 		c.Abort()
 		return
 	}
