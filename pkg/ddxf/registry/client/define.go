@@ -2,8 +2,6 @@ package client
 
 import "encoding/json"
 
-const REST_VERSION = "1.0.0"
-
 type RestfulReq struct {
 	Action  string
 	Version string

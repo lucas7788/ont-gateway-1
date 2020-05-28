@@ -143,7 +143,7 @@ func (this *EndpointImpl) QueryItemMetas(input io.MPEndpointQueryItemMetasInput)
 		return
 	}
 
-	itemMetas := make([]map[string]interface{}, 0)
+	itemMetas := make([]io.ItemMeta, 0)
 	err = cursor.All(context.Background(), &itemMetas)
 	if err != nil {
 		output.Code = http.StatusInternalServerError

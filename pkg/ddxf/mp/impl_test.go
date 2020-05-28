@@ -1,6 +1,7 @@
 package mp
 
 import (
+	"context"
 	"encoding/hex"
 	"fmt"
 	"github.com/ontio/ontology-crypto/keypair"
@@ -9,7 +10,9 @@ import (
 	"github.com/ontio/ontology/account"
 	signature2 "github.com/ontio/ontology/core/signature"
 	"github.com/stretchr/testify/assert"
+	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
+	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"net/http"
 	"testing"
 )
@@ -67,6 +70,14 @@ func TestEndpointImpl_GetAuditRule(t *testing.T) {
 }
 
 func TestEndpointImpl_QueryItemMetas(t *testing.T) {
+	timeout := config.Load().MongoConfig.Timeout
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	itemMeta := make(map[string]interface{})
+	itemMeta["key"] = "val"
+	_, err := instance.MongoOfficial().Collection(endpointCollectionName).InsertOne(ctx, itemMeta)
+	assert.Nil(t, err)
 	en := mp.Endpoint()
 	in2 := io.MPEndpointQueryItemMetasInput{
 		PageNum:  1,
