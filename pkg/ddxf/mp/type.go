@@ -1,6 +1,8 @@
 package mp
 
-import "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
+import (
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
+)
 
 // Marketplace ...
 type Marketplace interface {
