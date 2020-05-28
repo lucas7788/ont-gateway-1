@@ -13,7 +13,7 @@ type RegistryImplClient struct {
 
 func Sdk() *RegistryImplClient {
 	return &RegistryImplClient{
-		httpClient: NewHttpClient(""),
+		httpClient: NewHttpClient("127.0.0.1:20331"),
 	}
 }
 
