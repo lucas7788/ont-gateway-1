@@ -1,15 +1,15 @@
 package client
 
 import (
-	"net/http"
-	"time"
-	"strings"
-	"net/url"
-	"fmt"
-	"encoding/json"
-	"io"
 	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
 	"io/ioutil"
+	"net/http"
+	"net/url"
+	"strings"
+	"time"
 )
 
 type HttpClient struct {
@@ -17,10 +17,9 @@ type HttpClient struct {
 	httpClient *http.Client
 }
 
-
 func NewHttpClient(addr string) *HttpClient {
 	return &HttpClient{
-		addr:addr,
+		addr: addr,
 		httpClient: &http.Client{
 			Transport: &http.Transport{
 				MaxIdleConnsPerHost:   5,
@@ -33,7 +32,7 @@ func NewHttpClient(addr string) *HttpClient {
 	}
 }
 
-func (this *HttpClient) getRequestUrl(reqPath string, values ...*url.Values)(string, error) {
+func (this *HttpClient) getRequestUrl(reqPath string, values ...*url.Values) (string, error) {
 	var addr string
 	if !strings.HasPrefix(this.addr, "http") {
 		addr = "http://" + addr
@@ -49,7 +48,7 @@ func (this *HttpClient) getRequestUrl(reqPath string, values ...*url.Values)(str
 	return reqUrl.String(), nil
 }
 
-func (this *HttpClient) SendPostRequest(reqParam interface{}, reqPath string, values ...*url.Values)([]byte, error) {
+func (this *HttpClient) SendPostRequest(reqParam interface{}, reqPath string, values ...*url.Values) ([]byte, error) {
 	reqUrl, err := this.getRequestUrl(reqPath, values...)
 	if err != nil {
 		return nil, err

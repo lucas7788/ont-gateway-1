@@ -1,21 +1,21 @@
 package server
 
 import (
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
-	"go.mongodb.org/mongo-driver/bson"
-	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
-	"github.com/ontio/ontology-crypto/keypair"
-	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 	"context"
 	"encoding/hex"
-	"net/http"
+	"github.com/ontio/ontology-crypto/keypair"
 	"github.com/ontio/ontology/core/signature"
+	"github.com/zhiqiangxu/ont-gateway/pkg/config"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
+	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"net/http"
 )
 
 const (
 	registryCollectionName = "registry"
 )
-
 
 func AddEndpointService(input io.RegistryAddEndpointInput) (output io.RegistryAddEndpointOutput) {
 	timeout := config.Load().MongoConfig.Timeout
@@ -80,6 +80,9 @@ func RemoveEndpointService(input io.RegistryRemoveEndpointInput) (output io.Regi
 
 func QueryEndpointsService(input io.RegistryQueryEndpointsInput) (output io.RegistryQueryEndpointsOutput) {
 	filter := bson.D{}
+	opts := options.Find()
+	// Sort by `_id` field descending
+	opts.SetSort(bson.D{bson.E{Key: "_id", Value: -1}})
 	cursor, err := instance.MongoOfficial().Collection(registryCollectionName).Find(context.Background(), filter, opts)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
@@ -96,4 +99,3 @@ func QueryEndpointsService(input io.RegistryQueryEndpointsInput) (output io.Regi
 	}
 	return
 }
-

@@ -18,7 +18,7 @@ func Sdk(addr string) *RegistryImplClient {
 }
 
 func (this *RegistryImplClient) AddEndpoint(input io.RegistryAddEndpointInput) (output io.RegistryAddEndpointOutput) {
-	bs,err := this.httpClient.SendPostRequest(input,server.AddEndpoint)
+	bs, err := this.httpClient.SendPostRequest(input, server.AddEndpoint)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		return
@@ -32,7 +32,7 @@ func (this *RegistryImplClient) AddEndpoint(input io.RegistryAddEndpointInput) (
 }
 
 func (this *RegistryImplClient) RemoveEndpoint(input io.RegistryRemoveEndpointInput) (output io.RegistryRemoveEndpointOutput) {
-	bs,err := this.httpClient.SendPostRequest(input,server.RemoveEndpoint)
+	bs, err := this.httpClient.SendPostRequest(input, server.RemoveEndpoint)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		return

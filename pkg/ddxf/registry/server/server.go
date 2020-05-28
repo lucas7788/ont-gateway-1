@@ -5,9 +5,9 @@ import (
 )
 
 const (
-	AddEndpoint = "/ddxf/registry/addendpoint"
+	AddEndpoint    = "/ddxf/registry/addendpoint"
 	RemoveEndpoint = "/ddxf/registry/removeendpoint"
-	QueryEndpoint = "/ddxf/registry/queryendpoint"
+	QueryEndpoint  = "/ddxf/registry/queryendpoint"
 )
 
 func StartRegistryImplServer() {

@@ -1,12 +1,12 @@
 package server
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"io/ioutil"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.uber.org/zap"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
-	"encoding/json"
+	"io/ioutil"
 )
 
 func AddEndpointHandler(ctx *gin.Context) {
