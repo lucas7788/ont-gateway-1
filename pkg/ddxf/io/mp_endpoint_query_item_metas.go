@@ -19,5 +19,5 @@ type MPEndpointQueryItemMetasOutput struct {
 
 type ItemMeta struct {
 	Id   primitive.ObjectID     `bson:"_id" json:"id"`
-	Item map[string]interface{} `bson:"item" json:"item"`
+	Item map[string]interface{} `bson:"item_meta" json:"item_meta"`
 }
