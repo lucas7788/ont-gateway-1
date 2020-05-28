@@ -2,18 +2,19 @@ package client
 
 import (
 	"encoding/json"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/http_utils"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/registry/server"
 	"net/http"
 )
 
 type RegistryImplClient struct {
-	httpClient *HttpClient
+	httpClient *http_utils.HttpClient
 }
 
 func Sdk() *RegistryImplClient {
 	return &RegistryImplClient{
-		httpClient: NewHttpClient("127.0.0.1:20331"),
+		httpClient: http_utils.NewHttpClient("127.0.0.1:20331"),
 	}
 }
 

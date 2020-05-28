@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
@@ -10,40 +9,34 @@ import (
 	"io/ioutil"
 )
 
-func AddEndpointHandler(ctx *gin.Context) {
+func BuyDtokenHandler(ctx *gin.Context) {
 	paramsBs, err := ioutil.ReadAll(ctx.Request.Body)
 	if err != nil {
 		instance.Logger().Error("[AddEndpointHandler] read post param error:", zap.Error(err))
 		return
 	}
-	param := io.MPAddRegistryInput{}
+	param := io.BuyerBuyDtokenInput{}
 	err = json.Unmarshal(paramsBs, &param)
 	if err != nil {
 		instance.Logger().Error("[AddEndpointHandler] parse post param error:", zap.Error(err))
 		return
 	}
-	fmt.Println("req param:", param)
-	output := AddEndpointService(io.RegistryAddEndpointInput(param))
+	output := BuyDtokenService(param)
 	ctx.JSON(output.Code, output)
 }
 
-func RemoveEndpointHandler(ctx *gin.Context) {
+func UseTokenHandler(ctx *gin.Context) {
 	paramsBs, err := ioutil.ReadAll(ctx.Request.Body)
 	if err != nil {
-		instance.Logger().Error("[RemoveEndpointHandler] read post param error:", zap.Error(err))
+		instance.Logger().Error("[AddEndpointHandler] read post param error:", zap.Error(err))
 		return
 	}
-	param := io.MPRemoveRegistryInput{}
+	param := io.BuyerUseTokenInput{}
 	err = json.Unmarshal(paramsBs, &param)
 	if err != nil {
-		instance.Logger().Error("[RemoveEndpointHandler] parse post param error:", zap.Error(err))
+		instance.Logger().Error("[AddEndpointHandler] parse post param error:", zap.Error(err))
 		return
 	}
-	output := RemoveEndpointService(io.RegistryRemoveEndpointInput(param))
-	ctx.JSON(output.Code, output)
-}
-
-func QueryEndpointHandler(ctx *gin.Context) {
-	output := QueryEndpointsService(io.RegistryQueryEndpointsInput{})
+	output := UseTokenService(param)
 	ctx.JSON(output.Code, output)
 }

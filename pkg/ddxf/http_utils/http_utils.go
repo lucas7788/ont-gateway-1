@@ -1,4 +1,4 @@
-package client
+package http_utils
 
 import (
 	"bytes"
@@ -51,6 +51,23 @@ func (this *HttpClient) SendPostRequest(reqParam interface{}, reqPath string, va
 	if err != nil {
 		return nil, err
 	}
+	reqData, err := json.Marshal(reqParam)
+	if err != nil {
+		return nil, fmt.Errorf("json.Marshal error:%s", err)
+	}
+	resp, err := this.httpClient.Post(reqUrl, "application/json", bytes.NewReader(reqData))
+	if err != nil {
+		return nil, fmt.Errorf("send http post request error:%s", err)
+	}
+	defer resp.Body.Close()
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("read http body error:%s", err)
+	}
+	return data,nil
+}
+
+func (this *HttpClient) PostRequest(reqParam interface{}, reqUrl string) ([]byte, error) {
 	reqData, err := json.Marshal(reqParam)
 	if err != nil {
 		return nil, fmt.Errorf("json.Marshal error:%s", err)
