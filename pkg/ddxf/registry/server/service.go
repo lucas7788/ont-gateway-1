@@ -22,10 +22,10 @@ const (
 // Init for this collection
 func Init() (err error) {
 	opts := &options.IndexOptions{}
-	opts.SetName("u-registry")
+	opts.SetName("u-mp")
 	opts.SetUnique(true)
 	index := mongo.IndexModel{
-		Keys:    bsonx.Doc{{Key: "registry", Value: bsonx.Int32(1)}},
+		Keys:    bsonx.Doc{{Key: "mp", Value: bsonx.Int32(1)}},
 		Options: opts,
 	}
 	_, err = instance.MongoOfficial().Collection(registryCollectionName).Indexes().CreateOne(context.Background(), index)

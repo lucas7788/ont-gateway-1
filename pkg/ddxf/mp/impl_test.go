@@ -23,7 +23,6 @@ func TestMain(m *testing.M) {
 	acc, _ := ontology_go_sdk.NewAccountFromPrivateKey(pri, signature.SHA256withECDSA)
 	fmt.Println(acc.Address.ToBase58())
 	mp = NewMarketplaceImpl(acc)
-	mp.Init()
 	m.Run()
 }
 
