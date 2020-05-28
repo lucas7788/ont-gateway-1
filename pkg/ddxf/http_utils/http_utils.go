@@ -64,7 +64,7 @@ func (this *HttpClient) SendPostRequest(reqParam interface{}, reqPath string, va
 	if err != nil {
 		return nil, fmt.Errorf("read http body error:%s", err)
 	}
-	return data,nil
+	return data, nil
 }
 
 func (this *HttpClient) PostRequest(reqParam interface{}, reqUrl string) ([]byte, error) {
@@ -81,7 +81,7 @@ func (this *HttpClient) PostRequest(reqParam interface{}, reqUrl string) ([]byte
 	if err != nil {
 		return nil, fmt.Errorf("read http body error:%s", err)
 	}
-	return data,nil
+	return data, nil
 }
 
 func (this *HttpClient) SendGetRequest(reqPath string, values ...*url.Values) ([]byte, error) {
@@ -98,5 +98,5 @@ func (this *HttpClient) SendGetRequest(reqPath string, values ...*url.Values) ([
 	if err != nil {
 		return nil, fmt.Errorf("read http body error:%s", err)
 	}
-	return data,nil
+	return data, nil
 }

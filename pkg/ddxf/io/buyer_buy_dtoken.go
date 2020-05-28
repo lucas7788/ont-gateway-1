@@ -1,8 +1,8 @@
 package io
 
 import (
-	io2 "github.com/zhiqiangxu/ont-gateway/pkg/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/define"
+	io2 "github.com/zhiqiangxu/ont-gateway/pkg/io"
 )
 
 // BuyerBuyDtokenInput ...

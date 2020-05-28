@@ -18,7 +18,7 @@ func ReadString(source *common.ZeroCopySource) (string, error) {
 	if eof {
 		return "", io.ErrUnexpectedEOF
 	}
-	return data,nil
+	return data, nil
 }
 func DeserializeTokenTemplates(source *common.ZeroCopySource) ([]TokenTemplate, error) {
 	l, _, irregular, eof := source.NextVarUint()

@@ -20,7 +20,6 @@ const (
 	buyerCollectionName = "buyer"
 )
 
-
 func Init() error {
 	opts := &options.IndexOptions{}
 	opts.SetName("u-tx")
