@@ -109,12 +109,13 @@ func (this *EndpointImpl) GetItemMetaSchema(io.MPEndpointGetItemMetaSchemaInput)
 
 func (this *EndpointImpl) GetItemMeta(input io.MPEndpointGetItemMetaInput) (output io.MPEndpointGetItemMetaOutput) {
 	filter := bson.M{"mp": input.ItemMetaID}
-	output = io.MPEndpointGetItemMetaOutput{}
-	err := instance.MongoOfficial().Collection(endpointCollectionName).FindOne(context.Background(), filter).Decode(&output)
+	item := make(map[string]interface{})
+	err := instance.MongoOfficial().Collection(endpointCollectionName).FindOne(context.Background(), filter).Decode(&item)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
 	}
+	output.ItemMeta = item
 	return
 }
 
@@ -175,7 +176,7 @@ func (this *EndpointImpl) PublishItemMeta(input io.MPEndpointPublishItemMetaInpu
 	timeout := config.Load().MongoConfig.Timeout
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
-	_, err = instance.MongoOfficial().Collection(endpointCollectionName).InsertOne(ctx, input)
+	_, err = instance.MongoOfficial().Collection(endpointCollectionName).InsertOne(ctx, input.ItemMeta)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
