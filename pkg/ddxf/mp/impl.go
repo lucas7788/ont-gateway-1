@@ -18,19 +18,16 @@ import (
 )
 
 const (
-	mpCollectionName       = "marketplace"
 	endpointCollectionName = "mpendpoint"
 )
 
 type MarketplaceImpl struct {
 	endpointImpl Endpoint
-	registryAddr string
 }
 
-func NewMarketplaceImpl(acc *ontology_go_sdk.Account, addr string) *MarketplaceImpl {
+func NewMarketplaceImpl(acc *ontology_go_sdk.Account) *MarketplaceImpl {
 	return &MarketplaceImpl{
 		endpointImpl: NewEndpointImpl(acc),
-		registryAddr: addr,
 	}
 }
 
@@ -45,31 +42,17 @@ func NewEndpointImpl(acc *ontology_go_sdk.Account) *EndpointImpl {
 }
 
 func (this *MarketplaceImpl) AddRegistry(input io.MPAddRegistryInput) (output io.MPAddRegistryOutput) {
-	client.Sdk(this.registryAddr).AddEndpoint(io.RegistryAddEndpointInput(input))
+	client.Sdk().AddEndpoint(io.RegistryAddEndpointInput(input))
 	return
 }
 
 func (this *MarketplaceImpl) RemoveRegistry(input io.MPRemoveRegistryInput) (output io.MPRemoveRegistryOutput) {
-	output = io.MPRemoveRegistryOutput(client.Sdk(this.registryAddr).RemoveEndpoint(io.RegistryRemoveEndpointInput(input)))
+	output = io.MPRemoveRegistryOutput(client.Sdk().RemoveEndpoint(io.RegistryRemoveEndpointInput(input)))
 	return
 }
 
 func (this *MarketplaceImpl) Endpoint() Endpoint {
 	return this.endpointImpl
-}
-
-// Init for this collection
-func (m *MarketplaceImpl) Init() (err error) {
-	opts := &options.IndexOptions{}
-	opts.SetName("u-mp")
-	opts.SetUnique(true)
-	index := mongo.IndexModel{
-		Keys:    bsonx.Doc{{Key: "mp", Value: bsonx.Int32(1)}},
-		Options: opts,
-	}
-
-	_, err = instance.MongoOfficial().Collection(mpCollectionName).Indexes().CreateOne(context.Background(), index)
-	return
 }
 
 // Init for this collection

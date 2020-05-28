@@ -9,13 +9,28 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/x/bsonx"
 	"net/http"
 )
 
 const (
 	registryCollectionName = "registry"
 )
+
+// Init for this collection
+func Init() (err error) {
+	opts := &options.IndexOptions{}
+	opts.SetName("u-registry")
+	opts.SetUnique(true)
+	index := mongo.IndexModel{
+		Keys:    bsonx.Doc{{Key: "registry", Value: bsonx.Int32(1)}},
+		Options: opts,
+	}
+	_, err = instance.MongoOfficial().Collection(registryCollectionName).Indexes().CreateOne(context.Background(), index)
+	return
+}
 
 func AddEndpointService(input io.RegistryAddEndpointInput) (output io.RegistryAddEndpointOutput) {
 	timeout := config.Load().MongoConfig.Timeout

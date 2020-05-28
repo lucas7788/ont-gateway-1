@@ -11,9 +11,9 @@ type RegistryImplClient struct {
 	httpClient *HttpClient
 }
 
-func Sdk(addr string) *RegistryImplClient {
+func Sdk() *RegistryImplClient {
 	return &RegistryImplClient{
-		httpClient: NewHttpClient(addr),
+		httpClient: NewHttpClient(""),
 	}
 }
 

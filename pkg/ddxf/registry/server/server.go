@@ -15,5 +15,6 @@ func StartRegistryImplServer() {
 	r.POST(AddEndpoint, AddEndpointHandler)
 	r.POST(RemoveEndpoint, RemoveEndpointHandler)
 	r.GET(QueryEndpoint, QueryEndpointHandler)
+	Init()
 	go r.Run(":" + "20331")
 }
