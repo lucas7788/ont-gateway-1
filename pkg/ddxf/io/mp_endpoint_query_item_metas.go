@@ -4,7 +4,7 @@ import io2 "github.com/zhiqiangxu/ont-gateway/pkg/io"
 
 // MPEndpointQueryItemMetasInput ...
 type MPEndpointQueryItemMetasInput struct {
-	PageNum int64
+	PageNum  int64
 	PageSize int64
 }
 

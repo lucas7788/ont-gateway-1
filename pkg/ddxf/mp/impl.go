@@ -3,12 +3,11 @@ package mp
 import (
 	"context"
 	"encoding/hex"
-	"github.com/ontio/ontology-crypto/keypair"
 	"github.com/ontio/ontology-go-sdk"
-	signature2 "github.com/ontio/ontology/core/signature"
 	"github.com/ontio/ontology/core/types"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/registry/client"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -25,11 +24,13 @@ const (
 
 type MarketplaceImpl struct {
 	endpointImpl Endpoint
+	registryAddr string
 }
 
-func NewMarketplaceImpl(acc *ontology_go_sdk.Account) *MarketplaceImpl {
+func NewMarketplaceImpl(acc *ontology_go_sdk.Account, addr string) *MarketplaceImpl {
 	return &MarketplaceImpl{
 		endpointImpl: NewEndpointImpl(acc),
+		registryAddr: addr,
 	}
 }
 
@@ -44,62 +45,12 @@ func NewEndpointImpl(acc *ontology_go_sdk.Account) *EndpointImpl {
 }
 
 func (this *MarketplaceImpl) AddRegistry(input io.MPAddRegistryInput) (output io.MPAddRegistryOutput) {
-	timeout := config.Load().MongoConfig.Timeout
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-	pkBs, err := hex.DecodeString(input.PubKey)
-	if err != nil {
-		output.Code = http.StatusBadRequest
-		output.Msg = err.Error()
-		return
-	}
-	_, err = keypair.DeserializePublicKey(pkBs)
-	if err != nil {
-		output.Code = http.StatusBadRequest
-		output.Msg = err.Error()
-		return
-	}
-	_, err = instance.MongoOfficial().Collection(mpCollectionName).InsertOne(ctx, input)
-	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-	}
+	client.Sdk(this.registryAddr).AddEndpoint(io.RegistryAddEndpointInput(input))
 	return
 }
 
 func (this *MarketplaceImpl) RemoveRegistry(input io.MPRemoveRegistryInput) (output io.MPRemoveRegistryOutput) {
-	timeout := config.Load().MongoConfig.Timeout
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-	ad := &io.MPAddRegistryInput{}
-	filter := bson.M{"mp": input.MP}
-	err := instance.MongoOfficial().Collection(mpCollectionName).FindOne(ctx, filter).Decode(ad)
-	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-		return
-	}
-	pkBs, err := hex.DecodeString(ad.PubKey)
-	if err != nil {
-		panic(err)
-	}
-	pk, err := keypair.DeserializePublicKey(pkBs)
-	if err != nil {
-		panic(err)
-	}
-
-	err = signature2.Verify(pk, []byte(input.MP), input.Sign)
-	if err != nil {
-		output.Code = http.StatusBadRequest
-		output.Msg = err.Error()
-		return
-	}
-	filter = bson.M{"mp": input.MP}
-	_, err = instance.MongoOfficial().Collection(mpCollectionName).DeleteOne(ctx, filter)
-	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-	}
+	output = io.MPRemoveRegistryOutput(client.Sdk(this.registryAddr).RemoveEndpoint(io.RegistryRemoveEndpointInput(input)))
 	return
 }
 
