@@ -112,5 +112,6 @@ func QueryEndpointsService(input io.RegistryQueryEndpointsInput) (output io.Regi
 		output.Msg = err.Error()
 		return
 	}
+	output.Endpoints = itemMetas
 	return
 }

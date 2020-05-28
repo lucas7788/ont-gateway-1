@@ -7,6 +7,7 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.uber.org/zap"
 	"io/ioutil"
+	"fmt"
 )
 
 func AddEndpointHandler(ctx *gin.Context) {
@@ -21,6 +22,7 @@ func AddEndpointHandler(ctx *gin.Context) {
 		instance.Logger().Error("[AddEndpointHandler] parse post param error:", zap.Error(err))
 		return
 	}
+	fmt.Println("req param:",param)
 	output := AddEndpointService(io.RegistryAddEndpointInput(param))
 	ctx.JSON(output.Code, output)
 }

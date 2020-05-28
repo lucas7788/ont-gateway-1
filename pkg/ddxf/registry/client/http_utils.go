@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -33,13 +32,12 @@ func NewHttpClient(addr string) *HttpClient {
 }
 
 func (this *HttpClient) getRequestUrl(reqPath string, values ...*url.Values) (string, error) {
-	var addr string
 	if !strings.HasPrefix(this.addr, "http") {
-		addr = "http://" + addr
+		this.addr = "http://" + this.addr
 	}
-	reqUrl, err := new(url.URL).Parse(addr)
+	reqUrl, err := new(url.URL).Parse(this.addr)
 	if err != nil {
-		return "", fmt.Errorf("Parse address:%s error:%s", addr, err)
+		return "", fmt.Errorf("Parse address:%s error:%s", this.addr, err)
 	}
 	reqUrl.Path = reqPath
 	if len(values) > 0 && values[0] != nil {
@@ -62,23 +60,11 @@ func (this *HttpClient) SendPostRequest(reqParam interface{}, reqPath string, va
 		return nil, fmt.Errorf("send http post request error:%s", err)
 	}
 	defer resp.Body.Close()
-	return this.dealRestResponse(resp.Body)
-}
-
-func (this *HttpClient) dealRestResponse(body io.Reader) ([]byte, error) {
-	data, err := ioutil.ReadAll(body)
+	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("read http body error:%s", err)
 	}
-	restRsp := &RestfulResp{}
-	err = json.Unmarshal(data, restRsp)
-	if err != nil {
-		return nil, fmt.Errorf("json.Unmarshal RestfulResp:%s error:%s", body, err)
-	}
-	if restRsp.Error != 0 {
-		return nil, fmt.Errorf("sendRestRequest error code:%d desc:%s result:%s", restRsp.Error, restRsp.Desc, restRsp.Result)
-	}
-	return restRsp.Result, nil
+	return data,nil
 }
 
 func (this *HttpClient) SendGetRequest(reqPath string, values ...*url.Values) ([]byte, error) {
@@ -91,5 +77,9 @@ func (this *HttpClient) SendGetRequest(reqPath string, values ...*url.Values) ([
 		return nil, fmt.Errorf("send http get request error:%s", err)
 	}
 	defer resp.Body.Close()
-	return this.dealRestResponse(resp.Body)
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("read http body error:%s", err)
+	}
+	return data,nil
 }
