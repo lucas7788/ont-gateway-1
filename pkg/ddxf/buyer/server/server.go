@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	AddEndpoint    = "/ddxf/buyer/BuyDtoken"
-	QueryEndpoint  = "/ddxf/buyer/UseToken"
+	AddEndpoint   = "/ddxf/buyer/BuyDtoken"
+	QueryEndpoint = "/ddxf/buyer/UseToken"
 )
 
 func StartBuyerServer() {

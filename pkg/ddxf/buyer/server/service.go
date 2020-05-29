@@ -33,8 +33,11 @@ func Init() error {
 }
 
 func BuyDtokenService(input io.BuyerBuyDtokenInput) (output io.BuyerBuyDtokenOutput) {
+	//build qrcode
+
+	//TODO
 	var err error
-	output.EndpointTokens, err = sendTxAndGetTemplates(input.Tx, "buyDtoken")
+	output.EndpointTokens, err = sendTxAndGetTemplates(input.OnchainItemId, "buyDtoken")
 	timeout := config.Load().MongoConfig.Timeout
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
