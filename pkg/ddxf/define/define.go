@@ -2,6 +2,7 @@ package define
 
 import (
 	"github.com/ontio/ontology/common"
+	io2 "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"io"
 )
 
@@ -20,7 +21,8 @@ func ReadString(source *common.ZeroCopySource) (string, error) {
 	}
 	return data, nil
 }
-func DeserializeTokenTemplates(source *common.ZeroCopySource) ([]TokenTemplate, error) {
+func ConstructTokensAndEndpoint(data []byte, buyer common.Address, onchainItemId string) ([]io2.EndpointToken, error) {
+	source := common.NewZeroCopySource(data)
 	l, _, irregular, eof := source.NextVarUint()
 	if irregular {
 		return nil, common.ErrIrregularData
@@ -28,14 +30,25 @@ func DeserializeTokenTemplates(source *common.ZeroCopySource) ([]TokenTemplate, 
 	if eof {
 		return nil, io.ErrUnexpectedEOF
 	}
-	res := make([]TokenTemplate, l)
+	res := make([]io2.EndpointToken, l)
 	for i := 0; i < int(l); i++ {
 		tt := &TokenTemplate{}
 		err := tt.Deserialize(source)
 		if err != nil {
 			return nil, err
 		}
-		res[i] = *tt
+		endpoint, err := ReadString(source)
+		if err != nil {
+			return nil, err
+		}
+		res[i] = io2.EndpointToken{
+			Token: io2.Token{
+				TokenTemplate: *tt,
+				Buyer:         buyer,
+				OnchainItemId: onchainItemId,
+			},
+			Endpoint: endpoint,
+		}
 	}
 	return res, nil
 }

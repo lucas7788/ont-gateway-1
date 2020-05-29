@@ -12,13 +12,13 @@ import (
 func BuyDtokenHandler(ctx *gin.Context) {
 	paramsBs, err := ioutil.ReadAll(ctx.Request.Body)
 	if err != nil {
-		instance.Logger().Error("[AddEndpointHandler] read post param error:", zap.Error(err))
+		instance.Logger().Error("[BuyDtokenHandler] read post param error:", zap.Error(err))
 		return
 	}
 	param := io.BuyerBuyDtokenInput{}
 	err = json.Unmarshal(paramsBs, &param)
 	if err != nil {
-		instance.Logger().Error("[AddEndpointHandler] parse post param error:", zap.Error(err))
+		instance.Logger().Error("[BuyDtokenHandler] parse post param error:", zap.Error(err))
 		return
 	}
 	output := BuyDtokenService(param)
@@ -28,13 +28,13 @@ func BuyDtokenHandler(ctx *gin.Context) {
 func UseTokenHandler(ctx *gin.Context) {
 	paramsBs, err := ioutil.ReadAll(ctx.Request.Body)
 	if err != nil {
-		instance.Logger().Error("[AddEndpointHandler] read post param error:", zap.Error(err))
+		instance.Logger().Error("[UseTokenHandler] read post param error:", zap.Error(err))
 		return
 	}
 	param := io.BuyerUseTokenInput{}
 	err = json.Unmarshal(paramsBs, &param)
 	if err != nil {
-		instance.Logger().Error("[AddEndpointHandler] parse post param error:", zap.Error(err))
+		instance.Logger().Error("[UseTokenHandler] parse post param error:", zap.Error(err))
 		return
 	}
 	output := UseTokenService(param)

@@ -1,22 +1,29 @@
 package io
 
 import (
+	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/define"
 	io2 "github.com/zhiqiangxu/ont-gateway/pkg/io"
 )
 
 // BuyerBuyDtokenInput ...
 type BuyerBuyDtokenInput struct {
-	Tx            string
-	OnchainItemID string //resource_id
+	Tx string
 }
 
 // BuyerBuyDtokenOutput ...
 type BuyerBuyDtokenOutput struct {
 	io2.BaseResp
-	EndpointTokens EndpointTokens
+	EndpointTokens []EndpointToken
 }
-type EndpointTokens struct {
-	Tokens   []define.TokenTemplate `bson:"tokens" json:"tokens"`
-	Endpoint string                 `bson:"endpoint" json:"endpoint"`
+
+type EndpointToken struct {
+	Token    Token
+	Endpoint string
+}
+
+type Token struct {
+	TokenTemplate define.TokenTemplate
+	Buyer         common.Address
+	OnchainItemId string
 }
