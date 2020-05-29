@@ -24,13 +24,8 @@ func BuyDtokenHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, ResponseFailedOnto(http.StatusBadRequest, err))
 		return
 	}
-	output, err := BuyDTokenService(param)
-	if err != nil {
-		instance.Logger().Error("[BuyDtokenHandler] BuyDtokenService error:", zap.Error(err))
-		ctx.JSON(http.StatusInternalServerError, ResponseFailedOnto(http.StatusInternalServerError, err))
-		return
-	}
-	ctx.JSON(0, ResponseSuccess(output))
+	output := BuyDTokenService(param)
+	ctx.JSON(output.Code, output)
 }
 
 func UseTokenHandler(ctx *gin.Context) {
