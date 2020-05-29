@@ -15,18 +15,18 @@ type ExtraData struct {
 }
 
 type QrCode struct {
-	QrCodeId     string `json:"id" db:"QrCodeId"`
-	Ver          string `json:"ver" db:"Ver"`
-	OrderId      string `json:"orderId" db:"OrderId"`
-	Requester    string `json:"requester" db:"Requester"`
-	Signature    string `json:"signature" db:"Signature"`
-	Signer       string `json:"signer" db:"Signer"`
-	QrCodeData   string `json:"data" db:"QrCodeData"`
-	Callback     string `json:"callback" db:"Callback"`
-	Exp          int64  `json:"exp" db:"Exp"`
-	Chain        string `json:"chain" db:"Chain"`
-	QrCodeDesc   string `json:"desc" db:"QrCodeDesc"`
-	ContractType string `json:"contractType" db:"ContractType"`
+	QrCodeId     string `json:"id" bson:"qrCodeId"`
+	Ver          string `json:"ver" bson:"ver"`
+	OrderId      string `json:"orderId" bson:"orderId"`
+	Requester    string `json:"requester" bson:"requester"`
+	Signature    string `json:"signature" bson:"signature"`
+	Signer       string `json:"signer" bson:"signer"`
+	QrCodeData   string `json:"data" bson:"qrCodeData"`
+	Callback     string `json:"callback" bson:"callback"`
+	Exp          int64  `json:"exp" bson:"exp"`
+	Chain        string `json:"chain" bson:"chain"`
+	QrCodeDesc   string `json:"desc" bson:"qrCodeDesc"`
+	ContractType string `json:"contractType" bson:"contractType"`
 }
 
 type QrCodeData struct {
