@@ -12,6 +12,8 @@ github.com/btcsuite/btcd/btcec
 github.com/cespare/xxhash/v2
 # github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d
 github.com/cpuguy83/go-md2man/v2/md2man
+# github.com/davecgh/go-spew v1.1.1
+github.com/davecgh/go-spew/spew
 # github.com/emirpasic/gods v1.12.0
 github.com/emirpasic/gods/stacks/linkedliststack
 github.com/emirpasic/gods/containers
@@ -87,6 +89,8 @@ github.com/klauspost/compress/zstd/internal/xxhash
 github.com/klauspost/compress/fse
 # github.com/leodido/go-urn v1.2.0
 github.com/leodido/go-urn
+# github.com/magiconair/properties v1.8.1
+github.com/magiconair/properties/assert
 # github.com/mattn/go-isatty v0.0.12
 github.com/mattn/go-isatty
 # github.com/matttproud/golang_protobuf_extensions v1.0.1
@@ -100,20 +104,24 @@ github.com/oklog/run
 # github.com/ontio/go-bip32 v0.0.0-20190520025953-d3cea6894a2b
 github.com/ontio/go-bip32
 # github.com/ontio/ontology v1.8.2
+github.com/ontio/ontology/common
+github.com/ontio/ontology/core/types
+github.com/ontio/ontology/core/signature
+github.com/ontio/ontology/core/payload
+github.com/ontio/ontology/smartcontract/service/native/utils
 github.com/ontio/ontology/account
 github.com/ontio/ontology/cmd/utils
-github.com/ontio/ontology/common
 github.com/ontio/ontology/common/constants
 github.com/ontio/ontology/common/serialization
-github.com/ontio/ontology/core/payload
-github.com/ontio/ontology/core/types
 github.com/ontio/ontology/core/utils
 github.com/ontio/ontology/http/base/common
 github.com/ontio/ontology/smartcontract/event
 github.com/ontio/ontology/smartcontract/service/native/global_params
 github.com/ontio/ontology/smartcontract/service/native/ont
-github.com/ontio/ontology/core/signature
-github.com/ontio/ontology/smartcontract/service/native/utils
+github.com/ontio/ontology/core/program
+github.com/ontio/ontology/errors
+github.com/ontio/ontology/core/states
+github.com/ontio/ontology/smartcontract/service/native
 github.com/ontio/ontology/common/log
 github.com/ontio/ontology/cmd/abi
 github.com/ontio/ontology/common/config
@@ -121,18 +129,14 @@ github.com/ontio/ontology/http/base/error
 github.com/ontio/ontology/smartcontract/service/neovm
 github.com/ontio/ontology/smartcontract/states
 github.com/ontio/ontology/vm/neovm
-github.com/ontio/ontology/errors
-github.com/ontio/ontology/core/program
 github.com/ontio/ontology/core/ledger
 github.com/ontio/ontology/http/base/actor
 github.com/ontio/ontology/events
 github.com/ontio/ontology/events/message
 github.com/ontio/ontology/vm/neovm/types
-github.com/ontio/ontology/core/states
-github.com/ontio/ontology/smartcontract/service/native
-github.com/ontio/ontology/core/store
 github.com/ontio/ontology/smartcontract/context
 github.com/ontio/ontology/smartcontract/storage
+github.com/ontio/ontology/core/store
 github.com/ontio/ontology/vm/crossvm_codec
 github.com/ontio/ontology/vm/neovm/constants
 github.com/ontio/ontology/vm/neovm/errors
@@ -143,8 +147,8 @@ github.com/ontio/ontology/consensus/actor
 github.com/ontio/ontology/p2pserver/actor/server
 github.com/ontio/ontology/p2pserver/common
 github.com/ontio/ontology/txnpool/common
-github.com/ontio/ontology/core/store/overlaydb
 github.com/ontio/ontology/core/store/common
+github.com/ontio/ontology/core/store/overlaydb
 github.com/ontio/ontology/consensus/vbft/config
 github.com/ontio/ontology/core/store/leveldbstore
 github.com/ontio/ontology/merkle
@@ -168,8 +172,8 @@ github.com/ontio/ontology/p2pserver/actor/req
 github.com/ontio/ontology/p2pserver/common/set
 github.com/ontio/ontology/p2pserver/link
 # github.com/ontio/ontology-crypto v1.0.7
-github.com/ontio/ontology-crypto/ec
 github.com/ontio/ontology-crypto/keypair
+github.com/ontio/ontology-crypto/ec
 github.com/ontio/ontology-crypto/signature
 github.com/ontio/ontology-crypto/sm2
 github.com/ontio/ontology-crypto/sm3
@@ -183,11 +187,11 @@ github.com/ontio/ontology-eventbus/mailbox
 github.com/ontio/ontology-eventbus/internal/queue/goring
 github.com/ontio/ontology-eventbus/internal/queue/mpsc
 # github.com/ontio/ontology-go-sdk v1.11.1
+github.com/ontio/ontology-go-sdk/utils
 github.com/ontio/ontology-go-sdk
+github.com/ontio/ontology-go-sdk/common
 github.com/ontio/ontology-go-sdk/bip44
 github.com/ontio/ontology-go-sdk/client
-github.com/ontio/ontology-go-sdk/common
-github.com/ontio/ontology-go-sdk/utils
 # github.com/ontio/wagon v0.4.2
 github.com/ontio/wagon/exec
 github.com/ontio/wagon/validate
@@ -204,6 +208,8 @@ github.com/orcaman/concurrent-map
 github.com/piprate/json-gold/ld
 # github.com/pkg/errors v0.8.1
 github.com/pkg/errors
+# github.com/pmezard/go-difflib v1.0.0
+github.com/pmezard/go-difflib/difflib
 # github.com/pquerna/cachecontrol v0.0.0-20180517163645-1555304b9b35
 github.com/pquerna/cachecontrol
 github.com/pquerna/cachecontrol/cacheobject
@@ -227,6 +233,8 @@ github.com/russross/blackfriday/v2
 github.com/satori/go.uuid
 # github.com/shurcooL/sanitized_anchor_name v1.0.0
 github.com/shurcooL/sanitized_anchor_name
+# github.com/stretchr/testify v1.4.0
+github.com/stretchr/testify/assert
 # github.com/syndtr/goleveldb v1.0.0
 github.com/syndtr/goleveldb/leveldb/util
 github.com/syndtr/goleveldb/leveldb/comparer
@@ -264,14 +272,14 @@ github.com/zhiqiangxu/util
 github.com/zhiqiangxu/util/signal
 # go.mongodb.org/mongo-driver v1.3.1
 go.mongodb.org/mongo-driver/mongo
-go.mongodb.org/mongo-driver/bson
 go.mongodb.org/mongo-driver/mongo/options
 go.mongodb.org/mongo-driver/x/bsonx
+go.mongodb.org/mongo-driver/bson/primitive
+go.mongodb.org/mongo-driver/bson
 go.mongodb.org/mongo-driver/mongo/readpref
 go.mongodb.org/mongo-driver/x/mongo/driver/connstring
 go.mongodb.org/mongo-driver/bson/bsoncodec
 go.mongodb.org/mongo-driver/bson/bsontype
-go.mongodb.org/mongo-driver/bson/primitive
 go.mongodb.org/mongo-driver/event
 go.mongodb.org/mongo-driver/mongo/readconcern
 go.mongodb.org/mongo-driver/mongo/writeconcern
@@ -285,9 +293,9 @@ go.mongodb.org/mongo-driver/x/mongo/driver/operation
 go.mongodb.org/mongo-driver/x/mongo/driver/session
 go.mongodb.org/mongo-driver/x/mongo/driver/topology
 go.mongodb.org/mongo-driver/x/mongo/driver/uuid
-go.mongodb.org/mongo-driver/bson/bsonrw
 go.mongodb.org/mongo-driver/tag
 go.mongodb.org/mongo-driver/x/mongo/driver/wiremessage
+go.mongodb.org/mongo-driver/bson/bsonrw
 go.mongodb.org/mongo-driver/internal
 go.mongodb.org/mongo-driver/x/mongo/driver/dns
 go.mongodb.org/mongo-driver/bson/bsonoptions
