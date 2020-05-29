@@ -2,13 +2,13 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"github.com/ontio/ontology-go-sdk/utils"
 	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/define"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/http_utils"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
+	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -57,7 +57,13 @@ func UseTokenService(input io.BuyerUseTokenInput) (output io.BuyerUseTokenOutput
 		output.Msg = err.Error()
 		return
 	}
-	data, err := http_utils.NewHttpClient("").PostRequest(endpointTokens, input.TokenOpEndpoint)
+	paramBs, err := json.Marshal(endpointTokens)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	_, _, data, err := forward.JSONRequest("useToken", "", paramBs)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -130,7 +136,7 @@ func sendTxAndGetTemplates(txHex string, method string) ([]io.EndpointToken, err
 	if err != nil {
 		return nil, err
 	}
-	tokenEndpoints, err := define.ConstructTokensAndEndpoint(data, buyer, onchainItemId)
+	tokenEndpoints, err := io.ConstructTokensAndEndpoint(data, buyer, onchainItemId)
 	if err != nil {
 		return nil, err
 	}
