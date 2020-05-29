@@ -4,26 +4,33 @@ import (
 	"encoding/json"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/registry/server"
+	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 	"net/http"
 )
 
 type RegistryImplClient struct {
-	httpClient *HttpClient
+	addr string
 }
 
 func Sdk() *RegistryImplClient {
 	return &RegistryImplClient{
-		httpClient: NewHttpClient("127.0.0.1:20331"),
+		addr: "http://127.0.0.1:20331",
 	}
 }
 
 func (this *RegistryImplClient) AddEndpoint(input io.RegistryAddEndpointInput) (output io.RegistryAddEndpointOutput) {
-	bs, err := this.httpClient.SendPostRequest(input, server.AddEndpoint)
+	paramBs, err := json.Marshal(input)
+	if err != nil {
+		output.Code = http.StatusBadRequest
+		output.Msg = err.Error()
+		return
+	}
+	_, _, res, err := forward.JSONRequest("addendpoint", this.addr+server.AddEndpoint, paramBs)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		return
 	}
-	err = json.Unmarshal(bs, &output)
+	err = json.Unmarshal(res, &output)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -32,12 +39,19 @@ func (this *RegistryImplClient) AddEndpoint(input io.RegistryAddEndpointInput) (
 }
 
 func (this *RegistryImplClient) RemoveEndpoint(input io.RegistryRemoveEndpointInput) (output io.RegistryRemoveEndpointOutput) {
-	bs, err := this.httpClient.SendPostRequest(input, server.RemoveEndpoint)
+	paramBs, err := json.Marshal(input)
 	if err != nil {
-		output.Code = http.StatusInternalServerError
+		output.Code = http.StatusBadRequest
+		output.Msg = err.Error()
 		return
 	}
-	err = json.Unmarshal(bs, &output)
+	_, _, res, err := forward.JSONRequest("removeendpoint", this.addr+server.RemoveEndpoint, paramBs)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	err = json.Unmarshal(res, &output)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -46,7 +60,7 @@ func (this *RegistryImplClient) RemoveEndpoint(input io.RegistryRemoveEndpointIn
 }
 
 func (this *RegistryImplClient) QueryEndpoints(input io.RegistryQueryEndpointsInput) (output io.RegistryQueryEndpointsOutput) {
-	bs, err := this.httpClient.SendGetRequest(server.QueryEndpoint)
+	_, _, bs, err := forward.Get(this.addr + server.QueryEndpoint)
 	if err != nil {
 		output.Code = http.StatusBadRequest
 		output.Msg = err.Error()

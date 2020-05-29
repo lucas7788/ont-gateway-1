@@ -2,8 +2,13 @@ package misc
 
 import (
 	osdk "github.com/ontio/ontology-go-sdk"
+	"github.com/ontio/ontology-go-sdk/common"
+	common2 "github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
+	"time"
 )
+
+var ddxfContract *DDXFContractKit
 
 // OntSdk deals with ont sdk related stuff
 type OntSdk struct {
@@ -39,6 +44,30 @@ func (sdk *OntSdk) GetOntNode() string {
 // GetKit returns the ont sdk
 func (sdk *OntSdk) GetKit() *osdk.OntologySdk {
 	return sdk.kit
+}
+
+func (sdk *OntSdk) DDXFContract(gasLimit uint64,
+	gasPrice uint64,
+	payer *osdk.Account) *DDXFContractKit {
+	if ddxfContract == nil {
+		contractAddress, _ := common2.AddressFromHexString("")
+		ddxfContract = NewDDXFContractKit(sdk.kit, contractAddress)
+	} else {
+		ddxfContract.gasPrice = gasPrice
+		ddxfContract.gasLimit = gasLimit
+		ddxfContract.payer = payer
+	}
+	return ddxfContract
+}
+
+func (sdk *OntSdk) GetSmartCodeEvent(txHash string) (*common.SmartContactEvent, error) {
+	sdk.WaitForGenerateBlock()
+	return sdk.kit.GetSmartContractEvent(txHash)
+}
+
+func (sdk *OntSdk) WaitForGenerateBlock() (bool, error) {
+	timeout := time.Second * 30
+	return sdk.kit.WaitForGenerateBlock(timeout)
 }
 
 const (

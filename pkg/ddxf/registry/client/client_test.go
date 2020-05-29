@@ -1,14 +1,14 @@
 package client
 
 import (
-	"testing"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
-	"github.com/ontio/ontology/account"
-	"github.com/ontio/ontology-crypto/keypair"
 	"encoding/hex"
-	"github.com/stretchr/testify/assert"
-	"github.com/ontio/ontology/core/signature"
 	"fmt"
+	"github.com/ontio/ontology-crypto/keypair"
+	"github.com/ontio/ontology/account"
+	"github.com/ontio/ontology/core/signature"
+	"github.com/stretchr/testify/assert"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
+	"testing"
 )
 
 func TestSdk(t *testing.T) {

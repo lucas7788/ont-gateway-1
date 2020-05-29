@@ -2,10 +2,10 @@ package main
 
 import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/registry/server"
+	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"os"
 	"os/signal"
 	"syscall"
-	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 )
 
 func main() {

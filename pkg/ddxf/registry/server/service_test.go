@@ -46,5 +46,4 @@ func TestAddEndpointService(t *testing.T) {
 	output2 := RemoveEndpointService(rm)
 	assert.Equal(t, output2.Msg, "")
 
-
 }
