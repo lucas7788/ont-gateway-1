@@ -27,12 +27,12 @@ func GetWalletMin(c *gin.Context) {
 	// 	return
 	// }
 
-	var input io.GetWalletInput
+	var input io.GetWalletMinInput
 	if err := c.ShouldBind(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
-	output := service.Instance().GetWallet(input)
+	output := service.Instance().GetWalletMin(input)
 	sendoutput(c, output.Code, output)
 }
