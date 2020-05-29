@@ -7,7 +7,6 @@ import (
 
 const (
 	AddEndpoint    = "/ddxf/buyer/BuyDtoken"
-	RemoveEndpoint = "/ddxf/buyer/SaveTokenAndEndpoint"
 	QueryEndpoint  = "/ddxf/buyer/UseToken"
 )
 

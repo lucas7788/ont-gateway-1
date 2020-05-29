@@ -61,6 +61,15 @@ func UseTokenService(input io.BuyerUseTokenInput) (output io.BuyerUseTokenOutput
 		return
 	}
 	output.Result = data
+	timeout := config.Load().MongoConfig.Timeout
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	_, err = instance.MongoOfficial().Collection(buyerCollectionName).InsertOne(ctx, output.Result)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
 	return
 }
 

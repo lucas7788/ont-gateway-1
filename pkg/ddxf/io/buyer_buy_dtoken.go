@@ -18,12 +18,12 @@ type BuyerBuyDtokenOutput struct {
 }
 
 type EndpointToken struct {
-	Token    Token
-	Endpoint string
+	Token    Token  `bson:"token" json:"token"`
+	Endpoint string `bson:"endpoint" json:"endpoint"`
 }
 
 type Token struct {
-	TokenTemplate define.TokenTemplate
-	Buyer         common.Address
-	OnchainItemId string
+	TokenTemplate define.TokenTemplate `bson:"token_template" json:"token_template"`
+	Buyer         common.Address       `bson:"buyer" json:"buyer"`
+	OnchainItemId string               `bson:"onchain_item_id" json:"onchain_item_id"`
 }
