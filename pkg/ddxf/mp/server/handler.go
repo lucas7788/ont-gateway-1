@@ -10,75 +10,122 @@ import (
 )
 
 func AddRegistryHandler(ctx *gin.Context) {
-	handle(ctx, "AddRegistryHandler", io.MPAddRegistryInput{})
-}
-
-func RemoveRegistryHandler(ctx *gin.Context) {
-	handle(ctx, "RemoveRegistryHandler", io.MPRemoveRegistryInput{})
-}
-func PublishItemMetaHandler(ctx *gin.Context) {
-	handle(ctx, "PublishItemMetaHandler", io.MPEndpointPublishItemMetaInput{})
-}
-
-func GetAuditRuleHandler(ctx *gin.Context) {
-	handle(ctx, "GetAuditRuleHandler", io.MPEndpointGetAuditRuleInput{})
-}
-func GetFeeHandler(ctx *gin.Context) {
-	handle(ctx, "GetFeeHandler", io.MPEndpointGetFeeInput{})
-}
-func GetChallengePeriodHandler(ctx *gin.Context) {
-	handle(ctx, "GetChallengePeriodHandler", io.MPEndpointGetChallengePeriodInput{})
-}
-func GetItemMetaSchemaHandler(ctx *gin.Context) {
-	handle(ctx, "GetItemMetaSchemaHandler", io.MPEndpointGetItemMetaSchemaInput{})
-}
-func GetItemMetaHandler(ctx *gin.Context) {
-	handle(ctx, "GetItemMetaHandler", io.MPEndpointGetItemMetaInput{})
-}
-func QueryItemMetasHandler(ctx *gin.Context) {
-	handle(ctx, "QueryItemMetasHandler", io.MPEndpointQueryItemMetasInput{})
-}
-
-func handle(ctx *gin.Context, method string, param interface{}) {
 	paramsBs, err := ioutil.ReadAll(ctx.Request.Body)
 	if err != nil {
 		instance.Logger().Error("[AddEndpointHandler] read post param error:", zap.Error(err))
 		return
 	}
+	param := io.MPAddRegistryInput{}
 	err = json.Unmarshal(paramsBs, &param)
 	if err != nil {
 		instance.Logger().Error("[AddEndpointHandler] parse post param error:", zap.Error(err))
 		return
 	}
-	switch method {
-	case "AddRegistryHandler":
-		output := AddRegistryService(param.(io.MPAddRegistryInput))
-		ctx.JSON(output.Code, output)
-	case "RemoveRegistryHandler":
-		output := RemoveRegistryService(param.(io.MPRemoveRegistryInput))
-		ctx.JSON(output.Code, output)
-	case "PublishItemMetaHandler":
-		output := PublishItemMetaService(param.(io.MPEndpointPublishItemMetaInput))
-		ctx.JSON(output.Code, output)
-	case "GetAuditRuleHandler":
-		output := GetAuditRuleService(param.(io.MPEndpointGetAuditRuleInput))
-		ctx.JSON(output.Code, output)
-	case "GetFeeHandler":
-		output := GetFeeService(param.(io.MPEndpointGetFeeInput))
-		ctx.JSON(output.Code, output)
-	case "GetChallengePeriodHandler":
-		output := GetChallengePeriodService(param.(io.MPEndpointGetChallengePeriodInput))
-		ctx.JSON(output.Code, output)
-	case "GetItemMetaSchemaHandler":
-		output := GetItemMetaSchemaService(param.(io.MPEndpointGetItemMetaSchemaInput))
-		ctx.JSON(output.Code, output)
-	case "GetItemMetaHandler":
-		output := GetItemMetaService(param.(io.MPEndpointGetItemMetaInput))
-		ctx.JSON(output.Code, output)
-	case "QueryItemMetasHandler":
-		output := QueryItemMetasService(param.(io.MPEndpointQueryItemMetasInput))
-		ctx.JSON(output.Code, output)
-	default:
-		panic("not support service" + method)
+	output := AddRegistryService(param)
+	if output.Code != 0 {
+		instance.Logger().Error(output.Msg)
 	}
+	ctx.JSON(output.Code, output)
+}
+
+func RemoveRegistryHandler(ctx *gin.Context) {
+	paramsBs, err := ioutil.ReadAll(ctx.Request.Body)
+	if err != nil {
+		instance.Logger().Error("[AddEndpointHandler] read post param error:", zap.Error(err))
+		return
+	}
+	param := io.MPRemoveRegistryInput{}
+	err = json.Unmarshal(paramsBs, &param)
+	if err != nil {
+		instance.Logger().Error("[AddEndpointHandler] parse post param error:", zap.Error(err))
+		return
+	}
+	output := RemoveRegistryService(param)
+	if output.Code != 0 {
+		instance.Logger().Error(output.Msg)
+	}
+	ctx.JSON(output.Code, output)
+}
+func PublishItemMetaHandler(ctx *gin.Context) {
+	paramsBs, err := ioutil.ReadAll(ctx.Request.Body)
+	if err != nil {
+		instance.Logger().Error("[AddEndpointHandler] read post param error:", zap.Error(err))
+		return
+	}
+	param := io.MPEndpointPublishItemMetaInput{}
+	err = json.Unmarshal(paramsBs, &param)
+	if err != nil {
+		instance.Logger().Error("[AddEndpointHandler] parse post param error:", zap.Error(err))
+		return
+	}
+	output := PublishItemMetaService(param)
+	if output.Code != 0 {
+		instance.Logger().Error(output.Msg)
+	}
+	ctx.JSON(output.Code, output)
+}
+
+func GetAuditRuleHandler(ctx *gin.Context) {
+	output := GetAuditRuleService(io.MPEndpointGetAuditRuleInput{})
+	if output.Code != 0 {
+		instance.Logger().Error(output.Msg)
+	}
+	ctx.JSON(output.Code, output)
+}
+func GetFeeHandler(ctx *gin.Context) {
+	output := GetFeeService(io.MPEndpointGetFeeInput{})
+	if output.Code != 0 {
+		instance.Logger().Error(output.Msg)
+	}
+	ctx.JSON(output.Code, output)
+}
+func GetChallengePeriodHandler(ctx *gin.Context) {
+	output := GetChallengePeriodService(io.MPEndpointGetChallengePeriodInput{})
+	if output.Code != 0 {
+		instance.Logger().Error(output.Msg)
+	}
+	ctx.JSON(output.Code, output)
+}
+func GetItemMetaSchemaHandler(ctx *gin.Context) {
+	output := GetItemMetaSchemaService(io.MPEndpointGetItemMetaSchemaInput{})
+	if output.Code != 0 {
+		instance.Logger().Error(output.Msg)
+	}
+	ctx.JSON(output.Code, output)
+}
+func GetItemMetaHandler(ctx *gin.Context) {
+	paramsBs, err := ioutil.ReadAll(ctx.Request.Body)
+	if err != nil {
+		instance.Logger().Error("[AddEndpointHandler] read post param error:", zap.Error(err))
+		return
+	}
+	param := io.MPEndpointGetItemMetaInput{}
+	err = json.Unmarshal(paramsBs, &param)
+	if err != nil {
+		instance.Logger().Error("[AddEndpointHandler] parse post param error:", zap.Error(err))
+		return
+	}
+	output := GetItemMetaService(param)
+	if output.Code != 0 {
+		instance.Logger().Error(output.Msg)
+	}
+	ctx.JSON(output.Code, output)
+}
+func QueryItemMetasHandler(ctx *gin.Context) {
+	paramsBs, err := ioutil.ReadAll(ctx.Request.Body)
+	if err != nil {
+		instance.Logger().Error("[AddEndpointHandler] read post param error:", zap.Error(err))
+		return
+	}
+	param := io.MPEndpointQueryItemMetasInput{}
+	err = json.Unmarshal(paramsBs, &param)
+	if err != nil {
+		instance.Logger().Error("[AddEndpointHandler] parse post param error:", zap.Error(err))
+		return
+	}
+	output := QueryItemMetasService(param)
+	if output.Code != 0 {
+		instance.Logger().Error(output.Msg)
+	}
+	ctx.JSON(output.Code, output)
 }

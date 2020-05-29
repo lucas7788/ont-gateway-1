@@ -1,12 +1,12 @@
 package server
 
 import (
-	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.uber.org/zap"
 	"io/ioutil"
 	"net/http"
-	"encoding/json"
 )
 
 func BuyDtokenQrCodeHanler(ctx *gin.Context) {
@@ -64,4 +64,3 @@ func QrCodeCallBackHandler(ctx *gin.Context) {
 		ctx.JSON(0, ResponseSuccess(output))
 	}
 }
-

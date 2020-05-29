@@ -14,7 +14,6 @@ import (
 	"testing"
 )
 
-
 var mpAcc *ontology_go_sdk.Account
 
 func TestMain(m *testing.M) {

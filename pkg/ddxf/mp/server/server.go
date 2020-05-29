@@ -20,17 +20,17 @@ const (
 	publishItemMeta    = "/ddxf/mp/publishItemMeta"
 )
 
-func StartBuyerServer() {
+func StartMpServer() {
 	r := gin.Default()
 	r.Use(cors.Cors())
 	r.POST(addRegistry, AddRegistryHandler)
 	r.POST(removeRegistry, RemoveRegistryHandler)
 	r.POST(publishItemMeta, PublishItemMetaHandler)
+	r.POST(getItemMeta, GetItemMetaHandler)
 	r.GET(getAuditRule, GetAuditRuleHandler)
 	r.GET(getFee, GetFeeHandler)
 	r.GET(getChallengePeriod, GetChallengePeriodHandler)
 	r.GET(getItemMetaSchema, GetItemMetaSchemaHandler)
-	r.GET(getItemMeta, GetItemMetaHandler)
 	r.GET(queryItemMetas, QueryItemMetasHandler)
 	pri, _ := hex.DecodeString("c19f16785b8f3543bbaf5e1dbb5d398dfa6c85aaad54fc9d71203ce83e505c07")
 	MpAccount, _ = ontology_go_sdk.NewAccountFromPrivateKey(pri, signature.SHA256withECDSA)

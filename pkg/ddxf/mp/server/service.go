@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"encoding/hex"
+	"github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology/core/types"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
@@ -15,7 +16,6 @@ import (
 	"go.mongodb.org/mongo-driver/x/bsonx"
 	"net/http"
 	"time"
-	"github.com/ontio/ontology-go-sdk"
 )
 
 const (
@@ -25,7 +25,7 @@ const (
 var MpAccount *ontology_go_sdk.Account
 
 func AddRegistryService(input io.MPAddRegistryInput) (output io.MPAddRegistryOutput) {
-	client.Sdk().AddEndpoint(io.RegistryAddEndpointInput(input))
+	output = io.MPAddRegistryOutput(client.Sdk().AddEndpoint(io.RegistryAddEndpointInput(input)))
 	return
 }
 
@@ -168,7 +168,7 @@ func PublishItemMetaService(input io.MPEndpointPublishItemMetaInput) (output io.
 		output.Msg = err.Error()
 		return
 	}
-	err = instance.OntSdk().GetKit().SignToTransaction(muTx, mpAccount)
+	err = instance.OntSdk().GetKit().SignToTransaction(muTx, MpAccount)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()

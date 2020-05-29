@@ -13,13 +13,15 @@ import (
 
 func TestSdk(t *testing.T) {
 	user := account.NewAccount("")
-	mpStr := "mp4"
+	mpStr := "mp10"
 	pubkey := hex.EncodeToString(keypair.SerializePublicKey(user.PublicKey))
 	input := io.RegistryAddEndpointInput{
 		MP:       mpStr,
 		Endpoint: "endpoint",
 		PubKey:   pubkey,
 	}
+	fmt.Println(input)
+
 	output := Sdk().AddEndpoint(input)
 	if output.Code != 0 {
 		fmt.Println(output.Msg)
@@ -29,9 +31,16 @@ func TestSdk(t *testing.T) {
 	sig, _ := signature.Sign(user, []byte(mpStr))
 	rm := io.RegistryRemoveEndpointInput{
 		MP:   mpStr,
-		Sign: sig,
+		Sign: hex.EncodeToString(sig),
+	}
+	fmt.Println(rm)
+	if true {
+		return
 	}
 	output2 := Sdk().RemoveEndpoint(rm)
+	if output2.Code != 0 {
+		fmt.Println(output2)
+	}
 	assert.Equal(t, output2.Code, 0)
 }
 

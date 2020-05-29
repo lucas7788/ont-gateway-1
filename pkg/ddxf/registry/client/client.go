@@ -25,9 +25,10 @@ func (this *RegistryImplClient) AddEndpoint(input io.RegistryAddEndpointInput) (
 		output.Msg = err.Error()
 		return
 	}
-	_, _, res, err := forward.JSONRequest("addendpoint", this.addr+server.AddEndpoint, paramBs)
+	_, _, res, err := forward.PostJSONRequest(this.addr+server.AddEndpoint, paramBs)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
 		return
 	}
 	err = json.Unmarshal(res, &output)
@@ -45,7 +46,7 @@ func (this *RegistryImplClient) RemoveEndpoint(input io.RegistryRemoveEndpointIn
 		output.Msg = err.Error()
 		return
 	}
-	_, _, res, err := forward.JSONRequest("removeendpoint", this.addr+server.RemoveEndpoint, paramBs)
+	_, _, res, err := forward.PostJSONRequest(this.addr+server.RemoveEndpoint, paramBs)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()

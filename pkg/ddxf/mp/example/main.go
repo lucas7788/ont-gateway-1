@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/registry/server"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/mp/server"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"os"
 	"os/signal"
@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	server.StartRegistryImplServer()
+	server.StartMpServer()
 	waitToExit()
 }
 
