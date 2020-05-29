@@ -16,6 +16,12 @@ type ExtraData struct {
 	OntId     string `json:"ontId"`
 }
 
+type QrCodeDesc struct {
+	Type   string `json:"type"`
+	Detail string `json:"detail"`
+	Price  string `json:"price"`
+}
+
 type QrCode struct {
 	QrCodeId     string `json:"id" bson:"qrCodeId"`
 	Ver          string `json:"ver" bson:"ver"`
@@ -56,10 +62,6 @@ type Function struct {
 type Arg struct {
 	Name  string      `json:"name"`
 	Value interface{} `json:"value"`
-}
-
-func BuildWetherForcastQrCode() (*QrCode, error) {
-	return nil, nil
 }
 
 type QrCodeResponse struct {

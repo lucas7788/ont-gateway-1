@@ -5,7 +5,7 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
 )
 
-func ConstructPublishParam(seller common.Address, template param.TokenTemplate, tokenEndpointUrl string, itemMetaHash string, resourceType byte, fee param.Fee, expiredDate uint64, stock uint32, resourceId string) []interface{} {
+func ConstructPublishParam(seller common.Address, template param.TokenTemplate, tokenEndpointUrl string, itemMetaHash string, resourceType byte, fee param.Fee, expiredDate uint64, stock uint32, resourceId string) ([]byte, []byte, []byte) {
 	tokenResourceType := make(map[param.TokenTemplate]byte)
 	tokenResourceType[template] = resourceType
 	tokenEndpoint := make(map[param.TokenTemplate]string)
@@ -29,5 +29,5 @@ func ConstructPublishParam(seller common.Address, template param.TokenTemplate, 
 		Templates:   []param.TokenTemplate{template},
 	}
 
-	return []interface{}{resourceId, ddo.ToBytes(), item.ToBytes()}
+	return []byte(resourceId), ddo.ToBytes(), item.ToBytes()
 }

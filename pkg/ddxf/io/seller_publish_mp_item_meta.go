@@ -1,11 +1,16 @@
 package io
 
-import io2 "github.com/zhiqiangxu/ont-gateway/pkg/io"
+import (
+	io2 "github.com/zhiqiangxu/ont-gateway/pkg/io"
+)
 
 // SellerPublishMPItemMetaInput ...
 type SellerPublishMPItemMetaInput struct {
-	DataMeta   map[string]interface{}
-	MPEndpoint string
+	ItemMeta       map[string]interface{}
+	TokenMetaHash  string
+	DataMetaHash   string
+	MPContractHash string
+	MPEndpoint     string
 }
 
 // SellerPublishMPItemMetaOutput ...
