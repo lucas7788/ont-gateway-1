@@ -1,5 +1,19 @@
 package server
 
+import "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/qrCode"
+
+type QrCodeAndEndpoint struct {
+	Code          qrCode.QrCode `bson:"qrCode",json:"qrCode"`
+	TokenEndpoint string        `bson:"tokenEndpoint",json:"tokenEndpoint"`
+}
+
+type BuyerBuyDtokenQrCodeInput struct {
+	OnchainItemId   string
+	N               int
+	Buyer           string
+	TokenOpEndpoint string
+}
+
 type QrCodeCallBackParam struct {
 	Signer    string    `json:"signer"`
 	SignedTx  string    `json:"signedTx"`

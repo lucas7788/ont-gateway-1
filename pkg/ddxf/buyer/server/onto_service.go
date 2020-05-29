@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"github.com/ontio/ontology-go-sdk/utils"
 	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
@@ -8,16 +9,19 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
 	"strings"
-	"errors"
 )
 
-func BuyDtokenQrCodeService(input io.BuyerBuyDtokenInput) (qrCode.QrCodeResponse, error) {
+func BuyDtokenQrCodeService(input BuyerBuyDtokenQrCodeInput) (qrCode.QrCodeResponse, error) {
 	//build qrcode
 	code, err := qrCode.BuildBuyQrCode("testnet", input.OnchainItemId, input.N, input.Buyer)
 	if err != nil {
 		return qrCode.QrCodeResponse{}, err
 	}
-	err = insertOne(code)
+	qce := QrCodeAndEndpoint{
+		Code:          code,
+		TokenEndpoint: input.TokenOpEndpoint,
+	}
+	err = insertOne(qce)
 	if err != nil {
 		return qrCode.QrCodeResponse{}, err
 	}
@@ -26,9 +30,9 @@ func BuyDtokenQrCodeService(input io.BuyerBuyDtokenInput) (qrCode.QrCodeResponse
 
 func GetQrCodeByQrCodeIdService(qrCodeId string) (qrCode.QrCode, error) {
 	filter := bson.M{"qrCodeId": qrCodeId}
-	code := qrCode.QrCode{}
+	code := QrCodeAndEndpoint{}
 	err := findOne(filter, &code)
-	return code, err
+	return code.Code, err
 }
 
 func QrCodeCallBackService(param QrCodeCallBackParam) (map[string]interface{}, error) {
@@ -38,16 +42,27 @@ func QrCodeCallBackService(param QrCodeCallBackParam) (map[string]interface{}, e
 	if err != nil {
 		return nil, err
 	}
-	var method string
 	if strings.Contains(code.QrCodeDesc, buyDToken) {
-		method = buyDToken
+		output := BuyDTokenService(io.BuyerBuyDtokenInput{
+			SignedTx: param.SignedTx,
+		})
+		if output.Code != 0 {
+			return nil, output.Error()
+		}
 	} else if strings.Contains(code.QrCodeDesc, useToken) {
-		method = useTokenM
-	}
-	endpointTokens, err := sendTxAndGetTokens(param.SignedTx, method)
-	err = insertOne(endpointTokens)
-	if err != nil {
-		return nil, err
+		filter := bson.M{"qrCodeId": param.ExtraData.Id}
+		code := QrCodeAndEndpoint{}
+		err = findOne(filter, &code)
+		if err != nil {
+			return nil, err
+		}
+		output := UseTokenService(io.BuyerUseTokenInput{
+			Tx:              param.SignedTx,
+			TokenOpEndpoint: code.TokenEndpoint,
+		})
+		if output.Code != 0 {
+			return nil, output.Error()
+		}
 	}
 	return map[string]interface{}{
 		"result":  "SUCCESS",

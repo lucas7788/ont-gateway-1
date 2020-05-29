@@ -4,7 +4,6 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"io/ioutil"
 	"net/http"
 	"encoding/json"
@@ -17,7 +16,7 @@ func BuyDtokenQrCodeHanler(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, ResponseFailedOnto(http.StatusBadRequest, err))
 		return
 	}
-	param := io.BuyerBuyDtokenInput{}
+	param := BuyerBuyDtokenQrCodeInput{}
 	err = json.Unmarshal(paramsBs, &param)
 	if err != nil {
 		instance.Logger().Error("[BuyDtokenHandler] parse post param error:", zap.Error(err))

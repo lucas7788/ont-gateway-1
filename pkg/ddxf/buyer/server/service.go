@@ -3,12 +3,8 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"errors"
-	"github.com/ontio/ontology-go-sdk/utils"
-	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/qrCode"
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
@@ -16,7 +12,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/x/bsonx"
 	"net/http"
-	"strings"
 )
 
 const (
@@ -53,19 +48,23 @@ func findOne(filter bson.M, data interface{}) error {
 }
 
 func BuyDTokenService(param io.BuyerBuyDtokenInput) (output io.BuyerBuyDtokenOutput) {
+	var err error
+	output.EndpointTokens, err = sendTxAndGetTokens(param.SignedTx, "useToken")
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	err = insertOne(output.EndpointTokens)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	return
 }
 
 func UseTokenService(input io.BuyerUseTokenInput) (output io.BuyerUseTokenOutput) {
-	code, err := qrCode.BuildBuyQrCode("testnet", input.OnchainItemId, input.N, input.Buyer)
-	if err != nil {
-		return qrCode.QrCodeResponse{}, err
-	}
-	err = insertOne(code)
-	if err != nil {
-		return qrCode.QrCodeResponse{}, err
-	}
-	return qrCode.BuildBuyGetQrCodeRsp(code.QrCodeId), nil
-
 	endpointTokens, err := sendTxAndGetTokens(input.Tx, "useToken")
 	if err != nil {
 		output.Code = http.StatusInternalServerError
