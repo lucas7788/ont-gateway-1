@@ -15,3 +15,9 @@ func (r *BaseResp) Error() error {
 
 	return fmt.Errorf("code:%d msg:%s", r.Code, r.Msg)
 }
+
+// SetBase ...
+func (r *BaseResp) SetBase(code int, msg string) {
+	r.Code = code
+	r.Msg = msg
+}
