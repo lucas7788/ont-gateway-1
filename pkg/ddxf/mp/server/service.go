@@ -1,4 +1,4 @@
-package mp
+package server
 
 import (
 	"context"
@@ -22,42 +22,20 @@ const (
 	endpointCollectionName = "mp_endpoint"
 )
 
-type MarketplaceImpl struct {
-	endpointImpl Endpoint
-}
+var MpAccount *ontology_go_sdk.Account
 
-func NewMarketplaceImpl(acc *ontology_go_sdk.Account) *MarketplaceImpl {
-	return &MarketplaceImpl{
-		endpointImpl: NewEndpointImpl(acc),
-	}
-}
-
-type EndpointImpl struct {
-	mpAccount *ontology_go_sdk.Account
-}
-
-func NewEndpointImpl(acc *ontology_go_sdk.Account) *EndpointImpl {
-	return &EndpointImpl{
-		mpAccount: acc,
-	}
-}
-
-func (this *MarketplaceImpl) AddRegistry(input io.MPAddRegistryInput) (output io.MPAddRegistryOutput) {
-	client.Sdk().AddEndpoint(io.RegistryAddEndpointInput(input))
+func AddRegistryService(input io.MPAddRegistryInput) (output io.MPAddRegistryOutput) {
+	output = io.MPAddRegistryOutput(client.Sdk().AddEndpoint(io.RegistryAddEndpointInput(input)))
 	return
 }
 
-func (this *MarketplaceImpl) RemoveRegistry(input io.MPRemoveRegistryInput) (output io.MPRemoveRegistryOutput) {
+func RemoveRegistryService(input io.MPRemoveRegistryInput) (output io.MPRemoveRegistryOutput) {
 	output = io.MPRemoveRegistryOutput(client.Sdk().RemoveEndpoint(io.RegistryRemoveEndpointInput(input)))
 	return
 }
 
-func (this *MarketplaceImpl) Endpoint() Endpoint {
-	return this.endpointImpl
-}
-
 // Init for this collection
-func (m *EndpointImpl) Init() (err error) {
+func Init() (err error) {
 	opts := &options.IndexOptions{}
 	opts.SetName("u-item-meta_id")
 	opts.SetUnique(true)
@@ -70,22 +48,22 @@ func (m *EndpointImpl) Init() (err error) {
 	return
 }
 
-func (this *EndpointImpl) GetAuditRule(io.MPEndpointGetAuditRuleInput) (output io.MPEndpointGetAuditRuleOutput) {
+func GetAuditRuleService(io.MPEndpointGetAuditRuleInput) (output io.MPEndpointGetAuditRuleOutput) {
 	return
 }
 
-func (this *EndpointImpl) GetFee(io.MPEndpointGetFeeInput) (output io.MPEndpointGetFeeOutput) {
+func GetFeeService(io.MPEndpointGetFeeInput) (output io.MPEndpointGetFeeOutput) {
 	output.Count = 10
 	output.Type = io.ONG
 	return
 }
 
-func (this *EndpointImpl) GetChallengePeriod(io.MPEndpointGetChallengePeriodInput) (output io.MPEndpointGetChallengePeriodOutput) {
+func GetChallengePeriodService(io.MPEndpointGetChallengePeriodInput) (output io.MPEndpointGetChallengePeriodOutput) {
 	output.Period = 7 * 24 * 3600 * time.Second
 	return
 }
 
-func (this *EndpointImpl) GetItemMetaSchema(io.MPEndpointGetItemMetaSchemaInput) (output io.MPEndpointGetItemMetaSchemaOutput) {
+func GetItemMetaSchemaService(io.MPEndpointGetItemMetaSchemaInput) (output io.MPEndpointGetItemMetaSchemaOutput) {
 	output.ItemMetaSchema = map[string]interface{}{
 		"@context": map[string]interface{}{
 			"sec":        "http://purl.org/security#",
@@ -108,7 +86,7 @@ func (this *EndpointImpl) GetItemMetaSchema(io.MPEndpointGetItemMetaSchemaInput)
 	return
 }
 
-func (this *EndpointImpl) GetItemMeta(input io.MPEndpointGetItemMetaInput) (output io.MPEndpointGetItemMetaOutput) {
+func GetItemMetaService(input io.MPEndpointGetItemMetaInput) (output io.MPEndpointGetItemMetaOutput) {
 	id, err := primitive.ObjectIDFromHex(input.ItemMetaID)
 	if err != nil {
 		output.Code = http.StatusBadRequest
@@ -127,7 +105,7 @@ func (this *EndpointImpl) GetItemMeta(input io.MPEndpointGetItemMetaInput) (outp
 	return
 }
 
-func (this *EndpointImpl) QueryItemMetas(input io.MPEndpointQueryItemMetasInput) (output io.MPEndpointQueryItemMetasOutput) {
+func QueryItemMetasService(input io.MPEndpointQueryItemMetasInput) (output io.MPEndpointQueryItemMetasOutput) {
 	pageNum := input.PageNum
 	if pageNum < 1 {
 		pageNum = 1
@@ -162,7 +140,7 @@ func (this *EndpointImpl) QueryItemMetas(input io.MPEndpointQueryItemMetasInput)
 	return
 }
 
-func (this *EndpointImpl) PublishItemMeta(input io.MPEndpointPublishItemMetaInput) (output io.MPEndpointPublishItemMetaOutput) {
+func PublishItemMetaService(input io.MPEndpointPublishItemMetaInput) (output io.MPEndpointPublishItemMetaOutput) {
 	txBs, err := hex.DecodeString(input.SignedDDXFTx)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
@@ -190,7 +168,7 @@ func (this *EndpointImpl) PublishItemMeta(input io.MPEndpointPublishItemMetaInpu
 		output.Msg = err.Error()
 		return
 	}
-	err = instance.OntSdk().GetKit().SignToTransaction(muTx, this.mpAccount)
+	err = instance.OntSdk().GetKit().SignToTransaction(muTx, MpAccount)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()

@@ -78,7 +78,13 @@ func RemoveEndpointService(input io.RegistryRemoveEndpointInput) (output io.Regi
 		panic(err)
 	}
 
-	err = signature.Verify(pk, []byte(input.MP), input.Sign)
+	sig, err := hex.DecodeString(input.Sign)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	err = signature.Verify(pk, []byte(input.MP), sig)
 	if err != nil {
 		output.Code = http.StatusBadRequest
 		output.Msg = err.Error()

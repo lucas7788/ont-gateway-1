@@ -1,11 +1,14 @@
 package io
 
+import "github.com/zhiqiangxu/ont-gateway/pkg/io"
+
 // MPEndpointGetFeeInput ...
 type MPEndpointGetFeeInput struct {
 }
 
 // MPEndpointGetFeeOutput ...
 type MPEndpointGetFeeOutput struct {
+	io.BaseResp
 	Fee
 }
 

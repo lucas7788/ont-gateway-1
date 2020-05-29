@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
@@ -22,8 +21,10 @@ func AddEndpointHandler(ctx *gin.Context) {
 		instance.Logger().Error("[AddEndpointHandler] parse post param error:", zap.Error(err))
 		return
 	}
-	fmt.Println("req param:", param)
 	output := AddEndpointService(io.RegistryAddEndpointInput(param))
+	if output.Code != 0{
+		instance.Logger().Error(output.Msg)
+	}
 	ctx.JSON(output.Code, output)
 }
 
@@ -40,10 +41,16 @@ func RemoveEndpointHandler(ctx *gin.Context) {
 		return
 	}
 	output := RemoveEndpointService(io.RegistryRemoveEndpointInput(param))
+	if output.Code != 0{
+		instance.Logger().Error(output.Msg)
+	}
 	ctx.JSON(output.Code, output)
 }
 
 func QueryEndpointHandler(ctx *gin.Context) {
 	output := QueryEndpointsService(io.RegistryQueryEndpointsInput{})
+	if output.Code != 0{
+		instance.Logger().Error(output.Msg)
+	}
 	ctx.JSON(output.Code, output)
 }

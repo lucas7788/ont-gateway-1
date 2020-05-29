@@ -7,9 +7,7 @@ import (
 
 // BuyerBuyDtokenInput ...
 type BuyerBuyDtokenInput struct {
-	OnchainItemId string
-	n             int
-	buyer         common.Address
+	SignedTx string
 }
 
 // BuyerBuyDtokenOutput ...
