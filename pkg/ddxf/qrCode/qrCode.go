@@ -1,6 +1,8 @@
 package qrCode
 
-import ()
+const (
+	QrCodeExpire = 10 * 60
+)
 
 type SendTxParam struct {
 	Signer    string    `json:"signer"`
@@ -58,4 +60,13 @@ type Arg struct {
 
 func BuildWetherForcastQrCode() (*QrCode, error) {
 	return nil, nil
+}
+
+type QrCodeResponse struct {
+	QrCode GetQrCode `json:"qrCode"`
+	Id     string    `json:"id"`
+}
+
+type GetQrCode struct {
+	ONTAuthScanProtocol string `json:"ONTAuthScanProtocol"`
 }
