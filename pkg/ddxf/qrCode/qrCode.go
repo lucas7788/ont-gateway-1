@@ -4,7 +4,7 @@ const (
 	QrCodeExpire = 10 * 60
 )
 
-type SendTxParam struct {
+type QrCodeCallBackParam struct {
 	Signer    string    `json:"signer"`
 	SignedTx  string    `json:"signedTx"`
 	ExtraData ExtraData `json:"extraData"`
@@ -14,6 +14,12 @@ type ExtraData struct {
 	Id        string `json:"id"`
 	PublicKey string `json:"publickey"`
 	OntId     string `json:"ontId"`
+}
+
+type QrCodeDesc struct {
+	Type   string `json:"type"`
+	Detail string `json:"detail"`
+	Price  string `json:"price"`
 }
 
 type QrCode struct {
@@ -56,10 +62,6 @@ type Function struct {
 type Arg struct {
 	Name  string      `json:"name"`
 	Value interface{} `json:"value"`
-}
-
-func BuildWetherForcastQrCode() (*QrCode, error) {
-	return nil, nil
 }
 
 type QrCodeResponse struct {

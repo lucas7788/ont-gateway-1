@@ -1,12 +1,12 @@
-package seller
+package service
 
 import "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 
 // Seller ...
 type Seller interface {
-	SaveDataMeta(io.SellerSaveDataMetaInput) io.SellerSaveDataMetaOutput
-	SaveTokenMeta(io.SellerSaveTokenMetaInput) io.SellerSaveTokenMetaOutput
-	PublishMPItemMeta(io.SellerPublishMPItemMetaInput) io.SellerPublishMPItemMetaOutput
+	SaveDataMeta(io.SellerSaveDataMetaInput, string) io.SellerSaveDataMetaOutput
+	SaveTokenMeta(io.SellerSaveTokenMetaInput, string) io.SellerSaveTokenMetaOutput
+	PublishMPItemMeta(io.SellerPublishMPItemMetaInput, string) io.SellerPublishMPItemMetaOutput
 
 	DataLookupEndpoint() DataLookupEndpoint
 	TokenLookupEndpoint() TokenLookupEndpoint
