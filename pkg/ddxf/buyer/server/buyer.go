@@ -1,10 +1,10 @@
-package qrCode
+package server
 
 import (
 	"encoding/hex"
 	"encoding/json"
-	"github.com/ontio/sagapi/sagaconfig"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/qrCode"
 	"time"
 )
 
@@ -14,36 +14,36 @@ type qrCodeDesc struct {
 	Price  string `json:"price"`
 }
 
-func BuildBuyGetQrCodeRsp(qrCodeId string) QrCodeResponse {
-	get := GetQrCode{
-		ONTAuthScanProtocol:"",
+func BuildBuyGetQrCodeRsp(qrCodeId string) qrCode.QrCodeResponse {
+	get := qrCode.GetQrCode{
+		ONTAuthScanProtocol: "",
 	}
-	return QrCodeResponse{
-		QrCode:get,
-		Id:"",
+	return qrCode.QrCodeResponse{
+		QrCode: get,
+		Id:     qrCodeId,
 	}
 }
 
-func BuildBuyQrCode(netType string, resourceId string, n int, buyer string) (QrCode, error) {
-	exp := time.Now().Unix() + QrCodeExpire
-	data := &QrCodeData{
+func BuildBuyQrCode(netType string, resourceId string, n int, buyer string) (qrCode.QrCode, error) {
+	exp := time.Now().Unix() + qrCode.QrCodeExpire
+	data := &qrCode.QrCodeData{
 		Action: "signTransaction",
-		Params: QrCodeParam{
-			InvokeConfig: InvokeConfig{
+		Params: qrCode.QrCodeParam{
+			InvokeConfig: qrCode.InvokeConfig{
 				ContractHash: "",
-				Functions: []Function{
-					Function{
+				Functions: []qrCode.Function{
+					qrCode.Function{
 						Operation: "buyDToken",
-						Args: []Arg{
-							Arg{
+						Args: []qrCode.Arg{
+							qrCode.Arg{
 								Name:  "resource_id",
 								Value: "string:" + resourceId,
 							},
-							Arg{
+							qrCode.Arg{
 								Name:  "n",
 								Value: n,
 							},
-							Arg{
+							qrCode.Arg{
 								Name:  "buyer",
 								Value: "address:" + buyer,
 							},
@@ -58,12 +58,12 @@ func BuildBuyQrCode(netType string, resourceId string, n int, buyer string) (QrC
 	}
 	databs, err := json.Marshal(data)
 	if err != nil {
-		return QrCode{}, err
+		return qrCode.QrCode{}, err
 	}
 	id := common.GenerateUUId()
-	sig, err := sagaconfig.DefSagaConfig.OntIdAccount.Sign(databs)
+	sig, err := BuyerMgrAccount.Sign(databs)
 	if err != nil {
-		return QrCode{}, err
+		return qrCode.QrCode{}, err
 	}
 
 	qrDesc := qrCodeDesc{
@@ -73,10 +73,10 @@ func BuildBuyQrCode(netType string, resourceId string, n int, buyer string) (QrC
 
 	qrDescIn, err := json.Marshal(qrDesc)
 	if err != nil {
-		return QrCode{}, err
+		return qrCode.QrCode{}, err
 	}
 
-	return QrCode{
+	return qrCode.QrCode{
 		Ver:        "1.0.0",
 		QrCodeId:   id,
 		Requester:  buyer,

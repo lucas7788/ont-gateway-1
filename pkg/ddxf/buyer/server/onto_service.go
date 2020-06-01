@@ -13,7 +13,7 @@ import (
 
 func BuyDtokenQrCodeService(input BuyerBuyDtokenQrCodeInput) (qrCode.QrCodeResponse, error) {
 	//build qrcode
-	code, err := qrCode.BuildBuyQrCode("testnet", input.OnchainItemId, input.N, input.Buyer)
+	code, err := BuildBuyQrCode("testnet", input.OnchainItemId, input.N, input.Buyer)
 	if err != nil {
 		return qrCode.QrCodeResponse{}, err
 	}
@@ -25,11 +25,11 @@ func BuyDtokenQrCodeService(input BuyerBuyDtokenQrCodeInput) (qrCode.QrCodeRespo
 	if err != nil {
 		return qrCode.QrCodeResponse{}, err
 	}
-	return qrCode.BuildBuyGetQrCodeRsp(code.QrCodeId), nil
+	return BuildBuyGetQrCodeRsp(code.QrCodeId), nil
 }
 
 func GetQrCodeByQrCodeIdService(qrCodeId string) (qrCode.QrCode, error) {
-	filter := bson.M{"qrCodeId": qrCodeId}
+	filter := bson.M{"qrCode.qrCodeId": qrCodeId}
 	code := QrCodeAndEndpoint{}
 	err := findOne(filter, &code)
 	return code.Code, err
@@ -50,7 +50,7 @@ func QrCodeCallBackService(param QrCodeCallBackParam) (map[string]interface{}, e
 			return nil, output.Error()
 		}
 	} else if strings.Contains(code.QrCodeDesc, useToken) {
-		filter := bson.M{"qrCodeId": param.ExtraData.Id}
+		filter := bson.M{"qrCode.qrCodeId": param.ExtraData.Id}
 		code := QrCodeAndEndpoint{}
 		err = findOne(filter, &code)
 		if err != nil {
