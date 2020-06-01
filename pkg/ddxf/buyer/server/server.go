@@ -1,7 +1,10 @@
 package server
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/ontio/ontology-crypto/signature"
+	"github.com/ontio/ontology-go-sdk"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/middleware/cors"
 )
 
@@ -14,6 +17,8 @@ const (
 	getQrCodeByQrCodeId = "/onto/buyer/getQrCodeByQrCodeId/:qrCodeId"
 )
 
+var BuyerMgrAccount *ontology_go_sdk.Account
+
 func StartBuyerServer() {
 	r := gin.Default()
 	r.Use(cors.Cors())
@@ -22,6 +27,16 @@ func StartBuyerServer() {
 	r.POST(qrCodeCallBack, QrCodeCallBackHandler)
 	r.POST(buyDtoken, BuyDtokenHandler)
 	r.POST(useToken, UseTokenHandler)
-	Init()
+	err := Init()
+	if err != nil {
+		fmt.Println("init error:", err)
+		return
+	}
+	private := make([]byte, 32)
+	BuyerMgrAccount, err = ontology_go_sdk.NewAccountFromPrivateKey(private, signature.SHA256withECDSA)
+	if err != nil {
+		fmt.Println("NewAccountFromPrivateKey error:", err)
+		return
+	}
 	go r.Run(":" + "20332")
 }

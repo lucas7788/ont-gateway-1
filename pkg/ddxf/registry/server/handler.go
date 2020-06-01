@@ -22,7 +22,7 @@ func AddEndpointHandler(ctx *gin.Context) {
 		return
 	}
 	output := AddEndpointService(io.RegistryAddEndpointInput(param))
-	if output.Code != 0{
+	if output.Code != 0 {
 		instance.Logger().Error(output.Msg)
 	}
 	ctx.JSON(output.Code, output)
@@ -41,7 +41,7 @@ func RemoveEndpointHandler(ctx *gin.Context) {
 		return
 	}
 	output := RemoveEndpointService(io.RegistryRemoveEndpointInput(param))
-	if output.Code != 0{
+	if output.Code != 0 {
 		instance.Logger().Error(output.Msg)
 	}
 	ctx.JSON(output.Code, output)
@@ -49,7 +49,7 @@ func RemoveEndpointHandler(ctx *gin.Context) {
 
 func QueryEndpointHandler(ctx *gin.Context) {
 	output := QueryEndpointsService(io.RegistryQueryEndpointsInput{})
-	if output.Code != 0{
+	if output.Code != 0 {
 		instance.Logger().Error(output.Msg)
 	}
 	ctx.JSON(output.Code, output)

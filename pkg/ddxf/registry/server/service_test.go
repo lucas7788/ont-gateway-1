@@ -41,7 +41,7 @@ func TestAddEndpointService(t *testing.T) {
 	sig, _ := signature.Sign(user, []byte(mpStr))
 	rm := io.RegistryRemoveEndpointInput{
 		MP:   mpStr,
-		Sign: sig,
+		Sign: hex.EncodeToString(sig),
 	}
 	output2 := RemoveEndpointService(rm)
 	assert.Equal(t, output2.Msg, "")
