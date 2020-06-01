@@ -12,7 +12,8 @@ type SellerSaveDataMetaInput struct {
 	ResourceType byte                   `json:"resourceType"`
 	Fee          param.Fee              `json:"fee"`
 	Stock        uint32                 `json:"stock"`
-	ExpiredDate  uint64                 `bson:"expiredDate"`
+	ExpiredDate  uint64                 `json:"expiredDate"`
+	DataEndpoint string                 `json:"dataEndpoint"`
 }
 
 // SellerSaveDataMetaOutput ...
@@ -26,8 +27,9 @@ type SellerSaveDataMeta struct {
 	ResourceType byte                   `bson:"resourceType" json:"resourceType"`
 	DataIds      string                 `bson:"dataIds" json:"dataIds"`
 	// all below this shoudle save in dataId contract. did.
-	OntId       string    `bson:"ontId" json:"ontId"`
-	Fee         param.Fee `bson:"fee" json:"fee"`
-	Stock       uint32    `bson:"stock" json:"stock"`
-	ExpiredDate uint64    `bson:"expiredDate" json:"expiredDate"`
+	OntId        string    `bson:"ontId" json:"ontId"`
+	Fee          param.Fee `bson:"fee" json:"fee"`
+	Stock        uint32    `bson:"stock" json:"stock"`
+	ExpiredDate  uint64    `bson:"expiredDate" json:"expiredDate"`
+	DataEndpoint string    `bson:"dataEndpoint" json:"dataEndpoint"`
 }

@@ -6,6 +6,8 @@ import (
 	"github.com/urfave/cli"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/restful"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/sellerconfig"
+	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
+	"github.com/zhiqiangxu/ont-gateway/pkg/rest/middleware"
 	"os"
 	"os/signal"
 	"runtime"
@@ -61,6 +63,7 @@ func startDDXFSeller(ctx *cli.Context) error {
 
 func StartSellerServer() {
 	r := gin.Default()
+	r.Use(middleware.JWT)
 	r.POST(SaveDataMetaUrl, restful.SaveDataMetaHandle)
 	r.POST(SaveTokenMetaUrl, restful.SaveTokenMetaHandle)
 	r.POST(PublishMPItemMetaUrl, restful.PublishMPItemMetaHandle)

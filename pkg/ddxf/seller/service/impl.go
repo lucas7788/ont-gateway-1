@@ -45,6 +45,7 @@ func InitSellerImpl() *SellerImpl {
 	}
 	s.Init()
 	DefSellerImpl = s
+	return DefSellerImpl
 }
 
 // Init for this collection
@@ -87,6 +88,7 @@ func (self *SellerImpl) SaveDataMeta(input io.SellerSaveDataMetaInput, ontId str
 		Fee:          input.Fee,
 		Stock:        input.Stock,
 		ExpiredDate:  input.ExpiredDate,
+		DataEndpoint: input.DataEndpoint,
 	}
 
 	// store meta hash id.
@@ -179,6 +181,7 @@ func (self *SellerImpl) PublishMPItemMeta(input io.SellerPublishMPItemMetaInput,
 	resourceIdBytes, rosourceDDOBytes, itemBytes := contract.ConstructPublishParam(sellerAddress, tokenTemplate, adT.TokenEndpoint, itemMetaHash, adD.ResourceType, adD.Fee, adD.ExpiredDate, adD.Stock, adD.DataIds)
 	qrCodex, err := qrCode.BuildPublishQrCode(sellerconfig.DefSellerConfig.NetType, input.MPContractHash, resourceIdBytes, rosourceDDOBytes, itemBytes, arr[2], ontId)
 	response = qrCode.BuildQrCodeResponse(qrCodex.QrCodeId)
+	return
 }
 
 func (self *SellerImpl) DataLookupEndpoint() (output DataLookupEndpoint) {
@@ -194,19 +197,23 @@ func (self *SellerImpl) TokenOpEndpoint() (output TokenOpEndpoint) {
 }
 
 type DataLookupEndpointImpl struct {
+	SellerImpl *SellerImpl
 }
 
-func (self *DataLookupEndpointImpl) Lookup(io.SellerDataLookupEndpointLookupInput) (output io.SellerTokenLookupEndpointLookupOutput) {
+func (self DataLookupEndpointImpl) Lookup(io.SellerDataLookupEndpointLookupInput) (output io.SellerDataLookupEndpointLookupOutput) {
+	return
 }
 
 type TokenLookupEndpointImpl struct {
 }
 
-func (self *TokenLookupEndpointImpl) Lookup(io.SellerTokenLookupEndpointLookupInput) (output io.SellerTokenLookupEndpointLookupOutput) {
+func (self TokenLookupEndpointImpl) Lookup(io.SellerTokenLookupEndpointLookupInput) (output io.SellerTokenLookupEndpointLookupOutput) {
+	return
 }
 
 type TokenOpEndpointImpl struct {
 }
 
-func (self *TokenOpEndpointImpl) Lookup(io.SellerTokenLookupEndpointUseTokenInput) (output io.SellerTokenLookupEndpointUseTokenOutput) {
+func (self TokenOpEndpointImpl) UseToken(io.SellerTokenLookupEndpointUseTokenInput) (output io.SellerTokenLookupEndpointUseTokenOutput) {
+	return
 }

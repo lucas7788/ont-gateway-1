@@ -54,7 +54,7 @@ var DefSellerConfig = &SellerConfig{
 	NetType:             SoloNetType,
 }
 
-func InitAccount(s *sdk.OntologySdk, WalletName string) (*Account, error) {
+func InitAccount(s *sdk.OntologySdk, WalletName string) (*sdk.Account, error) {
 	wallet, err := s.OpenWallet(WalletName)
 	if err != nil {
 		return nil, fmt.Errorf("error in OpenWallet:%s\n", err)
