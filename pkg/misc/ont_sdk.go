@@ -10,6 +10,8 @@ import (
 
 var ddxfContract *DDXFContractKit
 
+const DDXF_CONTRACT_ADDRESS  = "cf267b778d54174717d2fe81f2a931fcffc2cdd4"
+
 // OntSdk deals with ont sdk related stuff
 type OntSdk struct {
 	kit *osdk.OntologySdk
@@ -50,7 +52,7 @@ func (sdk *OntSdk) DDXFContract(gasLimit uint64,
 	gasPrice uint64,
 	payer *osdk.Account) *DDXFContractKit {
 	if ddxfContract == nil {
-		contractAddress, _ := common2.AddressFromHexString("")
+		contractAddress, _ := common2.AddressFromHexString(DDXF_CONTRACT_ADDRESS)
 		ddxfContract = NewDDXFContractKit(sdk.kit, contractAddress)
 	} else {
 		ddxfContract.gasPrice = gasPrice
@@ -61,7 +63,6 @@ func (sdk *OntSdk) DDXFContract(gasLimit uint64,
 }
 
 func (sdk *OntSdk) GetSmartCodeEvent(txHash string) (*common.SmartContactEvent, error) {
-	sdk.WaitForGenerateBlock()
 	return sdk.kit.GetSmartContractEvent(txHash)
 }
 

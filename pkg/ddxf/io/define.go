@@ -21,11 +21,16 @@ func ReadString(source *common.ZeroCopySource) (string, error) {
 	return data, nil
 }
 func ConstructTokensAndEndpoint(data []byte, buyer common.Address, onchainItemId string) ([]EndpointToken, error) {
-	source := common.NewZeroCopySource(data)
-	l, _, irregular, eof := source.NextVarUint()
+	source2 := common.NewZeroCopySource(data)
+	bs,_,irregular,eof := source2.NextVarBytes()
 	if irregular {
 		return nil, common.ErrIrregularData
 	}
+	if eof {
+		return nil, io.ErrUnexpectedEOF
+	}
+	source := common.NewZeroCopySource(bs)
+	l, eof := source.NextUint32()
 	if eof {
 		return nil, io.ErrUnexpectedEOF
 	}
