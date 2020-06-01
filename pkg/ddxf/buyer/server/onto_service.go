@@ -1,12 +1,15 @@
 package server
 
 import (
+	"encoding/hex"
 	"errors"
+	"fmt"
 	"github.com/ontio/ontology-go-sdk/utils"
 	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/qrCode"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
+	"github.com/zhiqiangxu/ont-gateway/pkg/misc"
 	"go.mongodb.org/mongo-driver/bson"
 	"strings"
 )
@@ -72,20 +75,8 @@ func QrCodeCallBackService(param QrCodeCallBackParam) (map[string]interface{}, e
 	}, nil
 }
 
-func sendTxAndGetTokens(txHex string, method string) ([]io.EndpointToken, error) {
-	tx, err := utils.TransactionFromHexString(txHex)
-	if err != nil {
-		return nil, err
-	}
-	mutTx, err := tx.IntoMutable()
-	if err != nil {
-		return nil, err
-	}
-	txHash, err := instance.OntSdk().GetKit().SendTransaction(mutTx)
-	if err != nil {
-		return nil, err
-	}
-	event, err := instance.OntSdk().GetSmartCodeEvent(txHash.ToHexString())
+func HandleEvent(txHash string, method string) ([]io.EndpointToken, error) {
+	event, err := instance.OntSdk().GetSmartCodeEvent(txHash)
 	if err != nil {
 		return nil, err
 	}
@@ -96,29 +87,35 @@ func sendTxAndGetTokens(txHex string, method string) ([]io.EndpointToken, error)
 	var onchainItemId string
 	for _, notify := range event.Notify {
 		//TODO ddxf contractaddress
-		if notify.ContractAddress == "" {
-			states, ok := notify.States.([]string)
+		if notify.ContractAddress == misc.DDXF_CONTRACT_ADDRESS {
+			states, ok := notify.States.([]interface{})
 			if !ok || len(states) != 4 {
 				return nil, errors.New("notify wrong")
 			}
-			if method == "buyDtoken" {
-				buyer, err = common.AddressFromBase58(states[3])
+			if method == buyDToken {
+				buyer, err = common.AddressFromBase58(states[3].(string))
 				if err != nil {
 					return nil, err
 				}
-				onchainItemId = states[1]
-			} else if method == "useToken" {
-				buyer, err = common.AddressFromBase58(states[2])
+				onchainItemId = states[1].(string)
+				break
+			} else if method == useToken {
+				buyer, err = common.AddressFromBase58(states[2].(string))
 				if err != nil {
 					return nil, err
 				}
-				onchainItemId = states[1]
+				onchainItemId = states[1].(string)
+				break
 			}
 		}
 	}
 
+	onchainItemIdByes, err := hex.DecodeString(onchainItemId)
+	if err != nil {
+		return nil, err
+	}
 	res, err := instance.OntSdk().DDXFContract(0, 0,
-		nil).PreInvoke("getTokenTemplates", []interface{}{onchainItemId})
+		nil).PreInvoke("getTokenTemplates", []interface{}{onchainItemIdByes})
 	if err != nil {
 		return nil, err
 	}
@@ -131,4 +128,21 @@ func sendTxAndGetTokens(txHex string, method string) ([]io.EndpointToken, error)
 		return nil, err
 	}
 	return tokenEndpoints, nil
+}
+func sendTx(txHex string) (string, error) {
+	tx, err := utils.TransactionFromHexString(txHex)
+	if err != nil {
+		return "", err
+	}
+	mutTx, err := tx.IntoMutable()
+	if err != nil {
+		return "", err
+	}
+	txHash2 := mutTx.Hash()
+	fmt.Println(txHash2.ToHexString())
+	txHash, err := instance.OntSdk().GetKit().SendTransaction(mutTx)
+	if err != nil {
+		return "", err
+	}
+	return txHash.ToHexString(), nil
 }

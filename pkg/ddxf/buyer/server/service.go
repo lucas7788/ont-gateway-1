@@ -17,7 +17,7 @@ import (
 const (
 	buyerCollectionName = "buyer"
 	buyDToken           = "buyDToken"
-	useTokenM           = "useToken"
+	useToken            = "useToken"
 )
 
 func Init() error {
@@ -39,6 +39,13 @@ func insertOne(data interface{}) error {
 	_, err := instance.MongoOfficial().Collection(buyerCollectionName).InsertOne(ctx, data)
 	return err
 }
+func insertMany(data []interface{}) error {
+	timeout := config.Load().MongoConfig.Timeout
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	_, err := instance.MongoOfficial().Collection(buyerCollectionName).InsertMany(ctx, data)
+	return err
+}
 
 func findOne(filter bson.M, data interface{}) error {
 	timeout := config.Load().MongoConfig.Timeout
@@ -48,14 +55,24 @@ func findOne(filter bson.M, data interface{}) error {
 }
 
 func BuyDTokenService(param io.BuyerBuyDtokenInput) (output io.BuyerBuyDtokenOutput) {
-	var err error
-	output.EndpointTokens, err = sendTxAndGetTokens(param.SignedTx, "useToken")
+	txHash, err := sendTx(param.SignedTx)
+	if err != nil {
+		output.Code = http.StatusBadRequest
+		output.Msg = err.Error()
+		return
+	}
+	output.EndpointTokens, err = HandleEvent(txHash, buyDToken)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
 		return
 	}
-	err = insertOne(output.EndpointTokens)
+
+	p := make([]interface{}, len(output.EndpointTokens))
+	for i := 0; i < len(output.EndpointTokens); i++ {
+		p[i] = output.EndpointTokens[i]
+	}
+	err = insertMany(p)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -65,7 +82,13 @@ func BuyDTokenService(param io.BuyerBuyDtokenInput) (output io.BuyerBuyDtokenOut
 }
 
 func UseTokenService(input io.BuyerUseTokenInput) (output io.BuyerUseTokenOutput) {
-	endpointTokens, err := sendTxAndGetTokens(input.Tx, "useToken")
+	txHash, err := sendTx(input.Tx)
+	if err != nil {
+		output.Code = http.StatusBadRequest
+		output.Msg = err.Error()
+		return
+	}
+	endpointTokens, err := HandleEvent(txHash, useToken)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -77,6 +100,7 @@ func UseTokenService(input io.BuyerUseTokenInput) (output io.BuyerUseTokenOutput
 		output.Msg = err.Error()
 		return
 	}
+	//向seller发请求
 	_, _, data, err := forward.JSONRequest("useToken", "", paramBs)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
