@@ -36,6 +36,12 @@ var WalletCmd = cli.Command{
 			Action:    deleteWallet,
 			ArgsUsage: "wallet_name",
 		},
+		{
+			Name:      "dump",
+			Usage:     "dump all wallet",
+			Action:    dumpWallet,
+			ArgsUsage: "dump_path",
+		},
 	},
 }
 
@@ -74,6 +80,13 @@ func deleteWallet(c *cli.Context) (err error) {
 
 	input := io.DeleteWalletInput{WalletName: c.Args().Get(0)}
 	output := service.Instance().DeleteWallet(input)
+	err = output.Error()
+	return
+}
+
+func dumpWallet(c *cli.Context) (err error) {
+	input := io.DumpWalletInput{Path: c.Args().Get(0)}
+	output := service.Instance().DumpWallet(input)
 	err = output.Error()
 	return
 }

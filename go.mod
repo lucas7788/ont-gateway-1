@@ -7,11 +7,17 @@ require (
 	github.com/gin-gonic/gin v1.6.2
 	github.com/go-kit/kit v0.10.0
 	github.com/go-redis/redis v6.15.7+incompatible
+	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
+	github.com/magiconair/properties v1.8.1
 	github.com/oklog/run v1.0.0
+	github.com/ontio/ontology v1.8.2
+	github.com/ontio/ontology-crypto v1.0.7
 	github.com/ontio/ontology-go-sdk v1.11.1
 	github.com/piprate/json-gold v0.3.0
 	github.com/prometheus/client_golang v1.5.1
 	github.com/satori/go.uuid v1.2.0
+	github.com/stretchr/testify v1.4.0
+	github.com/urfave/cli v1.22.1
 	github.com/urfave/cli/v2 v2.2.0
 	github.com/zhiqiangxu/ddxf v0.0.0-20200513063214-5faa90a611bc
 	github.com/zhiqiangxu/tableflip v0.0.0-20190122113937-cebf5858b483
