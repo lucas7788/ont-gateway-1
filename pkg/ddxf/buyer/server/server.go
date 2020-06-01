@@ -10,8 +10,9 @@ import (
 
 const (
 	buyDtoken = "/ddxf/buyer/buyDtoken"
-	useDToken  = "/ddxf/buyer/useToken"
+	useDToken = "/ddxf/buyer/useToken"
 
+	loginBuyer          = "/onto/buyer/login"
 	buyDtokenQrCode     = "/onto/buyer/buyDtokenQrCode"
 	qrCodeCallBack      = "/onto/buyer/qrCodeCallBack"
 	getQrCodeByQrCodeId = "/onto/buyer/getQrCodeByQrCodeId/:qrCodeId"
@@ -22,6 +23,7 @@ var BuyerMgrAccount *ontology_go_sdk.Account
 func StartBuyerServer() {
 	r := gin.Default()
 	r.Use(cors.Cors())
+	r.POST(loginBuyer, LoginHandler)
 	r.POST(buyDtokenQrCode, BuyDtokenQrCodeHanler)
 	r.GET(getQrCodeByQrCodeId, GetQrCodeByQrCodeIdHandler)
 	r.POST(qrCodeCallBack, QrCodeCallBackHandler)

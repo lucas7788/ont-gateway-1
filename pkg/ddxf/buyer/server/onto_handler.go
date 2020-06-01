@@ -9,6 +9,10 @@ import (
 	"net/http"
 )
 
+func LoginHandler(ctx *gin.Context) {
+
+}
+
 func BuyDtokenQrCodeHanler(ctx *gin.Context) {
 	paramsBs, err := ioutil.ReadAll(ctx.Request.Body)
 	if err != nil {
