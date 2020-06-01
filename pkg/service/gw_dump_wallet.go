@@ -17,8 +17,8 @@ func (gw *Gateway) DumpWallet(input io.DumpWalletInput) (output io.DumpWalletOut
 
 	conf := config.Load()
 	out := time.Now().Format("2006_01_02")
-	fmt.Println("mongodump", "--collection=wallet --out=/home/ubuntu/wallet/"+path.Join(input.Path, out)+" --uri="+shellquote.Join(conf.MongoConfig.ConnectionString))
-	cmd := exec.Command("mongodump", "--collection=wallet --out=/home/ubuntu/wallet/"+path.Join(input.Path, out)+" --uri="+shellquote.Join(conf.MongoConfig.ConnectionString))
+	fmt.Println("mongodump", "--collection=wallet --out="+path.Join(input.Path, out)+" --uri="+shellquote.Join(conf.MongoConfig.ConnectionString))
+	cmd := exec.Command("mongodump", "--collection", "wallet", "--out", path.Join(input.Path, out), "--uri", conf.MongoConfig.ConnectionString)
 
 	_, err := cmd.Output()
 	if err != nil {
