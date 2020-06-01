@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"net/http"
 	"os/exec"
 	"path"
@@ -16,12 +17,13 @@ func (gw *Gateway) DumpWallet(input io.DumpWalletInput) (output io.DumpWalletOut
 
 	conf := config.Load()
 	out := time.Now().Format("2006_01_02")
+	fmt.Println("mongodump", "--collection=wallet --out=/home/ubuntu/wallet/"+path.Join(input.Path, out)+" --uri="+shellquote.Join(conf.MongoConfig.ConnectionString))
 	cmd := exec.Command("mongodump", "--collection=wallet --out=~/wallet/"+path.Join(input.Path, out)+" --uri="+shellquote.Join(conf.MongoConfig.ConnectionString))
 
-	outBytes, err := cmd.Output()
+	_, err := cmd.Output()
 	if err != nil {
 		output.Code = http.StatusInternalServerError
-		output.Msg = string(outBytes)
+		output.Msg = err.Error()
 		return
 	}
 
