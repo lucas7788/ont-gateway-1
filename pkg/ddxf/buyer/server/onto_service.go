@@ -52,7 +52,7 @@ func QrCodeCallBackService(param QrCodeCallBackParam) (map[string]interface{}, e
 		if output.Code != 0 {
 			return nil, output.Error()
 		}
-	} else if strings.Contains(code.QrCodeDesc, useTokenM) {
+	} else if strings.Contains(code.QrCodeDesc, useToken) {
 		filter := bson.M{"qrCode.qrCodeId": param.ExtraData.Id}
 		code := QrCodeAndEndpoint{}
 		err = findOne(filter, &code)
@@ -92,14 +92,14 @@ func HandleEvent(txHash string, method string) ([]io.EndpointToken, error) {
 			if !ok || len(states) != 4 {
 				return nil, errors.New("notify wrong")
 			}
-			if method == "buyDtoken" {
+			if method == buyDToken {
 				buyer, err = common.AddressFromBase58(states[3].(string))
 				if err != nil {
 					return nil, err
 				}
 				onchainItemId = states[1].(string)
 				break
-			} else if method == "useToken" {
+			} else if method == useToken {
 				buyer, err = common.AddressFromBase58(states[2].(string))
 				if err != nil {
 					return nil, err

@@ -19,6 +19,6 @@ func TestBuyDTokenService(t *testing.T) {
 
 func TestHandleEvent(t *testing.T) {
 	res, err := HandleEvent("0f792177d846c2e4a69e0a7a2058ced610febf701e8a671a9b0cb4447a5e1416", "buyDtoken")
-	assert.Nil(t,err)
+	assert.Nil(t, err)
 	fmt.Println(res)
 }

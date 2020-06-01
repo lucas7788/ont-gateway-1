@@ -17,7 +17,7 @@ import (
 const (
 	buyerCollectionName = "buyer"
 	buyDToken           = "buyDToken"
-	useTokenM           = "useToken"
+	useToken            = "useToken"
 )
 
 func Init() error {
@@ -61,7 +61,7 @@ func BuyDTokenService(param io.BuyerBuyDtokenInput) (output io.BuyerBuyDtokenOut
 		output.Msg = err.Error()
 		return
 	}
-	output.EndpointTokens, err = HandleEvent(txHash, "buyDtoken")
+	output.EndpointTokens, err = HandleEvent(txHash, buyDToken)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -88,7 +88,7 @@ func UseTokenService(input io.BuyerUseTokenInput) (output io.BuyerUseTokenOutput
 		output.Msg = err.Error()
 		return
 	}
-	endpointTokens, err := HandleEvent(txHash, "useToken")
+	endpointTokens, err := HandleEvent(txHash, useToken)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()

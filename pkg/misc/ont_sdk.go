@@ -10,7 +10,7 @@ import (
 
 var ddxfContract *DDXFContractKit
 
-const DDXF_CONTRACT_ADDRESS  = "cf267b778d54174717d2fe81f2a931fcffc2cdd4"
+const DDXF_CONTRACT_ADDRESS = "cf267b778d54174717d2fe81f2a931fcffc2cdd4"
 
 // OntSdk deals with ont sdk related stuff
 type OntSdk struct {

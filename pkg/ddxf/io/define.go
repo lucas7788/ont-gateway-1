@@ -22,7 +22,7 @@ func ReadString(source *common.ZeroCopySource) (string, error) {
 }
 func ConstructTokensAndEndpoint(data []byte, buyer common.Address, onchainItemId string) ([]EndpointToken, error) {
 	source2 := common.NewZeroCopySource(data)
-	bs,_,irregular,eof := source2.NextVarBytes()
+	bs, _, irregular, eof := source2.NextVarBytes()
 	if irregular {
 		return nil, common.ErrIrregularData
 	}
