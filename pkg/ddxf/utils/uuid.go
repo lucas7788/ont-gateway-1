@@ -2,6 +2,7 @@ package utils
 
 import (
 	"github.com/satori/go.uuid"
+	"strings"
 )
 
 const (
@@ -23,4 +24,12 @@ func GenerateUUId(uuidType int32) string {
 	}
 
 	return u1.String()
+}
+
+func UUIDType(s string) int32 {
+	if strings.Contains(s, SELLER_PUBLISH_PRIFIX) {
+		return UUID_TOKEN_SELLER_PUBLISH
+	}
+
+	return 0
 }

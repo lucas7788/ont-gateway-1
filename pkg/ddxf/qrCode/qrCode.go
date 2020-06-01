@@ -4,7 +4,7 @@ const (
 	QrCodeExpire = 10 * 60
 )
 
-type SendTxParam struct {
+type QrCodeCallBackParam struct {
 	Signer    string    `json:"signer"`
 	SignedTx  string    `json:"signedTx"`
 	ExtraData ExtraData `json:"extraData"`

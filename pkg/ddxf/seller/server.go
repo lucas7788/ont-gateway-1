@@ -1,4 +1,4 @@
-package seller
+package main
 
 import (
 	"github.com/gin-gonic/gin"
@@ -6,7 +6,6 @@ import (
 	"github.com/urfave/cli"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/restful"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/sellerconfig"
-	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"github.com/zhiqiangxu/ont-gateway/pkg/rest/middleware"
 	"os"
 	"os/signal"
@@ -16,9 +15,11 @@ import (
 )
 
 const (
-	SaveDataMetaUrl      string = "/ddxf/seller/saveDataMeta"
-	SaveTokenMetaUrl     string = "/ddxf/seller/saveTokenMeta"
-	PublishMPItemMetaUrl string = "/ddxf/seller/publishMPItemMeta"
+	SaveDataMetaUrl            string = "/ddxf/seller/saveDataMeta"
+	SaveTokenMetaUrl           string = "/ddxf/seller/saveTokenMeta"
+	PublishMPItemMetaUrl       string = "/ddxf/seller/publishMPItemMeta"
+	getQrCodeDataByQrCodeIdUrl string = "ddxf/seller/getQrCodeDataByQrCodeId"
+	qrCodeCallbackSendTxUrl    string = "ddxf/seller/qrCodeCallbackSendTx"
 )
 
 var (
@@ -67,6 +68,8 @@ func StartSellerServer() {
 	r.POST(SaveDataMetaUrl, restful.SaveDataMetaHandle)
 	r.POST(SaveTokenMetaUrl, restful.SaveTokenMetaHandle)
 	r.POST(PublishMPItemMetaUrl, restful.PublishMPItemMetaHandle)
+	r.POST(getQrCodeDataByQrCodeIdUrl, restful.GetQrCodeDataByQrCodeId)
+	r.POST(qrCodeCallbackSendTxUrl, restful.GrCodeCallbackSendTx)
 }
 
 func waitToExit() {

@@ -2,15 +2,14 @@ package service
 
 import (
 	"context"
-	sdk "github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ddxf"
-	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/contract"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/qrCode"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/sellerconfig"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/sql"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -21,7 +20,7 @@ import (
 )
 
 const (
-	sellerCollectionName   = "marketplace"
+	sellerCollectionName   = "seller"
 	endpointCollectionName = "sellerendpoint"
 )
 
@@ -30,8 +29,6 @@ var (
 )
 
 type SellerImpl struct {
-	wallet              *sdk.Wallet
-	walletpswd          string
 	dataLookupEndpoint  DataLookupEndpoint
 	tokenLookupEndpoint TokenLookupEndpoint
 	tokenOpEndpoint     TokenOpEndpoint
@@ -72,7 +69,7 @@ func (self *SellerImpl) SaveDataMeta(input io.SellerSaveDataMetaInput, ontId str
 		return
 	}
 
-	identity, err := self.wallet.NewDefaultSettingIdentity([]byte(self.walletpswd))
+	identity, err := sellerconfig.DefSellerConfig.Wallet.NewDefaultSettingIdentity([]byte(sellerconfig.DefSellerConfig.Pswd))
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -92,10 +89,7 @@ func (self *SellerImpl) SaveDataMeta(input io.SellerSaveDataMetaInput, ontId str
 	}
 
 	// store meta hash id.
-	timeout := config.Load().MongoConfig.Timeout
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-	_, err = instance.MongoOfficial().Collection(sellerCollectionName).InsertOne(ctx, dataStore)
+	err = sql.InsertElt(sql.DataMetaCollection, dataStore)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -105,10 +99,6 @@ func (self *SellerImpl) SaveDataMeta(input io.SellerSaveDataMetaInput, ontId str
 }
 
 func (self *SellerImpl) SaveTokenMeta(input io.SellerSaveTokenMetaInput, ontId string) (output io.SellerSaveTokenMetaOutput) {
-	timeout := config.Load().MongoConfig.Timeout
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
 	// verify hash.
 	h, err := ddxf.HashObject(input.TokenMeta)
 	if err != nil || h != input.TokenMetaHash {
@@ -117,8 +107,9 @@ func (self *SellerImpl) SaveTokenMeta(input io.SellerSaveTokenMetaInput, ontId s
 		return
 	}
 	adD := &io.SellerSaveDataMeta{}
+
 	filterD := bson.M{"dataMetaHash": input.DataMetaHash, "ontId": ontId}
-	err = instance.MongoOfficial().Collection(sellerCollectionName).FindOne(ctx, filterD).Decode(adD)
+	err = sql.FindElt(sql.DataMetaCollection, filterD, adD)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -133,7 +124,7 @@ func (self *SellerImpl) SaveTokenMeta(input io.SellerSaveTokenMetaInput, ontId s
 		OntId:         ontId,
 	}
 
-	_, err = instance.MongoOfficial().Collection(sellerCollectionName).InsertOne(ctx, tokenStore)
+	err = sql.InsertElt(sql.TokenMetaCollection, tokenStore)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -141,33 +132,24 @@ func (self *SellerImpl) SaveTokenMeta(input io.SellerSaveTokenMetaInput, ontId s
 	return
 }
 
-func (self *SellerImpl) PublishMPItemMeta(input io.SellerPublishMPItemMetaInput, ontId string) (output io.SellerPublishMPItemMetaOutput, response *qrCode.QrCodeResponse) {
-	timeout := config.Load().MongoConfig.Timeout
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
+func (self *SellerImpl) PublishMPItemMeta(input io.SellerPublishMPItemMetaInput, ontId string) (*qrCode.QrCodeResponse, error) {
 	adT := &io.SellerSaveTokenMeta{}
 	filterT := bson.M{"tokenMetaHash": input.TokenMetaHash, "ontId": ontId}
-	err := instance.MongoOfficial().Collection(sellerCollectionName).FindOne(ctx, filterT).Decode(adT)
+	err := sql.FindElt(sql.TokenMetaCollection, filterT, adT)
 	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-		return
+		return nil, err
 	}
 
 	adD := &io.SellerSaveDataMeta{}
 	filterD := bson.M{"dataMetaHash": input.DataMetaHash, "ontId": ontId}
-	err = instance.MongoOfficial().Collection(sellerCollectionName).FindOne(ctx, filterD).Decode(adD)
+	err = sql.FindElt(sql.DataMetaCollection, filterD, adD)
 	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-		return
+		return nil, err
 	}
 
 	arr := strings.Split(ontId, ":")
 	if len(arr) != 3 {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-		return
+		return nil, err
 	}
 	sellerAddress, err := common.AddressFromBase58(arr[2])
 
@@ -180,8 +162,14 @@ func (self *SellerImpl) PublishMPItemMeta(input io.SellerPublishMPItemMetaInput,
 
 	resourceIdBytes, rosourceDDOBytes, itemBytes := contract.ConstructPublishParam(sellerAddress, tokenTemplate, adT.TokenEndpoint, itemMetaHash, adD.ResourceType, adD.Fee, adD.ExpiredDate, adD.Stock, adD.DataIds)
 	qrCodex, err := qrCode.BuildPublishQrCode(sellerconfig.DefSellerConfig.NetType, input.MPContractHash, resourceIdBytes, rosourceDDOBytes, itemBytes, arr[2], ontId)
-	response = qrCode.BuildQrCodeResponse(qrCodex.QrCodeId)
-	return
+	qrCodeResp := qrCode.BuildQrCodeResponse(qrCodex.QrCodeId)
+
+	err = sql.InsertElt(sql.SellerQrCodeCollection, qrCodex)
+	if err != nil {
+		return nil, err
+	}
+
+	return qrCodeResp, nil
 }
 
 func (self *SellerImpl) DataLookupEndpoint() (output DataLookupEndpoint) {

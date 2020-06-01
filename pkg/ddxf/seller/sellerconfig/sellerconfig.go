@@ -41,7 +41,9 @@ type SellerConfig struct {
 	QrCodeCallback      string `json:"qrcode_callback"`
 	NetType             string `json:"net_type"`
 	WalletName          string `json:"wallet_name"`
+	Pswd                string
 	OntSdk              *sdk.OntologySdk
+	Wallet              *sdk.Wallet
 	ServerAccount       *sdk.Account
 }
 
@@ -50,7 +52,7 @@ var DefSellerConfig = &SellerConfig{
 	Version:             "1.0",
 	RestPort:            DEFAULT_REST_PORT,
 	ONTAuthScanProtocol: "http://172.29.36.101/ddxf/seller/getQrCodeDataByQrCodeId",
-	QrCodeCallback:      "http://172.29.36.101/ddxf/seller/qrCodeSendTx",
+	QrCodeCallback:      "http://172.29.36.101/ddxf/seller/qrCodeCallbackSendTx",
 	NetType:             SoloNetType,
 }
 
