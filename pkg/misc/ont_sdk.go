@@ -3,8 +3,10 @@ package misc
 import (
 	osdk "github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology-go-sdk/common"
+	"github.com/ontio/ontology-go-sdk/utils"
 	common2 "github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
+	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"time"
 )
 
@@ -62,12 +64,25 @@ func (sdk *OntSdk) DDXFContract(gasLimit uint64,
 	return ddxfContract
 }
 
+func (sdk *OntSdk) SendTx(txHex string) (string, error) {
+	tx, err := utils.TransactionFromHexString(txHex)
+	if err != nil {
+		return "", err
+	}
+	mutTx, err := tx.IntoMutable()
+	if err != nil {
+		return "", err
+	}
+	txHash, err := instance.OntSdk().GetKit().SendTransaction(mutTx)
+	return txHash.ToHexString(), err
+}
+
 func (sdk *OntSdk) GetSmartCodeEvent(txHash string) (*common.SmartContactEvent, error) {
 	return sdk.kit.GetSmartContractEvent(txHash)
 }
 
 func (sdk *OntSdk) WaitForGenerateBlock() (bool, error) {
-	timeout := time.Second * 30
+	timeout := time.Second * 60
 	return sdk.kit.WaitForGenerateBlock(timeout)
 }
 

@@ -10,7 +10,52 @@ import (
 )
 
 func LoginHandler(ctx *gin.Context) {
+	res := LoginService()
+	ctx.JSON(0, ResponseSuccess(res))
+}
 
+func GetLoginQrCodeHandler(ctx *gin.Context) {
+	qrCodeId := ctx.Param("qrCodeId")
+	code, err := GetLoginQrCodeService(qrCodeId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, ResponseSuccess(code))
+	} else {
+		ctx.JSON(0, ResponseSuccess(code))
+	}
+}
+
+func LoginCallBackHandler(ctx *gin.Context) {
+	paramsBs, err := ioutil.ReadAll(ctx.Request.Body)
+	if err != nil {
+		instance.Logger().Error("[LoginCallBackHandler] read post param error:", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, ResponseFailedOnto(http.StatusInternalServerError, err))
+		return
+	}
+	param := QrCodeCallBackParam{}
+	err = json.Unmarshal(paramsBs, &param)
+	if err != nil {
+		instance.Logger().Error("[LoginCallBackHandler] parse post param error:", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, ResponseFailedOnto(http.StatusInternalServerError, err))
+		return
+	}
+	err = LoginCallBackService(param)
+	if err != nil {
+		instance.Logger().Error("[LoginCallBackHandler] parse post param error:", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, ResponseFailedOnto(http.StatusInternalServerError, err))
+		return
+	}
+	ctx.JSON(0, ResponseSuccess("SUCCESS"))
+}
+
+func GetLoginResultHandler(ctx *gin.Context) {
+	qrCodeId := ctx.Param("qrCodeId")
+	status, err := GetLoginResultService(qrCodeId)
+	if err != nil {
+		instance.Logger().Error("[GetLoginResultHandler] param error:", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, ResponseFailedOnto(http.StatusInternalServerError, err))
+		return
+	}
+	ctx.JSON(0, ResponseSuccess(status))
 }
 
 func BuyDtokenQrCodeHanler(ctx *gin.Context) {

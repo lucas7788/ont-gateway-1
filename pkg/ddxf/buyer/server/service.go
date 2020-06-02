@@ -7,60 +7,22 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/x/bsonx"
 	"net/http"
 )
 
 const (
-	buyerCollectionName = "buyer"
 	buyDToken           = "buyDToken"
 	useToken            = "useToken"
 )
 
-func Init() error {
-	opts := &options.IndexOptions{}
-	opts.SetName("u-qrCodeId")
-	opts.SetUnique(true)
-	index := mongo.IndexModel{
-		Keys:    bsonx.Doc{{Key: "qrCodeId", Value: bsonx.Int32(1)}},
-		Options: opts,
-	}
-	_, err := instance.MongoOfficial().Collection(buyerCollectionName).Indexes().CreateOne(context.Background(), index)
-	return err
-}
-
-func insertOne(data interface{}) error {
-	timeout := config.Load().MongoConfig.Timeout
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-	_, err := instance.MongoOfficial().Collection(buyerCollectionName).InsertOne(ctx, data)
-	return err
-}
-func insertMany(data []interface{}) error {
-	timeout := config.Load().MongoConfig.Timeout
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-	_, err := instance.MongoOfficial().Collection(buyerCollectionName).InsertMany(ctx, data)
-	return err
-}
-
-func findOne(filter bson.M, data interface{}) error {
-	timeout := config.Load().MongoConfig.Timeout
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-	return instance.MongoOfficial().Collection(buyerCollectionName).FindOne(ctx, filter).Decode(data)
-}
-
 func BuyDTokenService(param io.BuyerBuyDtokenInput) (output io.BuyerBuyDtokenOutput) {
-	txHash, err := sendTx(param.SignedTx)
+	txHash, err := instance.OntSdk().SendTx(param.SignedTx)
 	if err != nil {
 		output.Code = http.StatusBadRequest
 		output.Msg = err.Error()
 		return
 	}
+	instance.OntSdk().WaitForGenerateBlock()
 	output.EndpointTokens, err = HandleEvent(txHash, buyDToken)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
@@ -82,12 +44,14 @@ func BuyDTokenService(param io.BuyerBuyDtokenInput) (output io.BuyerBuyDtokenOut
 }
 
 func UseTokenService(input io.BuyerUseTokenInput) (output io.BuyerUseTokenOutput) {
-	txHash, err := sendTx(input.Tx)
+
+	txHash, err := instance.OntSdk().SendTx(input.Tx)
 	if err != nil {
 		output.Code = http.StatusBadRequest
 		output.Msg = err.Error()
 		return
 	}
+	instance.OntSdk().WaitForGenerateBlock()
 	endpointTokens, err := HandleEvent(txHash, useToken)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
@@ -100,8 +64,9 @@ func UseTokenService(input io.BuyerUseTokenInput) (output io.BuyerUseTokenOutput
 		output.Msg = err.Error()
 		return
 	}
+
 	//向seller发请求
-	_, _, data, err := forward.JSONRequest("useToken", "", paramBs)
+	_, _, data, err := forward.JSONRequest("useToken", input.TokenOpEndpoint, paramBs)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
