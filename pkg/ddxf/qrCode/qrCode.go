@@ -1,7 +1,15 @@
 package qrCode
 
+import (
+	"encoding/hex"
+	"encoding/json"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
+	"time"
+)
+
 const (
 	QrCodeExpire = 10 * 60
+	testnet      = "testnet"
 )
 
 type QrCodeCallBackParam struct {
@@ -22,10 +30,69 @@ type QrCodeDesc struct {
 	Price  string `json:"price"`
 }
 
+func BuildLoginQrCode(id string) (QrCode, error) {
+	qp := QrCodeParam{
+		InvokeConfig: InvokeConfig{
+			ContractHash: "",
+			Functions: []Function{
+				Function{
+					Operation: "signMessage",
+					Args: []Arg{Arg{
+						Name:  "login",
+						Value: "String:ontid",
+					}},
+				},
+			},
+			Payer:    "",
+			GasPrice: 500,
+			GasLimit: 20000,
+		},
+	}
+	qcd := QrCodeData{
+		Action: "signMessage",
+		Params: qp,
+	}
+	qcdBs, err := json.Marshal(qcd)
+	if err != nil {
+		return QrCode{}, err
+	}
+	sig, err := config.DefDDXFConfig.OperatorAccount.Sign(qcdBs)
+	if err != nil {
+		return QrCode{}, err
+	}
+	qrCode := QrCode{
+		QrCodeId:     id,
+		Ver:          "v2.0.0",
+		Requester:    config.DefDDXFConfig.OperatorOntid,
+		Signature:    hex.EncodeToString(sig),
+		Signer:       "",
+		QrCodeData:   string(qcdBs),
+		Callback:     "", //TODO
+		Exp:          time.Now().Unix() + QrCodeExpire,
+		Chain:        testnet,
+		QrCodeDesc:   "",
+		ContractType: "",
+	}
+	return qrCode, nil
+}
+
+type LoginResultStatus uint8
+
+const (
+	NotLogin LoginResultStatus = iota
+	Logining
+	LoginFailed
+	Logined
+)
+
+type LoginResult struct {
+	QrCode QrCode `json:"qrCode" bson:"qrCode"`
+	Result LoginResultStatus `json:"result" bson:"result"`
+}
+
 type QrCode struct {
 	QrCodeId     string `json:"id" bson:"qrCodeId"`
 	Ver          string `json:"ver" bson:"ver"`
-	OrderId      string `json:"orderId" bson:"orderId"`
 	Requester    string `json:"requester" bson:"requester"`
 	Signature    string `json:"signature" bson:"signature"`
 	Signer       string `json:"signer" bson:"signer"`

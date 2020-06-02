@@ -2,6 +2,11 @@ package server
 
 import "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/qrCode"
 
+type UserInfo struct {
+	UserName string `bson:"userName",json:"userName"`
+	Password string `bson:"password",json:"password"`
+}
+
 type QrCodeAndEndpoint struct {
 	Code          qrCode.QrCode `bson:"qrCode",json:"qrCode"`
 	TokenEndpoint string        `bson:"tokenEndpoint",json:"tokenEndpoint"`

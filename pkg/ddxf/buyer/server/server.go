@@ -13,6 +13,9 @@ const (
 	useDToken = "/ddxf/buyer/useToken"
 
 	loginBuyer          = "/onto/buyer/login"
+	getloginQrCode      = "/onto/buyer/getLoginQrcode/:qrCodeId"
+	loginCallBack       = "/onto/buyer/loginCallBack"
+	getLoginResult      = "/onto/buyer/getLoginResult"
 	buyDtokenQrCode     = "/onto/buyer/buyDtokenQrCode"
 	qrCodeCallBack      = "/onto/buyer/qrCodeCallBack"
 	getQrCodeByQrCodeId = "/onto/buyer/getQrCodeByQrCodeId/:qrCodeId"
@@ -24,14 +27,17 @@ func StartBuyerServer() {
 	r := gin.Default()
 	r.Use(cors.Cors())
 	r.POST(loginBuyer, LoginHandler)
+	r.GET(getloginQrCode, GetLoginQrCodeHandler)
+	r.POST(loginCallBack, LoginCallBackHandler)
+	r.GET(getLoginResult, GetLoginResultHandler)
 	r.POST(buyDtokenQrCode, BuyDtokenQrCodeHanler)
 	r.GET(getQrCodeByQrCodeId, GetQrCodeByQrCodeIdHandler)
 	r.POST(qrCodeCallBack, QrCodeCallBackHandler)
 	r.POST(buyDtoken, BuyDtokenHandler)
 	r.POST(useDToken, UseTokenHandler)
-	err := Init()
+	err := initDb()
 	if err != nil {
-		fmt.Println("init error:", err)
+		fmt.Println("initDb error:", err)
 		return
 	}
 	private := make([]byte, 32)

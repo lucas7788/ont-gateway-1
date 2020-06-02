@@ -3,16 +3,79 @@ package server
 import (
 	"encoding/hex"
 	"errors"
-	"fmt"
-	"github.com/ontio/ontology-go-sdk/utils"
 	"github.com/ontio/ontology/common"
+	common2 "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/qrCode"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"github.com/zhiqiangxu/ont-gateway/pkg/misc"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.uber.org/zap"
 	"strings"
 )
+
+func LoginService() qrCode.QrCodeResponse {
+	//TODO
+	code := qrCode.GetQrCode{
+		ONTAuthScanProtocol: "",
+	}
+	qrCodeId := common2.GenerateUUId()
+	res := qrCode.QrCodeResponse{
+		QrCode: code,
+		Id:     qrCodeId,
+	}
+	return res
+}
+
+func GetLoginQrCodeService(id string) (qrCode.QrCode, error) {
+	code, err := qrCode.BuildLoginQrCode(id)
+	if err != nil {
+		return qrCode.QrCode{}, err
+	}
+	res := qrCode.LoginResult{
+		QrCode: code,
+		Result: qrCode.Logining,
+	}
+	err = insertOneLoginQrCode(res)
+	return code, err
+}
+
+func LoginCallBackService(param QrCodeCallBackParam) error {
+	err := sendTx(param.SignedTx)
+	if err != nil {
+		err2 := updateLoginStatus(param.ExtraData.Id, qrCode.LoginFailed)
+		if err2 != nil {
+			instance.Logger().Error("[LoginCallBackHandler] updateLoginStatus error:", zap.Error(err2))
+		}
+		return err
+	}
+	err = updateLoginStatus(param.ExtraData.Id, qrCode.LoginFailed)
+	if err != nil {
+		instance.Logger().Error("[LoginCallBackHandler] updateLoginStatus error:", zap.Error(err))
+	}
+	return nil
+}
+
+func sendTx(tx string) error {
+	txHash, err := instance.OntSdk().SendTx(tx)
+	if err != nil {
+		return err
+	}
+	instance.OntSdk().WaitForGenerateBlock()
+	event, err := instance.OntSdk().GetSmartCodeEvent(txHash)
+	if err != nil {
+		return err
+	}
+	if event.State != 1 {
+		return errors.New("tx failed")
+	}
+	return nil
+}
+
+//for web
+func GetLoginResultService(id string) (qrCode.LoginResultStatus, error) {
+	return QueryLoginResult(id)
+}
 
 func BuyDtokenQrCodeService(input BuyerBuyDtokenQrCodeInput) (qrCode.QrCodeResponse, error) {
 	//build qrcode
@@ -128,21 +191,4 @@ func HandleEvent(txHash string, method string) ([]io.EndpointToken, error) {
 		return nil, err
 	}
 	return tokenEndpoints, nil
-}
-func sendTx(txHex string) (string, error) {
-	tx, err := utils.TransactionFromHexString(txHex)
-	if err != nil {
-		return "", err
-	}
-	mutTx, err := tx.IntoMutable()
-	if err != nil {
-		return "", err
-	}
-	txHash2 := mutTx.Hash()
-	fmt.Println(txHash2.ToHexString())
-	txHash, err := instance.OntSdk().GetKit().SendTransaction(mutTx)
-	if err != nil {
-		return "", err
-	}
-	return txHash.ToHexString(), nil
 }
