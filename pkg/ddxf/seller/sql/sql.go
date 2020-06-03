@@ -11,7 +11,7 @@ const (
 	SellerQrCodeCollection = "SellerQrCodeCollection"
 	DataMetaCollection     = "SellerDataMetaCollection"
 	TokenMetaCollection    = "SellerTokenMetaCollection"
-	ItemMetaCollection    = "SellerItemMetaCollection"
+	ItemMetaCollection     = "SellerItemMetaCollection"
 )
 
 func InsertElt(collectionName string, data interface{}) error {

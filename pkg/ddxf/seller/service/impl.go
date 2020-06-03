@@ -2,8 +2,12 @@ package service
 
 import (
 	"context"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/ontio/ontology-crypto/signature"
+	"github.com/ontio/ontology-go-sdk"
+	"github.com/ontio/ontology-go-sdk/utils"
 	"github.com/zhiqiangxu/ddxf"
 	common2 "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
@@ -27,11 +31,12 @@ const (
 var (
 	DefSellerImpl *SellerImpl
 )
+var ServerAccount *ontology_go_sdk.Account
 
 type SellerImpl struct {
 	dataLookupEndpoint  DataLookupEndpoint
 	tokenLookupEndpoint TokenLookupEndpoint
-	tokenOpEndpoint     TokenOpEndpoint
+	tokenOpEndpoint     TokenOpEndpointImpl
 }
 
 func InitSellerImpl() *SellerImpl {
@@ -42,6 +47,8 @@ func InitSellerImpl() *SellerImpl {
 	}
 	s.Init()
 	DefSellerImpl = s
+	pri, _ := hex.DecodeString("c19f16785b8f3543bbaf5e1dbb5d398dfa6c85aaad54fc9d71203ce83e505c07")
+	ServerAccount, _ = ontology_go_sdk.NewAccountFromPrivateKey(pri, signature.SHA256withECDSA)
 	return DefSellerImpl
 }
 
@@ -164,7 +171,7 @@ func (self *SellerImpl) TokenLookupEndpoint() (output TokenLookupEndpoint) {
 	return self.tokenLookupEndpoint
 }
 
-func (self *SellerImpl) TokenOpEndpoint() (output TokenOpEndpoint) {
+func (self *SellerImpl) TokenOpEndpoint() TokenOpEndpointImpl {
 	return self.tokenOpEndpoint
 }
 
@@ -186,20 +193,39 @@ func (self TokenLookupEndpointImpl) Lookup(io.SellerTokenLookupEndpointLookupInp
 type TokenOpEndpointImpl struct {
 }
 
-func (self TokenOpEndpointImpl) UseToken(input io.SellerTokenLookupEndpointUseTokenInput) (output io.SellerTokenLookupEndpointUseTokenOutput) {
-	txHash, err := instance.OntSdk().SendTx(input.Tx)
+func UseTokenService(input io.SellerTokenLookupEndpointUseTokenInput) (output io.SellerTokenLookupEndpointUseTokenOutput) {
+	tx, err := utils.TransactionFromHexString(input.Tx)
+	if err != nil {
+		output.Code = http.StatusBadRequest
+		output.Msg = err.Error()
+		return
+	}
+	mutTx, err := tx.IntoMutable()
+	if err != nil {
+		output.Code = http.StatusBadRequest
+		output.Msg = err.Error()
+		return
+	}
+	err = instance.OntSdk().GetKit().SignToTransaction(mutTx, ServerAccount)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
 		return
 	}
-	instance.OntSdk().WaitForGenerateBlock()
+	txHash, err := instance.OntSdk().SendRawTx(mutTx)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
 	ets, err := common2.HandleEvent(txHash, "useToken")
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
 		return
 	}
+	//TODO
+	output.Result = "SUCCESS"
 	fmt.Println(ets)
 	return
 }

@@ -56,6 +56,29 @@ func PublishMPItemMetaHandle(c *gin.Context) {
 	c.JSON(http.StatusOK, qrResp)
 }
 
+func UseTokenHandler(c *gin.Context) {
+	data, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		instance.Logger().Error("UseTokenHandler:", zap.Error(err))
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusBadRequest, err))
+		return
+	}
+	param := io.SellerTokenLookupEndpointUseTokenInput{}
+	err = json.Unmarshal(data, &param)
+	if err != nil {
+		instance.Logger().Error("UseTokenHandler:", zap.Error(err))
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusBadRequest, err))
+		return
+	}
+	qrResp := service.UseTokenService(param)
+	if qrResp.Error() != nil {
+		instance.Logger().Error("UseTokenHandler:", zap.Error(qrResp.Error()))
+		c.JSON(http.StatusInternalServerError, common.ResponseFailedOnto(http.StatusInternalServerError, qrResp.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, qrResp)
+}
+
 func PublishMetaHandler(c *gin.Context) {
 	ontId, ok := c.Get(middleware.TenantIDKey)
 	if !ok {

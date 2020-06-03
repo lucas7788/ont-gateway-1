@@ -17,10 +17,15 @@ type DDXFContractKit struct {
 }
 
 func NewDDXFContractKit(sdk *ontology_go_sdk.OntologySdk,
-	contractAddress common.Address) *DDXFContractKit {
+	contractAddress common.Address, gasLimit uint64,
+	gasPrice uint64,
+	payer *ontology_go_sdk.Account) *DDXFContractKit {
 	return &DDXFContractKit{
 		sdk:             sdk,
 		contractAddress: contractAddress,
+		gasLimit:        gasLimit,
+		gasPrice:        gasPrice,
+		payer:           payer,
 	}
 }
 

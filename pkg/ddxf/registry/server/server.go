@@ -2,8 +2,8 @@ package server
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/middleware/cors"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/middleware/cors"
 )
 
 const (

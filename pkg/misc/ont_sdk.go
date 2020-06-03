@@ -3,10 +3,12 @@ package misc
 import (
 	"time"
 
+	"fmt"
 	osdk "github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology-go-sdk/common"
 	"github.com/ontio/ontology-go-sdk/utils"
 	common2 "github.com/ontio/ontology/common"
+	"github.com/ontio/ontology/core/types"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 )
 
@@ -55,7 +57,7 @@ func (sdk *OntSdk) DDXFContract(gasLimit uint64,
 	payer *osdk.Account) *DDXFContractKit {
 	if ddxfContract == nil {
 		contractAddress, _ := common2.AddressFromHexString(DDXF_CONTRACT_ADDRESS)
-		ddxfContract = NewDDXFContractKit(sdk.kit, contractAddress)
+		ddxfContract = NewDDXFContractKit(sdk.kit, contractAddress, gasLimit, gasPrice, payer)
 	} else {
 		ddxfContract.gasPrice = gasPrice
 		ddxfContract.gasLimit = gasLimit
@@ -76,9 +78,26 @@ func (sdk *OntSdk) SendTx(txHex string) (string, error) {
 	txHash, err := sdk.kit.SendTransaction(mutTx)
 	return txHash.ToHexString(), err
 }
+func (sdk *OntSdk) SendRawTx(mutTx *types.MutableTransaction) (string, error) {
+	txHash, err := sdk.kit.SendTransaction(mutTx)
+	return txHash.ToHexString(), err
+}
 
 func (sdk *OntSdk) GetSmartCodeEvent(txHash string) (*common.SmartContactEvent, error) {
-	return sdk.kit.GetSmartContractEvent(txHash)
+	for i := 0; i < 10; i++ {
+		event, err := sdk.kit.GetSmartContractEvent(txHash)
+		if event != nil {
+			return event, err
+		}
+		if err != nil {
+			fmt.Println("GetSmartContractEvent err:", err)
+			return nil, err
+		}
+		if event == nil {
+			time.Sleep(3 * time.Second)
+		}
+	}
+	return nil, fmt.Errorf("GetSmartCodeEvent timeout, txhash: %s", txHash)
 }
 
 func (sdk *OntSdk) WaitForGenerateBlock() (bool, error) {

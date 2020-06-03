@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/ontio/ontology-crypto/signature"
 	sdk "github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology/common"
 	"github.com/stretchr/testify/assert"
@@ -18,14 +19,14 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
 	"testing"
+	"time"
 )
-
-var ServerAccount *sdk.Account
 
 func TestMain(t *testing.M) {
 	Wallet := sdk.NewWallet("test")
 	var err error
-	ServerAccount, err = Wallet.NewDefaultSettingAccount([]byte("123456"))
+	pri, _ := hex.DecodeString("c19f16785b8f3543bbaf5e1dbb5d398dfa6c85aaad54fc9d71203ce83e505c07")
+	ServerAccount, _ = sdk.NewAccountFromPrivateKey(pri, signature.SHA256withECDSA)
 	if err != nil {
 		panic(err)
 	}
@@ -100,6 +101,7 @@ func TestSaveDataMeta(t *testing.T) {
 }
 
 func TestSellerImpl_PublishMPItemMeta(t *testing.T) {
+	fmt.Println("seller address:", ServerAccount.Address.ToBase58())
 	sellerImpl := InitSellerImpl()
 
 	tokenTemplate := param.TokenTemplate{
@@ -112,12 +114,12 @@ func TestSellerImpl_PublishMPItemMeta(t *testing.T) {
 	itemMetaDataBs, err := json.Marshal(itemMetaData)
 	bs := sha256.Sum256(itemMetaDataBs)
 	itemMetaHash, err := common.Uint256ParseFromBytes(bs[:])
+	expiredDate := time.Now().Unix() + 10*24*60*60
 	resourceId, ddo, item := contract.ConstructPublishParam(ServerAccount.Address, tokenTemplate,
 		"tokenendpointurl", itemMetaHash, 0, param.Fee{
-			Count: 100,
-		}, 1, 100, "resourceId")
+			Count: 1,
+		}, uint64(expiredDate), 100, "resourceId2")
 
-	fmt.Println("ddobytes: ", hex.EncodeToString(ddo))
 	tx, err := instance.OntSdk().DDXFContract(2000000, 500,
 		nil).BuildTx(ServerAccount, "dtokenSellerPublish", []interface{}{resourceId, ddo, item})
 	assert.Nil(t, err)

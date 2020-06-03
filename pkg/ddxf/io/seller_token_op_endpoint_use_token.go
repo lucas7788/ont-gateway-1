@@ -4,7 +4,9 @@ import io2 "github.com/zhiqiangxu/ont-gateway/pkg/io"
 
 // SellerTokenLookupEndpointUseTokenInput ...
 type SellerTokenLookupEndpointUseTokenInput struct {
-	Tx string
+	Tx             string
+	BuyerOntId     string
+	BuyerPublicKey string
 }
 
 // SellerTokenLookupEndpointUseTokenOutput ...

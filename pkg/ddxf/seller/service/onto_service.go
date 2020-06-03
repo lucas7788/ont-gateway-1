@@ -1,6 +1,8 @@
 package service
 
 import (
+	"crypto/sha256"
+	"encoding/json"
 	"errors"
 	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/contract"
@@ -13,8 +15,6 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"strings"
-	"crypto/sha256"
-	"encoding/json"
 )
 
 func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qrCode.QrCodeResponse, error) {
