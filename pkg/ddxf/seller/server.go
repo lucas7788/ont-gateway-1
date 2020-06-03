@@ -7,7 +7,7 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/restful"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/sellerconfig"
-	"github.com/zhiqiangxu/ont-gateway/pkg/rest/middleware"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/service"
 	"os"
 	"os/signal"
 	"runtime"
@@ -16,12 +16,13 @@ import (
 )
 
 const (
-	SaveDataMetaUrl            string = "/ddxf/seller/saveDataMeta"
-	SaveTokenMetaUrl           string = "/ddxf/seller/saveTokenMeta"
-	PublishMPItemMetaUrl       string = "/ddxf/seller/publishMPItemMeta"
-	PublishItemMetaUrl         string = "/ddxf/seller/publishItemMeta"
-	getQrCodeDataByQrCodeIdUrl string = "ddxf/seller/getQrCodeDataByQrCodeId"
-	qrCodeCallbackSendTxUrl    string = "ddxf/seller/qrCodeCallbackSendTx"
+	SaveDataMetaUrl            = "/ddxf/seller/saveDataMeta"
+	SaveTokenMetaUrl           = "/ddxf/seller/saveTokenMeta"
+	PublishMPItemMetaUrl       = "/ddxf/seller/publishMPItemMeta"
+	UseTokenUrl                = "/ddxf/seller/useToken"
+	PublishItemMetaUrl         = "/ddxf/seller/publishItemMeta"
+	getQrCodeDataByQrCodeIdUrl = "ddxf/seller/getQrCodeDataByQrCodeId"
+	qrCodeCallbackSendTxUrl    = "ddxf/seller/qrCodeCallbackSendTx"
 )
 
 var (
@@ -58,7 +59,7 @@ func startDDXFSeller(ctx *cli.Context) error {
 		return err
 	}
 	*sellerconfig.DefSellerConfig = *sellerConfig
-
+	service.InitSellerImpl()
 	StartSellerServer()
 	waitToExit()
 	return nil
@@ -66,10 +67,11 @@ func startDDXFSeller(ctx *cli.Context) error {
 
 func StartSellerServer() {
 	r := gin.Default()
-	r.Use(middleware.JWT)
+	//r.Use(middleware.JWT)
 	r.POST(SaveDataMetaUrl, restful.SaveDataMetaHandle)
 	r.POST(SaveTokenMetaUrl, restful.SaveTokenMetaHandle)
 	r.POST(PublishMPItemMetaUrl, restful.PublishMPItemMetaHandle)
+	r.POST(UseTokenUrl, restful.UseTokenHandler)
 	r.POST(PublishItemMetaUrl, restful.PublishMetaHandler)
 	r.POST(getQrCodeDataByQrCodeIdUrl, restful.GetQrCodeDataByQrCodeId)
 	r.POST(qrCodeCallbackSendTxUrl, restful.GrCodeCallbackSendTx)

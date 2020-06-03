@@ -2,12 +2,12 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.uber.org/zap"
 	"io/ioutil"
-	"fmt"
 )
 
 func AddRegistryHandler(ctx *gin.Context) {
@@ -59,7 +59,7 @@ func PublishItemMetaHandler(ctx *gin.Context) {
 		instance.Logger().Error("[AddEndpointHandler] parse post param error:", zap.Error(err))
 		return
 	}
-	fmt.Println("param:",param)
+	fmt.Println("param:", param)
 	output := PublishItemMetaService(param)
 	if output.Code != 0 {
 		instance.Logger().Error(output.Msg)

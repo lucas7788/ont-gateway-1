@@ -3,22 +3,65 @@ package server
 import (
 	"testing"
 
+	"encoding/hex"
 	"fmt"
+	common2 "github.com/ontio/ontology/common"
 	"github.com/stretchr/testify/assert"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
+	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 )
 
+var resourceId = "resourceId2"
+
 func TestBuyDTokenService(t *testing.T) {
+	buyParam := []interface{}{resourceId, 1, BuyerMgrAccount.Address}
+	tx, err := instance.OntSdk().DDXFContract(2000000, 500,
+		nil).BuildTx(BuyerMgrAccount, "buyDtoken", buyParam)
+	assert.Nil(t, err)
+
+	fmt.Println("buyerAddress:", BuyerMgrAccount.Address.ToBase58())
+	txImu, _ := tx.IntoImmutable()
+	sink := common2.NewZeroCopySink(nil)
+	txImu.Serialization(sink)
 	input := io.BuyerBuyDtokenInput{
-		SignedTx: "00d2ce8bd45ef40100000000000000c2eb0b000000005c645c529cbab407589537ef4b87b84374f23c384bd4cdc2fffc31a9f281fed2174717548d777b26cf360962757944746f6b656e077265736f5f323501000000000000000000000000000000151dd3ecff3994999739bee170e6f490437248a7000241403711b300ec7650b95a29003675ab20f517b21d42d5d725b7babae4558304f00623163825589c27452df6e1c093d40aef8b51ff00854fc6241ef187ceaa40bbcc2321025af6199b152051fb7d508d11897f8e95fa4c95aa76f764dda347f59e9db82955ac4140a91bcdb00468687b3c0177c0a26a1ae2d3d8f055fe1a9cbfa42f6e228ff66ebf43bbfcacb7a4830627a71a3c49297d768c3e87fa33a16e96471c0bf886ae12472321034a0e9b2b5478145833be19b8ae687a8b4625930288ab56f32614537bd40b22a6ac",
+		SignedTx: hex.EncodeToString(sink.Bytes()),
 	}
+	txHash := tx.Hash()
+	fmt.Println("txHash:", txHash.ToHexString())
+
 	output := BuyDTokenService(input)
 	assert.Equal(t, 0, output.Code)
 	fmt.Println("BuyDTokenService output: ", output)
 }
 
+func TestUseTokenService(t *testing.T) {
+	tokenHash := make([]byte, 32)
+	template := param.TokenTemplate{
+		DataIDs:   "",
+		TokenHash: string(tokenHash),
+	}
+	userTokenParam := []interface{}{resourceId, BuyerMgrAccount.Address, template.ToBytes(), 1}
+	tx, _ := instance.OntSdk().DDXFContract(2000000,
+		500, nil).BuildTx(BuyerMgrAccount, "useToken", userTokenParam)
+
+	imMut, _ := tx.IntoImmutable()
+	txHash := tx.Hash()
+	fmt.Println("txHash:", txHash.ToHexString())
+	sink := common2.NewZeroCopySink(nil)
+	imMut.Serialization(sink)
+	input := io.BuyerUseTokenInput{
+		Tx:              hex.EncodeToString(sink.Bytes()),
+		TokenOpEndpoint: config.SellerUseTokenUrl,
+	}
+	output := UseTokenService(input)
+	assert.Nil(t, output.Error())
+}
+
 func TestHandleEvent(t *testing.T) {
-	res, err := HandleEvent("0f792177d846c2e4a69e0a7a2058ced610febf701e8a671a9b0cb4447a5e1416", "buyDtoken")
+	res, err := common.HandleEvent("0f792177d846c2e4a69e0a7a2058ced610febf701e8a671a9b0cb4447a5e1416", "buyDtoken")
 	assert.Nil(t, err)
 	fmt.Println(res)
 }

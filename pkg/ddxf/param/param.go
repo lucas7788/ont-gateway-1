@@ -83,7 +83,7 @@ type ResourceDDO struct {
 	Manager           common.Address           // data owner id
 	Endpoint          string                   // data service provider uri
 	TokenEndpoint     map[TokenTemplate]string // endpoint for tokens
-	DescHash          common.Uint256                   // required if len(Templates) > 1
+	DescHash          common.Uint256           // required if len(Templates) > 1
 	DTC               common.Address           // can be empty
 	MP                common.Address           // can be empty
 	Split             common.Address           // can be empty
