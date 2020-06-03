@@ -16,7 +16,6 @@ import (
 	"time"
 )
 
-
 func JWT() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var err error

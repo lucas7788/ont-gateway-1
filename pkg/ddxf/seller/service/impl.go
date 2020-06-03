@@ -2,8 +2,10 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ddxf"
+	common2 "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/contract"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
@@ -202,6 +204,20 @@ func (self TokenLookupEndpointImpl) Lookup(io.SellerTokenLookupEndpointLookupInp
 type TokenOpEndpointImpl struct {
 }
 
-func (self TokenOpEndpointImpl) UseToken(io.SellerTokenLookupEndpointUseTokenInput) (output io.SellerTokenLookupEndpointUseTokenOutput) {
+func (self TokenOpEndpointImpl) UseToken(input io.SellerTokenLookupEndpointUseTokenInput) (output io.SellerTokenLookupEndpointUseTokenOutput) {
+	txHash, err := instance.OntSdk().SendTx(input.Tx)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	instance.OntSdk().WaitForGenerateBlock()
+	ets, err := common2.HandleEvent(txHash, "useToken")
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	fmt.Println(ets)
 	return
 }

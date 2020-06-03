@@ -45,7 +45,7 @@ func updateLoginStatus(id string, res qrCode.LoginResultStatus) error {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	filter := bson.D{{"qrCodeId", id}}
-	update := bson.D{{"result",res}}
+	update := bson.D{{"result", res}}
 	_, err := instance.MongoOfficial().Collection(loginCollectionName).UpdateOne(ctx, filter, update)
 	return err
 }
@@ -56,11 +56,11 @@ func QueryLoginResult(id string) (qrCode.LoginResultStatus, error) {
 	defer cancel()
 	filter := bson.M{"qrCode.qrCodeId": id}
 	res := qrCode.LoginResult{}
-	err := instance.MongoOfficial().Collection(loginCollectionName).FindOne(ctx,filter).Decode(&res)
+	err := instance.MongoOfficial().Collection(loginCollectionName).FindOne(ctx, filter).Decode(&res)
 	if err != nil {
 		return qrCode.NotLogin, err
 	}
-	return res.Result,nil
+	return res.Result, nil
 }
 
 func insertOne(data interface{}) error {

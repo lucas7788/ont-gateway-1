@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
@@ -11,8 +12,8 @@ import (
 )
 
 const (
-	buyDToken           = "buyDToken"
-	useToken            = "useToken"
+	buyDToken = "buyDToken"
+	useToken  = "useToken"
 )
 
 func BuyDTokenService(param io.BuyerBuyDtokenInput) (output io.BuyerBuyDtokenOutput) {
@@ -23,7 +24,7 @@ func BuyDTokenService(param io.BuyerBuyDtokenInput) (output io.BuyerBuyDtokenOut
 		return
 	}
 	instance.OntSdk().WaitForGenerateBlock()
-	output.EndpointTokens, err = HandleEvent(txHash, buyDToken)
+	output.EndpointTokens, err = common.HandleEvent(txHash, buyDToken)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -44,21 +45,7 @@ func BuyDTokenService(param io.BuyerBuyDtokenInput) (output io.BuyerBuyDtokenOut
 }
 
 func UseTokenService(input io.BuyerUseTokenInput) (output io.BuyerUseTokenOutput) {
-
-	txHash, err := instance.OntSdk().SendTx(input.Tx)
-	if err != nil {
-		output.Code = http.StatusBadRequest
-		output.Msg = err.Error()
-		return
-	}
-	instance.OntSdk().WaitForGenerateBlock()
-	endpointTokens, err := HandleEvent(txHash, useToken)
-	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-		return
-	}
-	paramBs, err := json.Marshal(endpointTokens)
+	paramBs, err := json.Marshal(input)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
