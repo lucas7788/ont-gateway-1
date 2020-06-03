@@ -65,5 +65,9 @@ func (gw *Gateway) CreateWallet(input io.CreateWalletInput) (output io.CreateWal
 		return
 	}
 
+	output.WalletName = input.WalletName
+	output.Content = string(data)
+	output.PSW = psw
+
 	return
 }

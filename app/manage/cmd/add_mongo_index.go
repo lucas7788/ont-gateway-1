@@ -29,5 +29,8 @@ func AddMongoIndex(c *cli.Context) error {
 	err = model.ResourceVersionManager().Init()
 	fmt.Println("ResourceVersionManager.Init", err)
 
+	err = model.WalletManager().Init()
+	fmt.Println("WalletManager.Init", err)
+
 	return nil
 }

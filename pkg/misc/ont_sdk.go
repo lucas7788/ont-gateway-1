@@ -1,13 +1,13 @@
 package misc
 
 import (
+	"time"
+
 	osdk "github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology-go-sdk/common"
 	"github.com/ontio/ontology-go-sdk/utils"
 	common2 "github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
-	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
-	"time"
 )
 
 var ddxfContract *DDXFContractKit
@@ -73,7 +73,7 @@ func (sdk *OntSdk) SendTx(txHex string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	txHash, err := instance.OntSdk().GetKit().SendTransaction(mutTx)
+	txHash, err := sdk.kit.SendTransaction(mutTx)
 	return txHash.ToHexString(), err
 }
 
