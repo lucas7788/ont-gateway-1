@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -68,6 +69,7 @@ func (gw *Gateway) CreateWallet(input io.CreateWalletInput) (output io.CreateWal
 	output.WalletName = input.WalletName
 	output.Content = string(data)
 	output.PSW = psw
+	fmt.Println("content", output.Content)
 
 	return
 }
