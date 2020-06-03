@@ -82,11 +82,11 @@ const (
 	NotLogin LoginResultStatus = iota
 	Logining
 	LoginFailed
-	Logined
+	LoginSuccess
 )
 
 type LoginResult struct {
-	QrCode QrCode `json:"qrCode" bson:"qrCode"`
+	QrCode QrCode            `json:"qrCode" bson:"qrCode"`
 	Result LoginResultStatus `json:"result" bson:"result"`
 }
 

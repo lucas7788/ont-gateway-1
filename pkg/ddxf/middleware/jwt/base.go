@@ -35,14 +35,13 @@ func GenerateJwt(userInfo string) (string, error) {
 		Kid: "",
 	}
 	c := Content{
-		OntId:userInfo,
+		OntId: userInfo,
 	}
 
 	p := Payload{
-		Exp: int(time.Now().Unix() + int64(24*60*60)),
-		Content:c,
+		Exp:     int(time.Now().Unix() + int64(24*60*60)),
+		Content: c,
 	}
-
 
 	hBs, err := json.Marshal(h)
 	if err != nil {
