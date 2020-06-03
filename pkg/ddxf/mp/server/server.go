@@ -6,6 +6,7 @@ import (
 	"github.com/ontio/ontology-crypto/signature"
 	"github.com/ontio/ontology-go-sdk"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/middleware/cors"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 )
 
 const (
@@ -34,5 +35,5 @@ func StartMpServer() {
 	r.GET(queryItemMetas, QueryItemMetasHandler)
 	pri, _ := hex.DecodeString("c19f16785b8f3543bbaf5e1dbb5d398dfa6c85aaad54fc9d71203ce83e505c07")
 	MpAccount, _ = ontology_go_sdk.NewAccountFromPrivateKey(pri, signature.SHA256withECDSA)
-	go r.Run(":" + "20333")
+	go r.Run(":" + config.MpPort)
 }

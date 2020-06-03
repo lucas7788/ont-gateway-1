@@ -1,9 +1,11 @@
 package misc
 
 import (
+	"fmt"
 	"github.com/ontio/ontology-go-sdk"
 	common2 "github.com/ontio/ontology-go-sdk/common"
 	"github.com/ontio/ontology/common"
+	"github.com/ontio/ontology/core/types"
 )
 
 type DDXFContractKit struct {
@@ -36,4 +38,23 @@ func (this *DDXFContractKit) Invoke(signer *ontology_go_sdk.Account, method stri
 		return common.UINT256_EMPTY, err
 	}
 	return txhash, nil
+}
+func (this *DDXFContractKit) BuildTx(signer *ontology_go_sdk.Account, method string, param []interface{}) (*types.MutableTransaction, error) {
+	tx, err := this.sdk.WasmVM.NewInvokeWasmVmTransaction(this.gasPrice, this.gasLimit, this.contractAddress, method, param)
+	if err != nil {
+		return nil, err
+	}
+	if this.payer != nil {
+		this.sdk.SetPayer(tx, this.payer.Address)
+		err = this.sdk.SignToTransaction(tx, signer)
+		if err != nil {
+			return nil, fmt.Errorf("payer sign tx error: %s", err)
+		}
+	}
+	err = this.sdk.SignToTransaction(tx, signer)
+	if err != nil {
+		return nil, err
+	}
+
+	return tx, nil
 }

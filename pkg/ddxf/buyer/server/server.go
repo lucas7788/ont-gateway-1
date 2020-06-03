@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/ontio/ontology-crypto/signature"
 	"github.com/ontio/ontology-go-sdk"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/middleware/cors"
 )
 
@@ -46,5 +47,5 @@ func StartBuyerServer() {
 		fmt.Println("NewAccountFromPrivateKey error:", err)
 		return
 	}
-	go r.Run(":" + "20332")
+	go r.Run(":" + config.BuyerPort)
 }
