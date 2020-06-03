@@ -39,7 +39,7 @@ type SellerImpl struct {
 	tokenOpEndpoint     TokenOpEndpointImpl
 }
 
-func InitSellerImpl() *SellerImpl {
+func InitSellerImpl() {
 	s := &SellerImpl{
 		dataLookupEndpoint:  DataLookupEndpointImpl{},
 		tokenLookupEndpoint: TokenLookupEndpointImpl{},
@@ -49,7 +49,6 @@ func InitSellerImpl() *SellerImpl {
 	DefSellerImpl = s
 	pri, _ := hex.DecodeString("c19f16785b8f3543bbaf5e1dbb5d398dfa6c85aaad54fc9d71203ce83e505c07")
 	ServerAccount, _ = ontology_go_sdk.NewAccountFromPrivateKey(pri, signature.SHA256withECDSA)
-	return DefSellerImpl
 }
 
 // Init for this collection

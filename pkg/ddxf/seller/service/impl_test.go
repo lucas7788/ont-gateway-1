@@ -33,11 +33,12 @@ func TestMain(t *testing.M) {
 	sellerconfig.DefSellerConfig.Wallet = Wallet
 	sellerconfig.DefSellerConfig.ServerAccount = ServerAccount
 	sellerconfig.DefSellerConfig.Pswd = "123456"
+	InitSellerImpl()
 	t.Run()
 }
 
 func TestSaveDataMeta(t *testing.T) {
-	sellerImpl := InitSellerImpl()
+
 	ontId := "did:ont:AcVBV1zKGogf9Q54p1Ve78NSQVU5ZUUGkn"
 	DataMeta := map[string]interface{}{
 		"1": "first",
@@ -50,7 +51,7 @@ func TestSaveDataMeta(t *testing.T) {
 		DataMetaHash: h,
 	}
 
-	output := sellerImpl.SaveDataMeta(input, ontId)
+	output := DefSellerImpl.SaveDataMeta(input, ontId)
 	assert.Equal(t, 0, output.Code)
 	fmt.Printf("data %s\n", output.Msg)
 
@@ -70,7 +71,7 @@ func TestSaveDataMeta(t *testing.T) {
 		DataMetaHash:  h,
 		TokenMetaHash: ht,
 	}
-	outputt := sellerImpl.SaveTokenMeta(inputt, ontId)
+	outputt := DefSellerImpl.SaveTokenMeta(inputt, ontId)
 	assert.Equal(t, 0, outputt.Code)
 	fmt.Printf("token %s\n", outputt.Msg)
 
@@ -102,7 +103,6 @@ func TestSaveDataMeta(t *testing.T) {
 
 func TestSellerImpl_PublishMPItemMeta(t *testing.T) {
 	fmt.Println("seller address:", ServerAccount.Address.ToBase58())
-	sellerImpl := InitSellerImpl()
 
 	tokenTemplate := param.TokenTemplate{
 		DataIDs:   "",
@@ -133,6 +133,6 @@ func TestSellerImpl_PublishMPItemMeta(t *testing.T) {
 			ItemMeta:      map[string]interface{}{},
 		},
 	}
-	output := sellerImpl.PublishMPItemMeta(input, "ontid")
+	output := DefSellerImpl.PublishMPItemMeta(input, "ontid")
 	assert.Nil(t, output.Error())
 }
