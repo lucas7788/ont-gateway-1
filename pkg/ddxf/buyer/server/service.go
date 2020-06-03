@@ -51,7 +51,6 @@ func UseTokenService(input io.BuyerUseTokenInput) (output io.BuyerUseTokenOutput
 		output.Msg = err.Error()
 		return
 	}
-
 	//向seller发请求
 	_, _, data, err := forward.JSONRequest("useToken", input.TokenOpEndpoint, paramBs)
 	if err != nil {

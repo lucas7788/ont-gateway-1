@@ -45,14 +45,44 @@ func PublishMPItemMetaHandle(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusInternalServerError, nil))
 		return
 	}
-	param := io.SellerPublishMPItemMetaInput{}
+	param := io.MPEndpointPublishItemMetaInput{}
 
-	qrResp, err := service.DefSellerImpl.PublishMPItemMeta(param, ontId.(string))
-	if err != nil {
-		instance.Logger().Error("PublishMPItemMetaHandle:", zap.Error(err))
-		c.JSON(http.StatusInternalServerError, common.ResponseFailedOnto(http.StatusInternalServerError, err))
+	qrResp := service.DefSellerImpl.PublishMPItemMeta(param, ontId.(string))
+	if qrResp.Error() != nil {
+		instance.Logger().Error("PublishMPItemMetaHandle:", zap.Error(qrResp.Error()))
+		c.JSON(http.StatusInternalServerError, common.ResponseFailedOnto(http.StatusInternalServerError, qrResp.Error()))
+		return
 	}
 	c.JSON(http.StatusOK, qrResp)
+}
+
+func PublishMetaHandler(c *gin.Context) {
+	ontId, ok := c.Get(middleware.TenantIDKey)
+	if !ok {
+		instance.Logger().Error("PublishMetaHandler: read ontId error")
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusInternalServerError, nil))
+		return
+	}
+	paramsBs, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		instance.Logger().Error("PublishMetaHandler: read post param error:", zap.Error(err))
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusInternalServerError, err))
+		return
+	}
+	param := io.SellerPublishMPItemMetaInput{}
+	err = json.Unmarshal(paramsBs, &param)
+	if err != nil {
+		instance.Logger().Error("PublishMetaHandler: parse post param error:", zap.Error(err))
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusInternalServerError, err))
+		return
+	}
+	res, err := service.PublishMetaService(param, ontId.(string))
+	if err != nil {
+		instance.Logger().Error("PublishMetaHandler: parse post param error:", zap.Error(err))
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusInternalServerError, err))
+		return
+	}
+	c.JSON(http.StatusOK, res)
 }
 
 func GetQrCodeDataByQrCodeId(c *gin.Context) {
@@ -84,6 +114,6 @@ func GrCodeCallbackSendTx(c *gin.Context) {
 		instance.Logger().Error("GrCodeCallbackSendTx: :", zap.Error(err))
 		c.JSON(http.StatusInternalServerError, common.ResponseFailedOnto(http.StatusInternalServerError, err))
 	} else {
-		c.JSON(http.StatusOK, common.ResponseSuccess(nil))
+		c.JSON(http.StatusOK, common.ResponseSuccess("SUCCESS"))
 	}
 }

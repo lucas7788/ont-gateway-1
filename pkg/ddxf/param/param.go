@@ -1,6 +1,7 @@
 package param
 
 import (
+	"github.com/kataras/go-errors"
 	"github.com/ontio/ontology/common"
 	"io"
 )
@@ -42,6 +43,23 @@ type TokenTemplate struct {
 	TokenHash string
 }
 
+func (this *TokenTemplate) Deserialize(source *common.ZeroCopySource) error {
+	data, irregular, eof := source.NextBool()
+	if irregular || eof {
+		return errors.New("")
+	}
+	if data {
+		dataIds, _, irregular, eof := source.NextString()
+		if irregular || eof {
+			return errors.New("")
+		}
+		this.DataIDs = dataIds
+	}
+	tokenHash, _, irregular, eof := source.NextString()
+	this.TokenHash = tokenHash
+	return nil
+}
+
 func (this *TokenTemplate) Serialize(sink *common.ZeroCopySink) {
 	if len(this.DataIDs) == 0 {
 		sink.WriteBool(false)
@@ -65,7 +83,7 @@ type ResourceDDO struct {
 	Manager           common.Address           // data owner id
 	Endpoint          string                   // data service provider uri
 	TokenEndpoint     map[TokenTemplate]string // endpoint for tokens
-	DescHash          string                   // required if len(Templates) > 1
+	DescHash          common.Uint256                   // required if len(Templates) > 1
 	DTC               common.Address           // can be empty
 	MP                common.Address           // can be empty
 	Split             common.Address           // can be empty
@@ -75,6 +93,36 @@ func (this *ResourceDDO) ToBytes() []byte {
 	sink := common.NewZeroCopySink(nil)
 	this.Serialize(sink)
 	return sink.Bytes()
+}
+func (this *ResourceDDO) Deserialize(source *common.ZeroCopySource) error {
+	source.NextByte()
+	l, eof := source.NextUint32()
+	if eof {
+		return errors.New("1. ResourceDDO Deserialize l error")
+	}
+	for i := 0; i < int(l); i++ {
+		tt := TokenTemplate{}
+		tt.Deserialize(source)
+		source.NextByte()
+	}
+	source.NextAddress()
+	source.NextString()
+	l, eof = source.NextUint32()
+	if eof {
+		return errors.New("2. ResourceDDO Deserialize l error")
+	}
+	for i := 0; i < int(l); i++ {
+		tt := TokenTemplate{}
+		tt.Deserialize(source)
+		source.NextString()
+	}
+	source.NextString()
+	var irregular bool
+	this.DescHash, eof = source.NextHash()
+	if irregular || eof {
+		return errors.New("2. ResourceDDO Deserialize l error")
+	}
+	return nil
 }
 
 func (this *ResourceDDO) Serialize(sink *common.ZeroCopySink) {
@@ -91,7 +139,9 @@ func (this *ResourceDDO) Serialize(sink *common.ZeroCopySink) {
 		k.Serialize(sink)
 		sink.WriteString(v)
 	}
-	sink.WriteString(this.DescHash)
+	//TODO
+	sink.WriteBool(true)
+	sink.WriteHash(this.DescHash)
 	if this.DTC != common.ADDRESS_EMPTY {
 		sink.WriteBool(true)
 		sink.WriteAddress(this.DTC)

@@ -33,6 +33,11 @@ const (
 	SoloNetType = "soloNet"
 )
 
+type ItemMeta struct {
+	ItemMetaHash string                 `bson:"itemMetaHash" json:"itemMetaHash"`
+	ItemMetaData map[string]interface{} `bson:"itemMetaData" json:"itemMetaData"`
+}
+
 type SellerConfig struct {
 	NetWorkId           int    `json:"network_id"`
 	Version             string `json:"version"`

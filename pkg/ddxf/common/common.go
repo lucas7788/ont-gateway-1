@@ -1,13 +1,13 @@
 package common
 
 import (
+	"encoding/hex"
 	"errors"
 	"github.com/ontio/ontology/common"
 	"github.com/satori/go.uuid"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"github.com/zhiqiangxu/ont-gateway/pkg/misc"
-	"encoding/hex"
 )
 
 func GenerateUUId() string {

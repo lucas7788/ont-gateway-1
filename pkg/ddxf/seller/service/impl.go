@@ -2,23 +2,21 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ddxf"
 	common2 "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/contract"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/qrCode"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/sellerconfig"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/sql"
+	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/x/bsonx"
 	"net/http"
-	"strings"
 )
 
 const (
@@ -134,44 +132,28 @@ func (self *SellerImpl) SaveTokenMeta(input io.SellerSaveTokenMetaInput, ontId s
 	return
 }
 
-func (self *SellerImpl) PublishMPItemMeta(input io.SellerPublishMPItemMetaInput, ontId string) (*qrCode.QrCodeResponse, error) {
-	adT := &io.SellerSaveTokenMeta{}
-	filterT := bson.M{"tokenMetaHash": input.TokenMetaHash, "ontId": ontId}
-	err := sql.FindElt(sql.TokenMetaCollection, filterT, adT)
+func (self *SellerImpl) PublishMPItemMeta(input io.MPEndpointPublishItemMetaInput, ontId string) (output io.SellerPublishMPItemMetaOutput) {
+	mpParamBs, err := json.Marshal(input)
 	if err != nil {
-		return nil, err
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
 	}
-
-	adD := &io.SellerSaveDataMeta{}
-	filterD := bson.M{"dataMetaHash": input.DataMetaHash, "ontId": ontId}
-	err = sql.FindElt(sql.DataMetaCollection, filterD, adD)
+	//TODO send mp
+	_, _, data, err := forward.JSONRequest("POST", config.PublishItemMetaUrl, mpParamBs)
 	if err != nil {
-		return nil, err
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
 	}
-
-	arr := strings.Split(ontId, ":")
-	if len(arr) != 3 {
-		return nil, err
-	}
-	sellerAddress, err := common.AddressFromBase58(arr[2])
-
-	// dataMeta related in data contract tx.
-	tokenTemplate := param.TokenTemplate{
-		DataIDs:   adD.DataIds,
-		TokenHash: adT.TokenMetaHash,
-	}
-	itemMetaHash, err := ddxf.HashObject(input.ItemMeta)
-
-	resourceIdBytes, rosourceDDOBytes, itemBytes := contract.ConstructPublishParam(sellerAddress, tokenTemplate, adT.TokenEndpoint, itemMetaHash, adD.ResourceType, adD.Fee, adD.ExpiredDate, adD.Stock, adD.DataIds)
-	qrCodex, err := qrCode.BuildPublishQrCode(sellerconfig.DefSellerConfig.NetType, input.MPContractHash, resourceIdBytes, rosourceDDOBytes, itemBytes, arr[2], ontId)
-	qrCodeResp := qrCode.BuildQrCodeResponse(qrCodex.QrCodeId)
-
-	err = sql.InsertElt(sql.SellerQrCodeCollection, qrCodex)
+	res := io.MPEndpointPublishItemMetaOutput{}
+	err = json.Unmarshal(data, &res)
 	if err != nil {
-		return nil, err
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
 	}
-
-	return qrCodeResp, nil
+	return
 }
 
 func (self *SellerImpl) DataLookupEndpoint() (output DataLookupEndpoint) {

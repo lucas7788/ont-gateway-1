@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/middleware/cors"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 )
 
 const (
@@ -18,5 +19,5 @@ func StartRegistryImplServer() {
 	r.POST(RemoveEndpoint, RemoveEndpointHandler)
 	r.GET(QueryEndpoint, QueryEndpointHandler)
 	Init()
-	go r.Run(":" + "20331")
+	go r.Run(":" + config.RegistryPort)
 }
