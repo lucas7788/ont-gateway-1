@@ -124,6 +124,12 @@ type ResourceDDO struct {
 	Split                    common.Address             // can be empty
 }
 
+func (this *ResourceDDO) ToBytes() []byte {
+	sink := common.NewZeroCopySink(nil)
+	this.Serialize(sink)
+	return sink.Bytes()
+}
+
 func (this *ResourceDDO) Serialize(sink *common.ZeroCopySink) {
 	sink.WriteAddress(this.Manager)
 	sink.WriteVarUint(uint64(len(this.TokenResourceTyEndpoints)))

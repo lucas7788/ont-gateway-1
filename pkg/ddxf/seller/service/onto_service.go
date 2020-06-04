@@ -52,10 +52,16 @@ func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qr
 	if err != nil {
 		return qrCode.QrCodeResponse{}, err
 	}
-	resourceIdBytes, rosourceDDOBytes, itemBytes := contract.ConstructPublishParam(sellerAddress, tokenTemplate,
-		adT.TokenEndpoint, itemMetaHash, adD.ResourceType, adD.Fee, adD.ExpiredDate, adD.Stock, adD.DataIds)
+	trt := &param.TokenResourceTyEndpoint{
+		TokenTemplate: tokenTemplate,
+		ResourceType:  adD.ResourceType,
+		Endpoint:      adT.TokenEndpoint,
+	}
+	resourceIdBytes, resourceDDOBytes, itemBytes := contract.ConstructPublishParam(sellerAddress, tokenTemplate,
+		[]*param.TokenResourceTyEndpoint{trt},
+		itemMetaHash, adD.Fee, adD.ExpiredDate, adD.Stock, adD.DataIds)
 	qrCodex, err := qrCode2.BuildPublishQrCode(sellerconfig.DefSellerConfig.NetType, input.MPContractHash,
-		resourceIdBytes, rosourceDDOBytes, itemBytes, arr[2], ontId)
+		resourceIdBytes, resourceDDOBytes, itemBytes, arr[2], ontId)
 	if err != nil {
 		return qrCode.QrCodeResponse{}, err
 	}
@@ -93,7 +99,7 @@ func QrCodeCallBackService(param qrCode.QrCodeCallBackParam) error {
 			return err
 		}
 		adD := sellerconfig.ItemMeta{}
-		filterD := bson.M{"dataMetaHash": ddo.DescHash}
+		filterD := bson.M{"dataMetaHash": ddo.ItemMetaHash}
 		err = sql.FindElt(sql.ItemMetaCollection, filterD, &adD)
 		if err != nil {
 			return err
@@ -104,7 +110,7 @@ func QrCodeCallBackService(param qrCode.QrCodeCallBackParam) error {
 				OnchainItemID: resourceId,
 				ItemMeta:      adD.ItemMetaData,
 			},
-			DataMetaHash: ddo.DescHash.ToHexString(),
+			DataMetaHash: ddo.ItemMetaHash.ToHexString(),
 		}
 		output := DefSellerImpl.PublishMPItemMeta(in, param.ExtraData.OntId)
 		return output.Error()
