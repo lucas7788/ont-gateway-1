@@ -71,7 +71,7 @@ func (this *TokenTemplate) Deserialize(source *common.ZeroCopySource) error {
 	return nil
 }
 
-func (this *TokenTemplate) Serialize(sink *common.ZeroCopySink) {
+func (this TokenTemplate) Serialize(sink *common.ZeroCopySink) {
 	if len(this.DataIDs) == 0 {
 		sink.WriteBool(false)
 	} else {
@@ -131,7 +131,6 @@ func (this *ResourceDDO) Serialize(sink *common.ZeroCopySink) {
 		v.Serialize(sink)
 	}
 	//TODO
-	sink.WriteBool(true)
 	sink.WriteHash(this.ItemMetaHash)
 	if this.DTC != common.ADDRESS_EMPTY {
 		sink.WriteBool(true)

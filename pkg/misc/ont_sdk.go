@@ -20,8 +20,8 @@ var (
 	defaultDataIdContract *DataIdContractKit
 )
 
-const DDXF_CONTRACT_ADDRESS = "cf267b778d54174717d2fe81f2a931fcffc2cdd4"
-const DATA_ID_CONTRACT_ADDRESS = "cf267b778d54174717d2fe81f2a931fcffc2cdd4"
+const DDXF_CONTRACT_ADDRESS = "01f6bbe1ca837336a658036ac4997efc0171495a"
+const DATA_ID_CONTRACT_ADDRESS = "ee01c44c77d9be31b4935a0d13d861f89b455094"
 
 // OntSdk deals with ont sdk related stuff
 type OntSdk struct {

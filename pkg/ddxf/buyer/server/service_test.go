@@ -14,7 +14,7 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 )
 
-var resourceId = "resourceId2"
+var resourceId = "abcresourceId4"
 
 func TestBuyDTokenService(t *testing.T) {
 	buyParam := []interface{}{resourceId, 1, BuyerMgrAccount.Address}
@@ -38,15 +38,18 @@ func TestBuyDTokenService(t *testing.T) {
 }
 
 func TestUseTokenService(t *testing.T) {
-	tokenHash := make([]byte, 32)
 	template := param.TokenTemplate{
 		DataIDs:    "",
-		TokenHashs: []string{string(tokenHash)},
+		TokenHashs: []string{string(common2.UINT256_EMPTY[:])},
 	}
+	fmt.Println(hex.EncodeToString(template.ToBytes()))
+	fmt.Println(BuyerMgrAccount.Address.ToBase58())
 	userTokenParam := []interface{}{resourceId, BuyerMgrAccount.Address, template.ToBytes(), 1}
 	tx, _ := instance.OntSdk().DDXFContract(2000000,
 		500, nil).BuildTx(BuyerMgrAccount, "useToken", userTokenParam)
 
+	txhash := tx.Hash()
+	fmt.Println("txhash:", txhash.ToHexString())
 	imMut, _ := tx.IntoImmutable()
 	txHash := tx.Hash()
 	fmt.Println("txHash:", txHash.ToHexString())

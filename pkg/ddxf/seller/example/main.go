@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/server"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"os"
 	"os/signal"
@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	seller.StartSellerServer()
+	server.StartSellerServer()
 	waitToExit()
 }
 

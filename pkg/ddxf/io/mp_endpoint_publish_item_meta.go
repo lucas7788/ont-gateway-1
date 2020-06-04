@@ -6,7 +6,7 @@ import io2 "github.com/zhiqiangxu/ont-gateway/pkg/io"
 type MPEndpointPublishItemMetaInput struct {
 	SignedDDXFTx string
 	ItemMeta     PublishItemMeta
-	DataMetaHash string
+	MPEndpoint   string
 }
 
 type PublishItemMeta struct {

@@ -12,7 +12,7 @@ type EnqueTxInput struct {
 	TxHash        string `json:"tx_hash"`
 	ExpireSeconds int    `json:"expire_seconds"`
 	PollAmount    bool   `json:"poll_amount"`
-	Admin         bool   `json:"admin"` // not available to restful
+	Admin         bool   `json:"admin"` // not available to handler
 }
 
 // Validate impl
