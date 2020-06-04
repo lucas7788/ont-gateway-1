@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/restful"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/service"
 )
 
 const (
@@ -17,6 +18,7 @@ const (
 )
 
 func StartSellerServer() {
+	service.InitSellerImpl()
 	r := gin.Default()
 	//r.Use(middleware.JWT)
 	r.POST(SaveDataMetaUrl, restful.SaveDataMetaHandle)

@@ -152,6 +152,69 @@ func (this *ResourceDDO) Serialize(sink *common.ZeroCopySink) {
 		sink.WriteBool(false)
 	}
 }
+func (this *ResourceDDO) Deserialize(source *common.ZeroCopySource) error {
+	var eof bool
+	this.Manager, eof = source.NextAddress()
+	if eof {
+		return io.ErrUnexpectedEOF
+	}
+	l, _, irregular, eof := source.NextVarUint()
+	if irregular || eof {
+		return errors.New("1. ResourceDDO Deserialize l error")
+	}
+	tokenResourceTypes := make([]*TokenResourceTyEndpoint, l)
+	for i := 0; i < int(l); i++ {
+		tt := &TokenResourceTyEndpoint{}
+		err := tt.Deserialize(source)
+		if err != nil {
+			return err
+		}
+		tokenResourceTypes[i] = tt
+	}
+	this.TokenResourceTyEndpoints = tokenResourceTypes
+
+	this.ItemMetaHash, eof = source.NextHash()
+	if irregular || eof {
+		return errors.New("2. ResourceDDO Deserialize l error")
+	}
+	data, irregular, eof := source.NextBool()
+	if irregular || eof {
+		return fmt.Errorf("read dtc failed irregular:%v, eof:%v", irregular, eof)
+	}
+	if data {
+		this.DTC, eof = source.NextAddress()
+		if eof {
+			return io.ErrUnexpectedEOF
+		}
+	}
+	data, irregular, eof = source.NextBool()
+	if irregular || eof {
+		return fmt.Errorf("read mp failed irregular:%v, eof:%v", irregular, eof)
+	}
+	if data {
+		this.MP, eof = source.NextAddress()
+		if eof {
+			return io.ErrUnexpectedEOF
+		}
+	}
+	data, irregular, eof = source.NextBool()
+	if irregular || eof {
+		return fmt.Errorf("read split failed irregular:%v, eof:%v", irregular, eof)
+	}
+	if data {
+		this.Split, eof = source.NextAddress()
+		if eof {
+			return io.ErrUnexpectedEOF
+		}
+	}
+	return nil
+}
+
+func (this *ResourceDDO) ToBytes() []byte {
+	sink := common.NewZeroCopySink(nil)
+	this.Serialize(sink)
+	return sink.Bytes()
+}
 
 type Fee struct {
 	ContractAddr common.Address
