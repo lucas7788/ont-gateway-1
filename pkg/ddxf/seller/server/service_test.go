@@ -135,7 +135,7 @@ func TestSellerImpl_PublishMPItemMeta(t *testing.T) {
 			OnchainItemID: hex.EncodeToString(resourceId),
 			ItemMeta:      map[string]interface{}{},
 		},
-		MPEndpoint:   config2.PublishItemMetaUrl,
+		MPEndpoint: config2.PublishItemMetaUrl,
 	}
 	output := PublishMPItemMetaService(input, "ontid")
 	assert.Nil(t, output.Error())
