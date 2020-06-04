@@ -1,10 +1,8 @@
-package seller
+package server
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/restful"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/service"
 )
 
 const (
@@ -18,15 +16,15 @@ const (
 )
 
 func StartSellerServer() {
-	service.InitSellerImpl()
+	InitSellerImpl()
 	r := gin.Default()
 	//r.Use(middleware.JWT)
-	r.POST(SaveDataMetaUrl, restful.SaveDataMetaHandle)
-	r.POST(SaveTokenMetaUrl, restful.SaveTokenMetaHandle)
-	r.POST(PublishMPItemMetaUrl, restful.PublishMPItemMetaHandle)
-	r.POST(UseTokenUrl, restful.UseTokenHandler)
-	r.POST(PublishItemMetaUrl, restful.PublishMetaHandler)
-	r.POST(getQrCodeDataByQrCodeIdUrl, restful.GetQrCodeDataByQrCodeId)
-	r.POST(qrCodeCallbackSendTxUrl, restful.GrCodeCallbackSendTx)
+	r.POST(SaveDataMetaUrl, SaveDataMetaHandler)
+	r.POST(SaveTokenMetaUrl, SaveTokenMetaHandler)
+	r.POST(PublishMPItemMetaUrl, PublishMPItemMetaHandler)
+	r.POST(UseTokenUrl, UseTokenHandler)
+	r.POST(PublishItemMetaUrl, PublishMetaHandler)
+	r.POST(getQrCodeDataByQrCodeIdUrl, GetQrCodeDataByQrCodeIdHandler)
+	r.POST(qrCodeCallbackSendTxUrl, GrCodeCallbackSendTxHandler)
 	go r.Run(":" + config.SellerPort)
 }

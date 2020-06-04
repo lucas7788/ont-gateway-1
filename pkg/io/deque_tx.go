@@ -6,7 +6,7 @@ import "fmt"
 type DequeTxInput struct {
 	App    int    `json:"app"`
 	TxHash string `json:"tx_hash"`
-	Admin  bool   `json:"admin"` // not available to restful
+	Admin  bool   `json:"admin"` // not available to handler
 }
 
 // Validate impl

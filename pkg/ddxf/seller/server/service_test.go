@@ -1,4 +1,4 @@
-package service
+package server
 
 import (
 	"encoding/hex"
@@ -8,12 +8,11 @@ import (
 	"github.com/ontio/ontology/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/zhiqiangxu/ddxf"
+	config2 "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/contract"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/qrCode"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/sellerconfig"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/sql"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
 	"testing"
@@ -24,19 +23,18 @@ func TestMain(t *testing.M) {
 	Wallet := sdk.NewWallet("test")
 	var err error
 	pri, _ := hex.DecodeString("c19f16785b8f3543bbaf5e1dbb5d398dfa6c85aaad54fc9d71203ce83e505c07")
-	ServerAccount, _ = sdk.NewAccountFromPrivateKey(pri, signature.SHA256withECDSA)
+	ServerAccount, _ := sdk.NewAccountFromPrivateKey(pri, signature.SHA256withECDSA)
 	if err != nil {
 		panic(err)
 	}
-	sellerconfig.DefSellerConfig.Wallet = Wallet
-	sellerconfig.DefSellerConfig.ServerAccount = ServerAccount
-	sellerconfig.DefSellerConfig.Pswd = "123456"
+	Wallet = Wallet
+	ServerAccount = ServerAccount
+	Pwd = []byte("123456")
 	InitSellerImpl()
 	t.Run()
 }
 
 func TestSaveDataMeta(t *testing.T) {
-
 	ontId := "did:ont:AcVBV1zKGogf9Q54p1Ve78NSQVU5ZUUGkn"
 	DataMeta := map[string]interface{}{
 		"1": "first",
@@ -49,13 +47,14 @@ func TestSaveDataMeta(t *testing.T) {
 		DataMetaHash: hex.EncodeToString(h[:]),
 	}
 
-	output := DefSellerImpl.SaveDataMeta(input, ontId)
+	output := SaveDataMetaService(input, ontId)
+	fmt.Println(output.Msg)
 	assert.Equal(t, 0, output.Code)
 	fmt.Printf("data %s\n", output.Msg)
 
 	dataStore := &io.SellerSaveDataMeta{}
 	filter := bson.M{"dataMetaHash": input.DataMetaHash}
-	err = sql.FindElt(sql.DataMetaCollection, filter, dataStore)
+	err = FindElt(DataMetaCollection, filter, dataStore)
 	assert.Nil(t, err)
 
 	TokenMeta := map[string]interface{}{
@@ -69,13 +68,13 @@ func TestSaveDataMeta(t *testing.T) {
 		DataMetaHash:  hex.EncodeToString(h[:]),
 		TokenMetaHash: hex.EncodeToString(ht[:]),
 	}
-	outputt := DefSellerImpl.SaveTokenMeta(inputt, ontId)
+	outputt := SaveTokenMetaService(inputt, ontId)
 	assert.Equal(t, 0, outputt.Code)
 	fmt.Printf("token %s\n", outputt.Msg)
 
 	tokenStore := &io.SellerSaveTokenMeta{}
 	filterT := bson.M{"tokenMetaHash": inputt.TokenMetaHash}
-	err = sql.FindElt(sql.TokenMetaCollection, filterT, tokenStore)
+	err = FindElt(TokenMetaCollection, filterT, tokenStore)
 	assert.Nil(t, err)
 
 	PublishMeta := map[string]interface{}{
@@ -95,13 +94,12 @@ func TestSaveDataMeta(t *testing.T) {
 
 	qrCodes := &qrCode.QrCode{}
 	filterQ := bson.M{"qrCodeId": res.Id}
-	err = sql.FindElt(sql.SellerQrCodeCollection, filterQ, qrCodes)
+	err = FindElt(SellerQrCodeCollection, filterQ, qrCodes)
 	assert.Nil(t, err)
 }
 
 func TestSellerImpl_PublishMPItemMeta(t *testing.T) {
 	fmt.Println("seller address:", ServerAccount.Address.ToBase58())
-
 	tokenTemplate := param.TokenTemplate{
 		DataIDs:    "",
 		TokenHashs: []string{string(common.UINT256_EMPTY[:])},
@@ -113,10 +111,17 @@ func TestSellerImpl_PublishMPItemMeta(t *testing.T) {
 	bs, err := ddxf.HashObject(itemMetaData)
 	itemMetaHash, err := common.Uint256ParseFromBytes(bs[:])
 	expiredDate := time.Now().Unix() + 10*24*60*60
-	resourceId, ddo, item := contract.ConstructPublishParam(ServerAccount.Address, tokenTemplate,
-		"tokenendpointurl", itemMetaHash, 0, param.Fee{
-			Count: 1,
-		}, uint64(expiredDate), 100, "resourceId2")
+	trt := &param.TokenResourceTyEndpoint{
+		TokenTemplate: tokenTemplate,
+		ResourceType:  0,
+		Endpoint:      "tokenendpointurl",
+	}
+	fee := param.Fee{
+		Count: 1,
+	}
+	resourceId, ddo, item := contract.ConstructPublishParam(ServerAccount.Address,
+		tokenTemplate, []*param.TokenResourceTyEndpoint{trt}, itemMetaHash, fee, uint64(expiredDate), 100,
+		"abcresourceId4")
 
 	tx, err := instance.OntSdk().DDXFContract(2000000, 500,
 		nil).BuildTx(ServerAccount, "dtokenSellerPublish", []interface{}{resourceId, ddo, item})
@@ -130,7 +135,8 @@ func TestSellerImpl_PublishMPItemMeta(t *testing.T) {
 			OnchainItemID: hex.EncodeToString(resourceId),
 			ItemMeta:      map[string]interface{}{},
 		},
+		MPEndpoint: config2.PublishItemMetaUrl,
 	}
-	output := DefSellerImpl.PublishMPItemMeta(input, "ontid")
+	output := PublishMPItemMetaService(input, "ontid")
 	assert.Nil(t, output.Error())
 }

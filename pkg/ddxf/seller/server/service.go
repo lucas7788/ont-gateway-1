@@ -1,4 +1,4 @@
-package service
+package server
 
 import (
 	"context"
@@ -8,13 +8,11 @@ import (
 	"github.com/ontio/ontology-crypto/signature"
 	"github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology-go-sdk/utils"
-	"github.com/walletsvr/neo/common"
+	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ddxf"
 	common2 "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/param"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/sellerconfig"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/sql"
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
@@ -24,37 +22,37 @@ import (
 	"net/http"
 )
 
+var (
+	WalletName    string
+	ServerAccount *ontology_go_sdk.Account
+	Wallet        *ontology_go_sdk.Wallet
+	Pwd           []byte
+	Version       string
+)
+
+const (
+	ONTAuthScanProtocol = "http://172.29.36.101" + config.SellerPort + "/ddxf/seller/getQrCodeDataByQrCodeId"
+	QrCodeCallback      = "http://172.29.36.101" + config.SellerPort + "/ddxf/seller/qrCodeCallbackSendTx"
+)
 const (
 	sellerCollectionName   = "seller"
 	endpointCollectionName = "sellerendpoint"
 )
 
-var (
-	DefSellerImpl *SellerImpl
-)
-
-type SellerImpl struct {
-	dataLookupEndpoint  DataLookupEndpoint
-	tokenLookupEndpoint TokenLookupEndpoint
-	tokenOpEndpoint     TokenOpEndpointImpl
-}
-
-func InitSellerImpl() {
-	s := &SellerImpl{
-		dataLookupEndpoint:  DataLookupEndpointImpl{},
-		tokenLookupEndpoint: TokenLookupEndpointImpl{},
-		tokenOpEndpoint:     TokenOpEndpointImpl{},
+func InitSellerImpl() error {
+	err := initDb()
+	if err != nil {
+		return err
 	}
-	s.Init()
-	DefSellerImpl = s
 	pri, _ := hex.DecodeString("c19f16785b8f3543bbaf5e1dbb5d398dfa6c85aaad54fc9d71203ce83e505c07")
-	sellerconfig.DefSellerConfig.ServerAccount, _ = ontology_go_sdk.NewAccountFromPrivateKey(pri, signature.SHA256withECDSA)
-	sellerconfig.DefSellerConfig.Wallet = ontology_go_sdk.NewWallet("./wallet.dat")
-	sellerconfig.DefSellerConfig.Pwd = []byte("111111")
+	ServerAccount, _ = ontology_go_sdk.NewAccountFromPrivateKey(pri, signature.SHA256withECDSA)
+	Wallet = ontology_go_sdk.NewWallet("./wallet.dat")
+	Pwd = []byte("111111")
+	return nil
 }
 
 // Init for this collection
-func (m *SellerImpl) Init() (err error) {
+func initDb() (err error) {
 	opts := &options.IndexOptions{}
 	opts.SetName("u-seller")
 	opts.SetUnique(true)
@@ -67,7 +65,7 @@ func (m *SellerImpl) Init() (err error) {
 	return
 }
 
-func (self *SellerImpl) SaveDataMeta(input io.SellerSaveDataMetaInput, ontId string) (output io.SellerSaveDataMetaOutput) {
+func SaveDataMetaService(input io.SellerSaveDataMetaInput, ontId string) (output io.SellerSaveDataMetaOutput) {
 	// verify hash.
 	h, err := ddxf.HashObject(input.DataMeta)
 	if err != nil || hex.EncodeToString(h[:]) != input.DataMetaHash {
@@ -76,7 +74,7 @@ func (self *SellerImpl) SaveDataMeta(input io.SellerSaveDataMetaInput, ontId str
 		return
 	}
 
-	identity, err := sellerconfig.DefSellerConfig.Wallet.NewDefaultSettingIdentity(sellerconfig.DefSellerConfig.Pwd)
+	identity, err := Wallet.NewDefaultSettingIdentity(Pwd)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -94,13 +92,13 @@ func (self *SellerImpl) SaveDataMeta(input io.SellerSaveDataMetaInput, ontId str
 		output.Msg = err.Error()
 		return
 	}
-	info := param.DataIdInfo{
+	info := DataIdInfo{
 		DataId:       identity.ID,
 		DataType:     input.ResourceType,
 		DataMetaHash: dataMetaHash,
 		DataHash:     dataHash,
 	}
-	txHash, err := instance.OntSdk().DefaultDataIdContract().Invoke(sellerconfig.DefSellerConfig.ServerAccount, "registerDataId", []interface{}{info})
+	txHash, err := instance.OntSdk().DefaultDataIdContract().Invoke(ServerAccount, "registerDataId", []interface{}{info.ToBytes()})
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -131,7 +129,7 @@ func (self *SellerImpl) SaveDataMeta(input io.SellerSaveDataMetaInput, ontId str
 	}
 
 	// store meta hash id.
-	err = sql.InsertElt(sql.DataMetaCollection, dataStore)
+	err = InsertElt(DataMetaCollection, dataStore)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -140,7 +138,7 @@ func (self *SellerImpl) SaveDataMeta(input io.SellerSaveDataMetaInput, ontId str
 	return
 }
 
-func (self *SellerImpl) SaveTokenMeta(input io.SellerSaveTokenMetaInput, ontId string) (output io.SellerSaveTokenMetaOutput) {
+func SaveTokenMetaService(input io.SellerSaveTokenMetaInput, ontId string) (output io.SellerSaveTokenMetaOutput) {
 	// verify hash.
 	h, err := ddxf.HashObject(input.TokenMeta)
 
@@ -152,7 +150,7 @@ func (self *SellerImpl) SaveTokenMeta(input io.SellerSaveTokenMetaInput, ontId s
 	adD := &io.SellerSaveDataMeta{}
 
 	filterD := bson.M{"dataMetaHash": input.DataMetaHash, "ontId": ontId}
-	err = sql.FindElt(sql.DataMetaCollection, filterD, adD)
+	err = FindElt(DataMetaCollection, filterD, adD)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -167,7 +165,7 @@ func (self *SellerImpl) SaveTokenMeta(input io.SellerSaveTokenMetaInput, ontId s
 		OntId:         ontId,
 	}
 
-	err = sql.InsertElt(sql.TokenMetaCollection, tokenStore)
+	err = InsertElt(TokenMetaCollection, tokenStore)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -175,23 +173,15 @@ func (self *SellerImpl) SaveTokenMeta(input io.SellerSaveTokenMetaInput, ontId s
 	return
 }
 
-func (self *SellerImpl) PublishMPItemMeta(input io.MPEndpointPublishItemMetaInput, ontId string) (output io.SellerPublishMPItemMetaOutput) {
+func PublishMPItemMetaService(input io.MPEndpointPublishItemMetaInput, ontId string) (output io.SellerPublishMPItemMetaOutput) {
 	mpParamBs, err := json.Marshal(input)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
 		return
 	}
-	filter := bson.M{"dataMetaHash": input.DataMetaHash}
-	publishParam := io.SellerPublishMPItemMetaInput{}
-	err = sql.FindElt(sql.PublishParamCollection, filter, &publishParam)
-	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-		return
-	}
 	//TODO send mp
-	_, _, data, err := forward.JSONRequest("POST", publishParam.MPEndpoint, mpParamBs)
+	_, _, data, err := forward.JSONRequest("POST", input.MPEndpoint, mpParamBs)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -207,34 +197,8 @@ func (self *SellerImpl) PublishMPItemMeta(input io.MPEndpointPublishItemMetaInpu
 	return
 }
 
-func (self *SellerImpl) DataLookupEndpoint() (output DataLookupEndpoint) {
-	return self.dataLookupEndpoint
-}
-
-func (self *SellerImpl) TokenLookupEndpoint() (output TokenLookupEndpoint) {
-	return self.tokenLookupEndpoint
-}
-
-func (self *SellerImpl) TokenOpEndpoint() TokenOpEndpointImpl {
-	return self.tokenOpEndpoint
-}
-
-type DataLookupEndpointImpl struct {
-	SellerImpl *SellerImpl
-}
-
-func (self DataLookupEndpointImpl) Lookup(io.SellerDataLookupEndpointLookupInput) (output io.SellerDataLookupEndpointLookupOutput) {
+func LookupService(io.SellerDataLookupEndpointLookupInput) (output io.SellerDataLookupEndpointLookupOutput) {
 	return
-}
-
-type TokenLookupEndpointImpl struct {
-}
-
-func (self TokenLookupEndpointImpl) Lookup(io.SellerTokenLookupEndpointLookupInput) (output io.SellerTokenLookupEndpointLookupOutput) {
-	return
-}
-
-type TokenOpEndpointImpl struct {
 }
 
 func UseTokenService(input io.SellerTokenLookupEndpointUseTokenInput) (output io.SellerTokenLookupEndpointUseTokenOutput) {

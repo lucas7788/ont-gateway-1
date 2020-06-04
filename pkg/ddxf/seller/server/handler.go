@@ -1,12 +1,10 @@
-package restful
+package server
 
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/qrCode"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/service"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"github.com/zhiqiangxu/ont-gateway/pkg/rest/middleware"
 	"go.uber.org/zap"
@@ -14,7 +12,7 @@ import (
 	"net/http"
 )
 
-func SaveDataMetaHandle(c *gin.Context) {
+func SaveDataMetaHandler(c *gin.Context) {
 	ontId, ok := c.Get(middleware.TenantIDKey)
 	if !ok {
 		instance.Logger().Error("[SaveDataMetaHandle] read ontId error")
@@ -22,11 +20,11 @@ func SaveDataMetaHandle(c *gin.Context) {
 		return
 	}
 	param := io.SellerSaveDataMetaInput{}
-	output := service.DefSellerImpl.SaveDataMeta(param, ontId.(string))
+	output := SaveDataMetaService(param, ontId.(string))
 	c.JSON(output.Code, output)
 }
 
-func SaveTokenMetaHandle(c *gin.Context) {
+func SaveTokenMetaHandler(c *gin.Context) {
 	ontId, ok := c.Get(middleware.TenantIDKey)
 	if !ok {
 		instance.Logger().Error("[SaveDataMetaHandle] read ontId error")
@@ -34,11 +32,11 @@ func SaveTokenMetaHandle(c *gin.Context) {
 		return
 	}
 	param := io.SellerSaveTokenMetaInput{}
-	output := service.DefSellerImpl.SaveTokenMeta(param, ontId.(string))
+	output := SaveTokenMetaService(param, ontId.(string))
 	c.JSON(output.Code, output)
 }
 
-func PublishMPItemMetaHandle(c *gin.Context) {
+func PublishMPItemMetaHandler(c *gin.Context) {
 	ontId, ok := c.Get(middleware.TenantIDKey)
 	if !ok {
 		instance.Logger().Error("PublishMPItemMetaHandle: read ontId error")
@@ -47,7 +45,7 @@ func PublishMPItemMetaHandle(c *gin.Context) {
 	}
 	param := io.MPEndpointPublishItemMetaInput{}
 
-	qrResp := service.DefSellerImpl.PublishMPItemMeta(param, ontId.(string))
+	qrResp := PublishMPItemMetaService(param, ontId.(string))
 	if qrResp.Error() != nil {
 		instance.Logger().Error("PublishMPItemMetaHandle:", zap.Error(qrResp.Error()))
 		c.JSON(http.StatusInternalServerError, common.ResponseFailedOnto(http.StatusInternalServerError, qrResp.Error()))
@@ -70,7 +68,7 @@ func UseTokenHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusBadRequest, err))
 		return
 	}
-	qrResp := service.UseTokenService(param)
+	qrResp := UseTokenService(param)
 	if qrResp.Error() != nil {
 		instance.Logger().Error("UseTokenHandler:", zap.Error(qrResp.Error()))
 		c.JSON(http.StatusInternalServerError, common.ResponseFailedOnto(http.StatusInternalServerError, qrResp.Error()))
@@ -99,44 +97,11 @@ func PublishMetaHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusInternalServerError, err))
 		return
 	}
-	res, err := service.PublishMetaService(param, ontId.(string))
+	res, err := PublishMetaService(param, ontId.(string))
 	if err != nil {
 		instance.Logger().Error("PublishMetaHandler: parse post param error:", zap.Error(err))
 		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusInternalServerError, err))
 		return
 	}
 	c.JSON(http.StatusOK, res)
-}
-
-func GetQrCodeDataByQrCodeId(c *gin.Context) {
-	qrCodeId := c.Param("qrCodeId")
-	code, err := service.GetQrCodeByQrCodeIdService(qrCodeId)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, common.ResponseFailedOnto(http.StatusInternalServerError, err))
-	} else {
-		c.JSON(http.StatusOK, common.ResponseSuccess(code))
-	}
-}
-
-func GrCodeCallbackSendTx(c *gin.Context) {
-	paramsBs, err := ioutil.ReadAll(c.Request.Body)
-	if err != nil {
-		instance.Logger().Error("GrCodeCallbackSendTx: read post param error:", zap.Error(err))
-		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusInternalServerError, err))
-		return
-	}
-	param := qrCode.QrCodeCallBackParam{}
-	err = json.Unmarshal(paramsBs, &param)
-	if err != nil {
-		instance.Logger().Error("GrCodeCallbackSendTx: parse post param error:", zap.Error(err))
-		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusInternalServerError, err))
-		return
-	}
-	err = service.QrCodeCallBackService(param)
-	if err != nil {
-		instance.Logger().Error("GrCodeCallbackSendTx: :", zap.Error(err))
-		c.JSON(http.StatusInternalServerError, common.ResponseFailedOnto(http.StatusInternalServerError, err))
-	} else {
-		c.JSON(http.StatusOK, common.ResponseSuccess("SUCCESS"))
-	}
 }

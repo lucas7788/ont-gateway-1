@@ -1,4 +1,4 @@
-package qrCode
+package server
 
 import (
 	"encoding/hex"
@@ -7,7 +7,6 @@ import (
 	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/qrCode"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/sellerconfig"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/utils"
 	"strings"
 	"time"
@@ -16,7 +15,7 @@ import (
 func BuildQrCodeResponse(id string) qrCode.QrCodeResponse {
 	return qrCode.QrCodeResponse{
 		QrCode: qrCode.GetQrCode{
-			ONTAuthScanProtocol: sellerconfig.DefSellerConfig.ONTAuthScanProtocol + "/" + id,
+			ONTAuthScanProtocol: ONTAuthScanProtocol + "/" + id,
 		},
 		Id: id,
 	}
@@ -86,7 +85,7 @@ func BuildPublishQrCode(chain string, contractHash string, resourceId []byte, re
 		return nil, err
 	}
 	id := utils.GenerateUUId(utils.UUID_TOKEN_SELLER_PUBLISH)
-	sig, err := sellerconfig.DefSellerConfig.ServerAccount.Sign(databs)
+	sig, err := ServerAccount.Sign(databs)
 	if err != nil {
 		return nil, err
 	}
@@ -105,10 +104,10 @@ func BuildPublishQrCode(chain string, contractHash string, resourceId []byte, re
 		Ver:        "1.0.0",
 		QrCodeId:   id,
 		Signature:  hex.EncodeToString(sig),
-		Requester:  sellerconfig.DefSellerConfig.ServerAccount.Address.ToHexString(),
+		Requester:  ServerAccount.Address.ToHexString(),
 		Signer:     ontid,
 		QrCodeData: string(databs),
-		Callback:   sellerconfig.DefSellerConfig.QrCodeCallback,
+		Callback:   QrCodeCallback,
 		Exp:        exp,
 		Chain:      chain,
 		QrCodeDesc: string(qrDescIn),

@@ -1,4 +1,4 @@
-package service
+package server
 
 import (
 	"errors"
@@ -9,9 +9,6 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/qrCode"
-	qrCode2 "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/qrCode"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/sellerconfig"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/sql"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"strings"
@@ -20,14 +17,14 @@ import (
 func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qrCode.QrCodeResponse, error) {
 	adT := &io.SellerSaveTokenMeta{}
 	filterT := bson.M{"tokenMetaHash": input.TokenMetaHash, "ontId": ontId}
-	err := sql.FindElt(sql.TokenMetaCollection, filterT, adT)
+	err := FindElt(TokenMetaCollection, filterT, adT)
 	if err != nil {
 		return qrCode.QrCodeResponse{}, err
 	}
 
 	adD := &io.SellerSaveDataMeta{}
 	filterD := bson.M{"dataMetaHash": input.DataMetaHash, "ontId": ontId}
-	err = sql.FindElt(sql.DataMetaCollection, filterD, adD)
+	err = FindElt(DataMetaCollection, filterD, adD)
 	if err != nil {
 		return qrCode.QrCodeResponse{}, err
 	}
@@ -45,11 +42,11 @@ func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qr
 	}
 	bs, err := ddxf.HashObject(input.ItemMeta)
 	itemMetaHash, err := common.Uint256ParseFromBytes(bs[:])
-	im := sellerconfig.ItemMeta{
+	im := ItemMeta{
 		ItemMetaHash: itemMetaHash.ToHexString(),
 		ItemMetaData: input.ItemMeta,
 	}
-	err = sql.InsertElt(sql.ItemMetaCollection, im)
+	err = InsertElt(ItemMetaCollection, im)
 	if err != nil {
 		return qrCode.QrCodeResponse{}, err
 	}
@@ -58,7 +55,8 @@ func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qr
 		ResourceType:  adD.ResourceType,
 		Endpoint:      adT.TokenEndpoint,
 	}
-	resourceIdBytes, resourceDDOBytes, itemBytes := contract.ConstructPublishParam(sellerAddress, tokenTemplate,
+	resourceIdBytes, resourceDDOBytes, itemBytes := contract.ConstructPublishParam(sellerAddress,
+		tokenTemplate,
 		[]*param.TokenResourceTyEndpoint{trt},
 		itemMetaHash, adD.Fee, adD.ExpiredDate, adD.Stock, adD.DataIds)
 	//TODO
@@ -68,47 +66,51 @@ func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qr
 	} else {
 		netType = "mainnet"
 	}
-	qrCodex, err := qrCode2.BuildPublishQrCode(netType, input.MPContractHash,
+	qrCodex, err := BuildPublishQrCode(netType, input.MPContractHash,
 		resourceIdBytes, resourceDDOBytes, itemBytes, arr[2], ontId)
 	if err != nil {
 		return qrCode.QrCodeResponse{}, err
 	}
 
-	err = sql.InsertElt(sql.PublishParamCollection, input)
+	p := io.PublishParam{
+		QrCodeId: qrCodex.QrCodeId,
+		Input:    input,
+	}
+	err = InsertElt(PublishParamCollection, p)
 	if err != nil {
 		return qrCode.QrCodeResponse{}, err
 	}
-	err = sql.InsertElt(sql.SellerQrCodeCollection, qrCodex)
+	err = InsertElt(SellerQrCodeCollection, qrCodex)
 	if err != nil {
 		return qrCode.QrCodeResponse{}, err
 	}
-	return qrCode2.BuildQrCodeResponse(qrCodex.QrCodeId), nil
+	return BuildQrCodeResponse(qrCodex.QrCodeId), nil
 }
 
 func GetQrCodeByQrCodeIdService(qrCodeId string) (qrCode.QrCode, error) {
 	filter := bson.M{"qrCodeId": qrCodeId}
 	code := qrCode.QrCode{}
-	err := sql.FindElt(sql.SellerQrCodeCollection, filter, &code)
+	err := FindElt(SellerQrCodeCollection, filter, &code)
 	return code, err
 }
 
 func QrCodeCallBackService(param qrCode.QrCodeCallBackParam) error {
 	filter := bson.M{"qrCodeId": param.ExtraData.Id}
 	code := qrCode.QrCode{}
-	err := sql.FindElt(sql.SellerQrCodeCollection, filter, &code)
+	err := FindElt(SellerQrCodeCollection, filter, &code)
 	if err != nil {
 		return err
 	}
 	uuidType := utils.UUIDType(code.QrCodeId)
 	switch uuidType {
 	case utils.UUID_TOKEN_SELLER_PUBLISH:
-		resourceId, ddo, err := qrCode2.ParseFromBytes(code.QrCodeData)
+		resourceId, ddo, err := ParseFromBytes(code.QrCodeData)
 		if err != nil {
 			return err
 		}
-		adD := sellerconfig.ItemMeta{}
+		adD := ItemMeta{}
 		filterD := bson.M{"dataMetaHash": ddo.ItemMetaHash}
-		err = sql.FindElt(sql.ItemMetaCollection, filterD, &adD)
+		err = FindElt(ItemMetaCollection, filterD, &adD)
 		if err != nil {
 			return err
 		}
@@ -118,9 +120,8 @@ func QrCodeCallBackService(param qrCode.QrCodeCallBackParam) error {
 				OnchainItemID: resourceId,
 				ItemMeta:      adD.ItemMetaData,
 			},
-			DataMetaHash: ddo.ItemMetaHash.ToHexString(),
 		}
-		output := DefSellerImpl.PublishMPItemMeta(in, param.ExtraData.OntId)
+		output := PublishMPItemMetaService(in, param.ExtraData.OntId)
 		return output.Error()
 	default:
 		return errors.New("wrong uuid type")

@@ -13,6 +13,11 @@ type SellerPublishMPItemMetaInput struct {
 	MPEndpoint     string                 `bson:"mpEndpoint",json:"mpEndpoint"`
 }
 
+type PublishParam struct {
+	QrCodeId string
+	Input    SellerPublishMPItemMetaInput
+}
+
 //type TokenTemplate2 struct {
 //	dataid    string
 //	tokenHash []string
