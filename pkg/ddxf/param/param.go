@@ -40,7 +40,7 @@ func (this *CountAndAgent) FromBytes(data []byte) error {
 
 type TokenTemplate struct {
 	DataIDs   string // can be empty
-	TokenHash string
+	TokenHash []string
 }
 
 func (this *TokenTemplate) Deserialize(source *common.ZeroCopySource) error {
@@ -56,7 +56,7 @@ func (this *TokenTemplate) Deserialize(source *common.ZeroCopySource) error {
 		this.DataIDs = dataIds
 	}
 	tokenHash, _, irregular, eof := source.NextString()
-	this.TokenHash = tokenHash
+	this.TokenHash = []string{tokenHash}
 	return nil
 }
 
@@ -67,7 +67,10 @@ func (this *TokenTemplate) Serialize(sink *common.ZeroCopySink) {
 		sink.WriteBool(true)
 		sink.WriteString(this.DataIDs)
 	}
-	sink.WriteString(this.TokenHash)
+	sink.WriteUint32(uint32(len(this.TokenHash)))
+	for i := 0; i < len(this.TokenHash); i++ {
+		sink.WriteString(this.TokenHash[i])
+	}
 }
 
 func (this *TokenTemplate) ToBytes() []byte {

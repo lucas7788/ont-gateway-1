@@ -1,9 +1,7 @@
 package service
 
 import (
-	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"github.com/ontio/ontology-crypto/signature"
 	sdk "github.com/ontio/ontology-go-sdk"
@@ -48,7 +46,7 @@ func TestSaveDataMeta(t *testing.T) {
 	assert.Nil(t, err)
 	input := io.SellerSaveDataMetaInput{
 		DataMeta:     DataMeta,
-		DataMetaHash: h,
+		DataMetaHash: hex.EncodeToString(h[:]),
 	}
 
 	output := DefSellerImpl.SaveDataMeta(input, ontId)
@@ -68,8 +66,8 @@ func TestSaveDataMeta(t *testing.T) {
 	assert.Nil(t, err)
 	inputt := io.SellerSaveTokenMetaInput{
 		TokenMeta:     TokenMeta,
-		DataMetaHash:  h,
-		TokenMetaHash: ht,
+		DataMetaHash:  hex.EncodeToString(h[:]),
+		TokenMetaHash: hex.EncodeToString(ht[:]),
 	}
 	outputt := DefSellerImpl.SaveTokenMeta(inputt, ontId)
 	assert.Equal(t, 0, outputt.Code)
@@ -106,13 +104,13 @@ func TestSellerImpl_PublishMPItemMeta(t *testing.T) {
 
 	tokenTemplate := param.TokenTemplate{
 		DataIDs:   "",
-		TokenHash: string(common.UINT256_EMPTY[:]),
+		TokenHash: []string{string(common.UINT256_EMPTY[:])},
 	}
 	itemMetaData := map[string]interface{}{
 		"item": "val",
 	}
-	itemMetaDataBs, err := json.Marshal(itemMetaData)
-	bs := sha256.Sum256(itemMetaDataBs)
+
+	bs, err := ddxf.HashObject(itemMetaData)
 	itemMetaHash, err := common.Uint256ParseFromBytes(bs[:])
 	expiredDate := time.Now().Unix() + 10*24*60*60
 	resourceId, ddo, item := contract.ConstructPublishParam(ServerAccount.Address, tokenTemplate,

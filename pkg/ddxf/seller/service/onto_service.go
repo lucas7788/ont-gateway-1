@@ -1,10 +1,9 @@
 package service
 
 import (
-	"crypto/sha256"
-	"encoding/json"
 	"errors"
 	"github.com/ontio/ontology/common"
+	"github.com/zhiqiangxu/ddxf"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/contract"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
@@ -41,13 +40,10 @@ func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qr
 	// dataMeta related in data contract tx.
 	tokenTemplate := param.TokenTemplate{
 		DataIDs:   adD.DataIds,
-		TokenHash: adT.TokenMetaHash,
+		TokenHash: []string{adT.TokenMetaHash},
 	}
-	//itemMetaHash, err := ddxf.HashObject(input.ItemMeta)
-	itemMetaDataBs, err := json.Marshal(input.ItemMeta)
-	bs := sha256.Sum256(itemMetaDataBs)
+	bs, err := ddxf.HashObject(input.ItemMeta)
 	itemMetaHash, err := common.Uint256ParseFromBytes(bs[:])
-
 	im := sellerconfig.ItemMeta{
 		ItemMetaHash: itemMetaHash.ToHexString(),
 		ItemMetaData: input.ItemMeta,
@@ -64,6 +60,10 @@ func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qr
 		return qrCode.QrCodeResponse{}, err
 	}
 
+	err = sql.InsertElt(sql.PublishParamCollection, input)
+	if err != nil {
+		return qrCode.QrCodeResponse{}, err
+	}
 	err = sql.InsertElt(sql.SellerQrCodeCollection, qrCodex)
 	if err != nil {
 		return qrCode.QrCodeResponse{}, err
@@ -104,6 +104,7 @@ func QrCodeCallBackService(param qrCode.QrCodeCallBackParam) error {
 				OnchainItemID: resourceId,
 				ItemMeta:      adD.ItemMetaData,
 			},
+			DataMetaHash: ddo.DescHash.ToHexString(),
 		}
 		output := DefSellerImpl.PublishMPItemMeta(in, param.ExtraData.OntId)
 		return output.Error()

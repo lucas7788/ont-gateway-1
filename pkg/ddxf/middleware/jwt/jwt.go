@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/ontio/ontology/core/signature"
-	"github.com/ontio/sagapi/sagaconfig"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
@@ -33,9 +32,9 @@ func JWT() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		c.Set(sagaconfig.Key_OntId, load.Content.OntId)
-		c.Set(sagaconfig.JWTAud, load.Aud)
-		c.Set(sagaconfig.JWTAdmin, false)
+		c.Set(config.Key_OntId, load.Content.OntId)
+		c.Set(config.JWTAud, load.Aud)
+		c.Set(config.JWTAdmin, false)
 		c.Next()
 	}
 }

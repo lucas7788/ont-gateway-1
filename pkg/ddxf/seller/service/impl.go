@@ -10,7 +10,6 @@ import (
 	"github.com/ontio/ontology-go-sdk/utils"
 	"github.com/zhiqiangxu/ddxf"
 	common2 "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/sellerconfig"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/sql"
@@ -53,7 +52,6 @@ func InitSellerImpl() {
 
 // Init for this collection
 func (m *SellerImpl) Init() (err error) {
-
 	opts := &options.IndexOptions{}
 	opts.SetName("u-seller")
 	opts.SetUnique(true)
@@ -69,7 +67,7 @@ func (m *SellerImpl) Init() (err error) {
 func (self *SellerImpl) SaveDataMeta(input io.SellerSaveDataMetaInput, ontId string) (output io.SellerSaveDataMetaOutput) {
 	// verify hash.
 	h, err := ddxf.HashObject(input.DataMeta)
-	if err != nil || h != input.DataMetaHash {
+	if err != nil || hex.EncodeToString(h[:]) != input.DataMetaHash {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
 		return
@@ -107,7 +105,8 @@ func (self *SellerImpl) SaveDataMeta(input io.SellerSaveDataMetaInput, ontId str
 func (self *SellerImpl) SaveTokenMeta(input io.SellerSaveTokenMetaInput, ontId string) (output io.SellerSaveTokenMetaOutput) {
 	// verify hash.
 	h, err := ddxf.HashObject(input.TokenMeta)
-	if err != nil || h != input.TokenMetaHash {
+
+	if err != nil || hex.EncodeToString(h[:]) != input.TokenMetaHash {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
 		return
@@ -145,8 +144,16 @@ func (self *SellerImpl) PublishMPItemMeta(input io.MPEndpointPublishItemMetaInpu
 		output.Msg = err.Error()
 		return
 	}
+	filter := bson.M{"dataMetaHash": input.DataMetaHash}
+	publishParam := io.SellerPublishMPItemMetaInput{}
+	err = sql.FindElt(sql.PublishParamCollection, filter, &publishParam)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
 	//TODO send mp
-	_, _, data, err := forward.JSONRequest("POST", config.PublishItemMetaUrl, mpParamBs)
+	_, _, data, err := forward.JSONRequest("POST", publishParam.MPEndpoint, mpParamBs)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()

@@ -13,10 +13,6 @@ import (
 	"time"
 )
 
-type QrCodeScan struct {
-	ONTAuthScanProtocol string `json:"ONTAuthScanProtocol"`
-}
-
 func BuildQrCodeResponse(id string) qrCode.QrCodeResponse {
 	return qrCode.QrCodeResponse{
 		QrCode: qrCode.GetQrCode{
@@ -26,7 +22,7 @@ func BuildQrCodeResponse(id string) qrCode.QrCodeResponse {
 	}
 }
 
-func ParseFromBytes(qrCodeData string) (resourceId string, resource_ddo *param.ResourceDDO, err error) {
+func ParseFromBytes(qrCodeData string) (resourceId string, resourceDdo *param.ResourceDDO, err error) {
 	data := qrCode.QrCodeData{}
 	err = json.Unmarshal([]byte(qrCodeData), &data)
 	if err != nil {
@@ -43,13 +39,13 @@ func ParseFromBytes(qrCodeData string) (resourceId string, resource_ddo *param.R
 	}
 	resourceId = strings.ReplaceAll(args[0].Value.(string), "ByteArray:", "")
 	ddoStr := strings.ReplaceAll(args[1].Value.(string), "ByteArray:", "")
-	var ddobytes []byte
-	ddobytes, err = hex.DecodeString(ddoStr)
+	var ddoBytes []byte
+	ddoBytes, err = hex.DecodeString(ddoStr)
 	if err != nil {
 		return
 	}
-	source := common.NewZeroCopySource(ddobytes)
-	err = resource_ddo.Deserialize(source)
+	source := common.NewZeroCopySource(ddoBytes)
+	err = resourceDdo.Deserialize(source)
 	return
 }
 
