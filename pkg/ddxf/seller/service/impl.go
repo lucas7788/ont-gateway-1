@@ -30,7 +30,6 @@ const (
 var (
 	DefSellerImpl *SellerImpl
 )
-var ServerAccount *ontology_go_sdk.Account
 
 type SellerImpl struct {
 	dataLookupEndpoint  DataLookupEndpoint
@@ -47,7 +46,9 @@ func InitSellerImpl() {
 	s.Init()
 	DefSellerImpl = s
 	pri, _ := hex.DecodeString("c19f16785b8f3543bbaf5e1dbb5d398dfa6c85aaad54fc9d71203ce83e505c07")
-	ServerAccount, _ = ontology_go_sdk.NewAccountFromPrivateKey(pri, signature.SHA256withECDSA)
+	sellerconfig.DefSellerConfig.ServerAccount, _ = ontology_go_sdk.NewAccountFromPrivateKey(pri, signature.SHA256withECDSA)
+	sellerconfig.DefSellerConfig.Wallet = ontology_go_sdk.NewWallet("./wallet.dat")
+	sellerconfig.DefSellerConfig.Pwd = []byte("111111")
 }
 
 // Init for this collection
@@ -73,7 +74,7 @@ func (self *SellerImpl) SaveDataMeta(input io.SellerSaveDataMetaInput, ontId str
 		return
 	}
 
-	identity, err := sellerconfig.DefSellerConfig.Wallet.NewDefaultSettingIdentity([]byte(sellerconfig.DefSellerConfig.Pswd))
+	identity, err := sellerconfig.DefSellerConfig.Wallet.NewDefaultSettingIdentity(sellerconfig.DefSellerConfig.Pwd)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()

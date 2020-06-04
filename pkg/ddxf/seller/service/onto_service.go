@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ddxf"
+	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/contract"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
@@ -60,7 +61,14 @@ func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qr
 	resourceIdBytes, resourceDDOBytes, itemBytes := contract.ConstructPublishParam(sellerAddress, tokenTemplate,
 		[]*param.TokenResourceTyEndpoint{trt},
 		itemMetaHash, adD.Fee, adD.ExpiredDate, adD.Stock, adD.DataIds)
-	qrCodex, err := qrCode2.BuildPublishQrCode(sellerconfig.DefSellerConfig.NetType, input.MPContractHash,
+	//TODO
+	var netType string
+	if config.Load().Prod {
+		netType = "testnet"
+	} else {
+		netType = "mainnet"
+	}
+	qrCodex, err := qrCode2.BuildPublishQrCode(netType, input.MPContractHash,
 		resourceIdBytes, resourceDDOBytes, itemBytes, arr[2], ontId)
 	if err != nil {
 		return qrCode.QrCodeResponse{}, err
