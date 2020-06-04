@@ -8,9 +8,11 @@ import (
 	"github.com/ontio/ontology-crypto/signature"
 	"github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology-go-sdk/utils"
+	"github.com/walletsvr/neo/common"
 	"github.com/zhiqiangxu/ddxf"
 	common2 "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/param"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/sellerconfig"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/sql"
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
@@ -78,6 +80,41 @@ func (self *SellerImpl) SaveDataMeta(input io.SellerSaveDataMetaInput, ontId str
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
+		return
+	}
+	dataMetaHash, err := common.Uint256FromHexString(input.DataMetaHash)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	dataHash, err := common.Uint256FromHexString(input.DataMetaHash)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	info := param.DataIdInfo{
+		DataId:       identity.ID,
+		DataType:     input.ResourceType,
+		DataMetaHash: dataMetaHash,
+		DataHash:     dataHash,
+	}
+	txHash, err := instance.OntSdk().DefaultDataIdContract().Invoke(sellerconfig.DefSellerConfig.ServerAccount, "registerDataId", []interface{}{info})
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	event, err := instance.OntSdk().GetSmartCodeEvent(txHash.ToHexString())
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	if event.State != 1 {
+		output.Code = http.StatusInternalServerError
+		output.Msg = fmt.Sprintf("registerDataId failed, txHash: %s", txHash.ToHexString())
 		return
 	}
 	// reg identity.
