@@ -1,6 +1,7 @@
 package param
 
 import (
+	"fmt"
 	"github.com/kataras/go-errors"
 	"github.com/ontio/ontology/common"
 	"io"
@@ -39,8 +40,8 @@ func (this *CountAndAgent) FromBytes(data []byte) error {
 }
 
 type TokenTemplate struct {
-	DataIDs   string // can be empty
-	TokenHash []string
+	DataIDs    string // can be empty
+	TokenHashs []string
 }
 
 func (this *TokenTemplate) Deserialize(source *common.ZeroCopySource) error {
@@ -51,12 +52,22 @@ func (this *TokenTemplate) Deserialize(source *common.ZeroCopySource) error {
 	if data {
 		dataIds, _, irregular, eof := source.NextString()
 		if irregular || eof {
-			return errors.New("")
+			return fmt.Errorf("read dataids failed irregular:%v, eof:%v", irregular, eof)
 		}
 		this.DataIDs = dataIds
 	}
-	tokenHash, _, irregular, eof := source.NextString()
-	this.TokenHash = []string{tokenHash}
+	l, _, irregular, eof := source.NextVarUint()
+	if irregular || eof {
+		return fmt.Errorf("read tokenhash length failed irregular:%v, eof:%v", irregular, eof)
+	}
+	tokenHashs := make([]string, l)
+	for i := 0; i < int(l); i++ {
+		tokenHashs[i], _, irregular, eof = source.NextString()
+		if irregular || eof {
+			return fmt.Errorf("read tokenhash failed irregular:%v, eof:%v", irregular, eof)
+		}
+	}
+	this.TokenHashs = tokenHashs
 	return nil
 }
 
@@ -67,9 +78,9 @@ func (this *TokenTemplate) Serialize(sink *common.ZeroCopySink) {
 		sink.WriteBool(true)
 		sink.WriteString(this.DataIDs)
 	}
-	sink.WriteUint32(uint32(len(this.TokenHash)))
-	for i := 0; i < len(this.TokenHash); i++ {
-		sink.WriteString(this.TokenHash[i])
+	sink.WriteVarUint(uint64(len(this.TokenHashs)))
+	for i := 0; i < len(this.TokenHashs); i++ {
+		sink.WriteString(this.TokenHashs[i])
 	}
 }
 

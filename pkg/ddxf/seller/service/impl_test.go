@@ -103,8 +103,8 @@ func TestSellerImpl_PublishMPItemMeta(t *testing.T) {
 	fmt.Println("seller address:", ServerAccount.Address.ToBase58())
 
 	tokenTemplate := param.TokenTemplate{
-		DataIDs:   "",
-		TokenHash: []string{string(common.UINT256_EMPTY[:])},
+		DataIDs:    "",
+		TokenHashs: []string{string(common.UINT256_EMPTY[:])},
 	}
 	itemMetaData := map[string]interface{}{
 		"item": "val",

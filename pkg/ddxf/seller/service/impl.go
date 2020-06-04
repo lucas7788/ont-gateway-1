@@ -212,12 +212,6 @@ func UseTokenService(input io.SellerTokenLookupEndpointUseTokenInput) (output io
 		output.Msg = err.Error()
 		return
 	}
-	err = instance.OntSdk().GetKit().SignToTransaction(mutTx, ServerAccount)
-	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-		return
-	}
 	txHash, err := instance.OntSdk().SendRawTx(mutTx)
 	if err != nil {
 		output.Code = http.StatusInternalServerError

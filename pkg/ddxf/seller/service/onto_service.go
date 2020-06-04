@@ -39,8 +39,8 @@ func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qr
 
 	// dataMeta related in data contract tx.
 	tokenTemplate := param.TokenTemplate{
-		DataIDs:   adD.DataIds,
-		TokenHash: []string{adT.TokenMetaHash},
+		DataIDs:    adD.DataIds,
+		TokenHashs: []string{adT.TokenMetaHash},
 	}
 	bs, err := ddxf.HashObject(input.ItemMeta)
 	itemMetaHash, err := common.Uint256ParseFromBytes(bs[:])
