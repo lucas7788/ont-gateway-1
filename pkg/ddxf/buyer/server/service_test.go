@@ -41,7 +41,7 @@ func TestUseTokenService(t *testing.T) {
 	tokenHash := make([]byte, 32)
 	template := param.TokenTemplate{
 		DataIDs:   "",
-		TokenHash: string(tokenHash),
+		TokenHash: []string{string(tokenHash)},
 	}
 	userTokenParam := []interface{}{resourceId, BuyerMgrAccount.Address, template.ToBytes(), 1}
 	tx, _ := instance.OntSdk().DDXFContract(2000000,

@@ -11,3 +11,9 @@ const (
 	PublishItemMetaUrl = "http://127.0.0.1:" + MpPort + "/ddxf/mp/publishItemMeta"
 	SellerUseTokenUrl  = "http://127.0.0.1:" + SellerPort + "/ddxf/seller/useToken"
 )
+
+const (
+	Key_OntId = "OntId"
+	JWTAdmin  = "JWTAdmin"
+	JWTAud    = "JWTAud"
+)

@@ -12,6 +12,7 @@ const (
 	DataMetaCollection     = "SellerDataMetaCollection"
 	TokenMetaCollection    = "SellerTokenMetaCollection"
 	ItemMetaCollection     = "SellerItemMetaCollection"
+	PublishParamCollection = "PublishParamCollection"
 )
 
 func InsertElt(collectionName string, data interface{}) error {
