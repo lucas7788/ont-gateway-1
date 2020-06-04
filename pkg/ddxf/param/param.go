@@ -90,36 +90,18 @@ func (this *TokenTemplate) ToBytes() []byte {
 	return sink.Bytes()
 }
 
-type TokenTemplateEndPoint struct {
+type TokenResourceTyEndpoint struct {
 	TokenTemplate TokenTemplate
+	ResourceType  byte
 	Endpoint      string
 }
 
-func (this TokenTemplateEndPoint) Serialize(sink *common.ZeroCopySink) {
-	this.TokenTemplate.Serialize(sink)
-	sink.WriteString(this.Endpoint)
-}
-
-func (this *TokenTemplateEndPoint) Deserialize(source *common.ZeroCopySource) error {
-	this.TokenTemplate.Deserialize(source)
-	var irregular, eof bool
-	this.Endpoint, _, irregular, eof = source.NextString()
-	if irregular || eof {
-		return fmt.Errorf("[TokenTemplateEndPoint] read endpoint failed,irregular:%v, eof:%v", irregular, eof)
-	}
-	return nil
-}
-
-type TokenResourceType struct {
-	TokenTemplate TokenTemplate
-	ResourceType  byte
-}
-
-func (this TokenResourceType) Serialize(sink *common.ZeroCopySink) {
+func (this TokenResourceTyEndpoint) Serialize(sink *common.ZeroCopySink) {
 	this.TokenTemplate.Serialize(sink)
 	sink.WriteByte(this.ResourceType)
+	sink.WriteString(this.Endpoint)
 }
-func (this *TokenResourceType) Deserialize(source *common.ZeroCopySource) error {
+func (this *TokenResourceTyEndpoint) Deserialize(source *common.ZeroCopySource) error {
 	err := this.TokenTemplate.Deserialize(source)
 	if err != nil {
 		return err
@@ -134,26 +116,22 @@ func (this *TokenResourceType) Deserialize(source *common.ZeroCopySource) error 
 
 // ResourceDDO is ddo for resource
 type ResourceDDO struct {
-	Manager            common.Address           // data owner id
-	TokenResourceTypes []*TokenResourceType     // RT for tokens
-	TokenEndpoints     []*TokenTemplateEndPoint // endpoint for tokens
-	ItemMetaHash       common.Uint256           //
-	DTC                common.Address           // can be empty
-	MP                 common.Address           // can be empty
-	Split              common.Address           // can be empty
+	Manager                  common.Address             // data owner id
+	TokenResourceTyEndpoints []*TokenResourceTyEndpoint // RT for tokens
+	ItemMetaHash             common.Uint256             //
+	DTC                      common.Address             // can be empty
+	MP                       common.Address             // can be empty
+	Split                    common.Address             // can be empty
 }
 
 func (this *ResourceDDO) Serialize(sink *common.ZeroCopySink) {
 	sink.WriteAddress(this.Manager)
-	sink.WriteVarUint(uint64(len(this.TokenResourceTypes)))
-	for _, v := range this.TokenResourceTypes {
-		v.Serialize(sink)
-	}
-	sink.WriteVarUint(uint64(len(this.TokenEndpoints)))
-	for _, v := range this.TokenEndpoints {
+	sink.WriteVarUint(uint64(len(this.TokenResourceTyEndpoints)))
+	for _, v := range this.TokenResourceTyEndpoints {
 		v.Serialize(sink)
 	}
 	//TODO
+	sink.WriteBool(true)
 	sink.WriteHash(this.ItemMetaHash)
 	if this.DTC != common.ADDRESS_EMPTY {
 		sink.WriteBool(true)
@@ -173,82 +151,6 @@ func (this *ResourceDDO) Serialize(sink *common.ZeroCopySink) {
 	} else {
 		sink.WriteBool(false)
 	}
-}
-func (this *ResourceDDO) Deserialize(source *common.ZeroCopySource) error {
-	var eof bool
-	this.Manager, eof = source.NextAddress()
-	if eof {
-		return io.ErrUnexpectedEOF
-	}
-	l, _, irregular, eof := source.NextVarUint()
-	if irregular || eof {
-		return errors.New("1. ResourceDDO Deserialize l error")
-	}
-	tokenResourceTypes := make([]*TokenResourceType, l)
-	for i := 0; i < int(l); i++ {
-		tt := &TokenResourceType{}
-		err := tt.Deserialize(source)
-		if err != nil {
-			return err
-		}
-		tokenResourceTypes[i] = tt
-	}
-	this.TokenResourceTypes = tokenResourceTypes
-	l, _, irregular, eof = source.NextVarUint()
-	if irregular || eof {
-		return errors.New("1. ResourceDDO Deserialize l error")
-	}
-	tokenEndpoints := make([]*TokenTemplateEndPoint, l)
-	for i := 0; i < int(l); i++ {
-		tt := &TokenTemplateEndPoint{}
-		err := tt.Deserialize(source)
-		if err != nil {
-			return err
-		}
-		tokenEndpoints[i] = tt
-	}
-	this.TokenEndpoints = tokenEndpoints
-	this.ItemMetaHash, eof = source.NextHash()
-	if irregular || eof {
-		return errors.New("2. ResourceDDO Deserialize l error")
-	}
-	data, irregular, eof := source.NextBool()
-	if irregular || eof {
-		return fmt.Errorf("read dtc failed irregular:%v, eof:%v", irregular, eof)
-	}
-	if data {
-		this.DTC, eof = source.NextAddress()
-		if eof {
-			return io.ErrUnexpectedEOF
-		}
-	}
-	data, irregular, eof = source.NextBool()
-	if irregular || eof {
-		return fmt.Errorf("read mp failed irregular:%v, eof:%v", irregular, eof)
-	}
-	if data {
-		this.MP, eof = source.NextAddress()
-		if eof {
-			return io.ErrUnexpectedEOF
-		}
-	}
-	data, irregular, eof = source.NextBool()
-	if irregular || eof {
-		return fmt.Errorf("read split failed irregular:%v, eof:%v", irregular, eof)
-	}
-	if data {
-		this.Split, eof = source.NextAddress()
-		if eof {
-			return io.ErrUnexpectedEOF
-		}
-	}
-	return nil
-}
-
-func (this *ResourceDDO) ToBytes() []byte {
-	sink := common.NewZeroCopySink(nil)
-	this.Serialize(sink)
-	return sink.Bytes()
 }
 
 type Fee struct {
