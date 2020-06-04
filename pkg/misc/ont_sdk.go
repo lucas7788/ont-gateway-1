@@ -12,9 +12,16 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 )
 
-var ddxfContract *DDXFContractKit
+var (
+	ddxfContract        *DDXFContractKit
+	defaultDdxfContract *DDXFContractKit
+
+	dataIdContract        *DataIdContractKit
+	defaultDataIdContract *DataIdContractKit
+)
 
 const DDXF_CONTRACT_ADDRESS = "cf267b778d54174717d2fe81f2a931fcffc2cdd4"
+const DATA_ID_CONTRACT_ADDRESS = "cf267b778d54174717d2fe81f2a931fcffc2cdd4"
 
 // OntSdk deals with ont sdk related stuff
 type OntSdk struct {
@@ -52,6 +59,36 @@ func (sdk *OntSdk) GetKit() *osdk.OntologySdk {
 	return sdk.kit
 }
 
+func (sdk *OntSdk) DefaultDataIdContract() *DataIdContractKit {
+	if defaultDataIdContract == nil {
+		contractAddress, _ := common2.AddressFromHexString(DATA_ID_CONTRACT_ADDRESS)
+		defaultDataIdContract = NewDataIdContractKit(sdk.kit, contractAddress, 20000000, 500, nil)
+	}
+	return defaultDataIdContract
+}
+
+func (sdk *OntSdk) DataIdContract(gasLimit uint64,
+	gasPrice uint64,
+	payer *osdk.Account) *DataIdContractKit {
+	if ddxfContract == nil {
+		contractAddress, _ := common2.AddressFromHexString(DDXF_CONTRACT_ADDRESS)
+		dataIdContract = NewDataIdContractKit(sdk.kit, contractAddress, gasLimit, gasPrice, payer)
+	} else {
+		dataIdContract.bc.gasPrice = gasPrice
+		dataIdContract.bc.gasLimit = gasLimit
+		dataIdContract.bc.payer = payer
+	}
+	return dataIdContract
+}
+
+func (sdk *OntSdk) DefaultDDXFContract() *DDXFContractKit {
+	if defaultDdxfContract == nil {
+		contractAddress, _ := common2.AddressFromHexString(DDXF_CONTRACT_ADDRESS)
+		defaultDdxfContract = NewDDXFContractKit(sdk.kit, contractAddress, 20000000, 500, nil)
+	}
+	return defaultDdxfContract
+}
+
 func (sdk *OntSdk) DDXFContract(gasLimit uint64,
 	gasPrice uint64,
 	payer *osdk.Account) *DDXFContractKit {
@@ -59,9 +96,9 @@ func (sdk *OntSdk) DDXFContract(gasLimit uint64,
 		contractAddress, _ := common2.AddressFromHexString(DDXF_CONTRACT_ADDRESS)
 		ddxfContract = NewDDXFContractKit(sdk.kit, contractAddress, gasLimit, gasPrice, payer)
 	} else {
-		ddxfContract.gasPrice = gasPrice
-		ddxfContract.gasLimit = gasLimit
-		ddxfContract.payer = payer
+		ddxfContract.bc.gasPrice = gasPrice
+		ddxfContract.bc.gasLimit = gasLimit
+		ddxfContract.bc.payer = payer
 	}
 	return ddxfContract
 }
