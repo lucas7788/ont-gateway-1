@@ -12,6 +12,7 @@ type DataIdInfo struct {
 	DataType     byte
 	DataMetaHash common.Uint256
 	DataHash     common.Uint256
+	Owner        string
 }
 
 func (this DataIdInfo) Serialize(sink *common.ZeroCopySink) {
@@ -19,6 +20,7 @@ func (this DataIdInfo) Serialize(sink *common.ZeroCopySink) {
 	sink.WriteByte(this.DataType)
 	sink.WriteHash(this.DataMetaHash)
 	sink.WriteHash(this.DataHash)
+	sink.WriteString(this.Owner)
 }
 
 func (this *DataIdInfo) ToBytes() []byte {

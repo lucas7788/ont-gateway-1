@@ -37,15 +37,16 @@ func (this *BaseContract) BuildTx(contractAddr common.Address, signer *ontology_
 	}
 	if this.payer != nil {
 		this.sdk.SetPayer(tx, this.payer.Address)
-		err = this.sdk.SignToTransaction(tx, signer)
+		err = this.sdk.SignToTransaction(tx, this.payer)
 		if err != nil {
 			return nil, fmt.Errorf("payer sign tx error: %s", err)
 		}
 	}
-	err = this.sdk.SignToTransaction(tx, signer)
-	if err != nil {
-		return nil, err
+	if this.payer != signer {
+		err = this.sdk.SignToTransaction(tx, signer)
+		if err != nil {
+			return nil, err
+		}
 	}
-
 	return tx, nil
 }

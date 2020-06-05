@@ -10,8 +10,8 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/misc"
 )
 
-func GenerateUUId() string {
-	return uuid.NewV4().String()
+func GenerateUUId(preFix string) string {
+	return preFix + uuid.NewV4().String()
 }
 
 func HandleEvent(txHash string, method string) ([]io.EndpointToken, error) {

@@ -17,3 +17,7 @@ const (
 	JWTAdmin  = "JWTAdmin"
 	JWTAud    = "JWTAud"
 )
+
+const (
+	UUID_PRE_DATAID = "dataid_"
+)

@@ -5,10 +5,8 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"net/http"
-
 	"github.com/ontio/ontology-crypto/signature"
-	ontology_go_sdk "github.com/ontio/ontology-go-sdk"
+	"github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology-go-sdk/utils"
 	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ddxf"
@@ -21,6 +19,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/x/bsonx"
+	"net/http"
 )
 
 var (
@@ -70,34 +69,30 @@ func SaveDataMetaService(input io.SellerSaveDataMetaInput, ontId string) (output
 	// verify hash.
 	h, err := ddxf.HashObject(input.DataMeta)
 	if err != nil || hex.EncodeToString(h[:]) != input.DataMetaHash {
-		output.Code = http.StatusBadRequest
-		output.Msg = err.Error()
-		return
-	}
-
-	identity, err := Wallet.NewDefaultSettingIdentity(Pwd)
-	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
 		return
 	}
+
 	dataMetaHash, err := common.Uint256FromHexString(input.DataMetaHash)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
 		return
 	}
-	dataHash, err := common.Uint256FromHexString(input.DataHash)
+	dataHash, err := common.Uint256FromHexString(input.DataMetaHash)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
 		return
 	}
+	dataId := common2.GenerateUUId(config.UUID_PRE_DATAID)
 	info := DataIdInfo{
-		DataId:       identity.ID,
+		DataId:       dataId,
 		DataType:     input.ResourceType,
 		DataMetaHash: dataMetaHash,
 		DataHash:     dataHash,
+		Owner:        ontId,
 	}
 	txHash, err := instance.OntSdk().DefaultDataIdContract().Invoke(ServerAccount, "registerDataId", []interface{}{info.ToBytes()})
 	if err != nil {
@@ -122,7 +117,7 @@ func SaveDataMetaService(input io.SellerSaveDataMetaInput, ontId string) (output
 		DataMetaHash: input.DataMetaHash,
 		ResourceType: input.ResourceType,
 		OntId:        ontId,
-		DataIds:      identity.ID,
+		DataIds:      dataId,
 		Fee:          input.Fee,
 		Stock:        input.Stock,
 		ExpiredDate:  input.ExpiredDate,
