@@ -3,6 +3,7 @@ package io
 import (
 	"github.com/ontio/ontology/common"
 	io2 "github.com/zhiqiangxu/ont-gateway/pkg/io"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
 )
 
 // BuyerBuyDtokenInput ...
@@ -22,7 +23,7 @@ type EndpointToken struct {
 }
 
 type Token struct {
-	TokenTemplate TokenTemplate  `bson:"token_template" json:"token_template"`
+	TokenTemplate param.TokenTemplate  `bson:"token_template" json:"token_template"`
 	Buyer         common.Address `bson:"buyer" json:"buyer"`
 	OnchainItemId string         `bson:"onchain_item_id" json:"onchain_item_id"`
 }

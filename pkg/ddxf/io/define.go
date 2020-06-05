@@ -2,8 +2,8 @@ package io
 
 import (
 	"github.com/ontio/ontology/common"
-	"io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
+	"io"
 )
 
 func ReadString(source *common.ZeroCopySource) (string, error) {

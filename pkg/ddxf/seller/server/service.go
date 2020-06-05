@@ -13,6 +13,8 @@ import (
 	common2 "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/mp/server"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
@@ -20,7 +22,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/x/bsonx"
 	"net/http"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/mp/server"
 )
 
 var (
@@ -67,6 +68,11 @@ func initDb() (err error) {
 }
 
 func SaveDataMetaService(input io.SellerSaveDataMetaInput, ontId string) (output io.SellerSaveDataMetaOutput) {
+	if input.DataMeta["ISDN"] == "" {
+		output.Code = http.StatusBadRequest
+		output.Msg = "datameta does not contain ISDN"
+		return
+	}
 	// verify hash.
 	h, err := ddxf.HashObject(input.DataMeta)
 	if err != nil || hex.EncodeToString(h[:]) != input.DataMetaHash {
@@ -118,7 +124,7 @@ func SaveDataMetaService(input io.SellerSaveDataMetaInput, ontId string) (output
 		DataMetaHash: input.DataMetaHash,
 		ResourceType: input.ResourceType,
 		OntId:        ontId,
-		DataIds:      dataId,
+		DataId:       dataId,
 		Fee:          input.Fee,
 		Stock:        input.Stock,
 		ExpiredDate:  input.ExpiredDate,
@@ -224,8 +230,29 @@ func UseTokenService(input io.SellerTokenLookupEndpointUseTokenInput) (output io
 		return
 	}
 	//TODO
-	output.Result = "SUCCESS"
+	if len(ets) == 0 {
+		output.Code = http.StatusInternalServerError
+		output.Msg = ""
+		return
+	}
+	output.Result, err = GetDataByOnchainIdService(ets[0].Token.OnchainItemId, ets[0].Token.Buyer, ets[0].Token.TokenTemplate)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
 	fmt.Println(ets)
 	return
 }
 
+//书籍
+func GetDataByOnchainIdService(onchainItemId string, buyer common.Address, template param.TokenTemplate) (interface{}, error) {
+	//根据 onchainId 拿到真实的数据
+	data := io.SellerSaveDataMeta{}
+	find := bson.M{"dataId": template.DataID}
+	err := FindElt(DataMetaCollection, find, &data)
+	if err != nil {
+		return nil, err
+	}
+	return "http://localhost/book/" + data.DataMeta["ISDN"].(string), nil
+}

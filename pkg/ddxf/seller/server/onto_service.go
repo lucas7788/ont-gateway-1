@@ -37,7 +37,7 @@ func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qr
 
 	// dataMeta related in data contract tx.
 	tokenTemplate := &param.TokenTemplate{
-		DataID:     adD.DataIds,
+		DataID:     adD.DataId,
 		TokenHashs: []string{adT.TokenMetaHash},
 	}
 	bs, err := ddxf.HashObject(input.ItemMeta)
@@ -58,7 +58,7 @@ func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qr
 	resourceIdBytes, resourceDDOBytes, itemBytes := contract.ConstructPublishParam(sellerAddress,
 		tokenTemplate,
 		[]*param.TokenResourceTyEndpoint{trt},
-		itemMetaHash, adD.Fee, adD.ExpiredDate, adD.Stock, adD.DataIds)
+		itemMetaHash, adD.Fee, adD.ExpiredDate, adD.Stock, adD.DataId)
 	//TODO
 	var netType string
 	if config.Load().Prod {
