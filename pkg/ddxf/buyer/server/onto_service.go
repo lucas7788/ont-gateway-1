@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.uber.org/zap"
 	"strings"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 )
 
 func LoginService() qrCode.QrCodeResponse {
@@ -16,7 +17,7 @@ func LoginService() qrCode.QrCodeResponse {
 	code := qrCode.GetQrCode{
 		ONTAuthScanProtocol: "",
 	}
-	qrCodeId := common2.GenerateUUId()
+	qrCodeId := common2.GenerateUUId(config.UUID_PRE_QRCODE_ID)
 	res := qrCode.QrCodeResponse{
 		QrCode: code,
 		Id:     qrCodeId,
