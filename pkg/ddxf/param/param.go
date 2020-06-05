@@ -90,6 +90,11 @@ func (this *TokenTemplate) ToBytes() []byte {
 	return sink.Bytes()
 }
 
+func (this *TokenTemplate) FromBytes(data []byte) error {
+	source := common.NewZeroCopySource(data)
+	return this.Deserialize(source)
+}
+
 type TokenResourceTyEndpoint struct {
 	TokenTemplate *TokenTemplate
 	ResourceType  byte

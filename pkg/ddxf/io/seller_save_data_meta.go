@@ -26,7 +26,7 @@ type SellerSaveDataMeta struct {
 	DataMeta     map[string]interface{} `bson:"dataMeta" json:"dataMeta"`
 	DataMetaHash string                 `bson:"dataMetaHash" json:"dataMetaHash"`
 	ResourceType byte                   `bson:"resourceType" json:"resourceType"`
-	DataIds      string                 `bson:"dataIds" json:"dataIds"`
+	DataId       string                 `bson:"dataId" json:"dataId"`
 	// all below this shoudle save in dataId contract. did.
 	OntId        string    `bson:"ontId" json:"ontId"`
 	Fee          param.Fee `bson:"fee" json:"fee"`
