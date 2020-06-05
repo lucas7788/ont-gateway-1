@@ -5,8 +5,10 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	"github.com/ontio/ontology-crypto/signature"
-	"github.com/ontio/ontology-go-sdk"
+	ontology_go_sdk "github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology-go-sdk/utils"
 	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ddxf"
@@ -19,7 +21,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/x/bsonx"
-	"net/http"
 )
 
 var (
@@ -69,7 +70,7 @@ func SaveDataMetaService(input io.SellerSaveDataMetaInput, ontId string) (output
 	// verify hash.
 	h, err := ddxf.HashObject(input.DataMeta)
 	if err != nil || hex.EncodeToString(h[:]) != input.DataMetaHash {
-		output.Code = http.StatusInternalServerError
+		output.Code = http.StatusBadRequest
 		output.Msg = err.Error()
 		return
 	}
@@ -86,7 +87,7 @@ func SaveDataMetaService(input io.SellerSaveDataMetaInput, ontId string) (output
 		output.Msg = err.Error()
 		return
 	}
-	dataHash, err := common.Uint256FromHexString(input.DataMetaHash)
+	dataHash, err := common.Uint256FromHexString(input.DataHash)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
