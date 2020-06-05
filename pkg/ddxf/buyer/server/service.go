@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"github.com/ontio/ontology-crypto/keypair"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
@@ -12,6 +11,7 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"net/http"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/server"
 )
 
 const (
@@ -59,15 +59,13 @@ func UseTokenService(input io.BuyerUseTokenInput) (output io.BuyerUseTokenOutput
 		output.Msg = err.Error()
 		return
 	}
-	fmt.Println(string(paramBs))
 	//向seller发请求
-	_, _, data, err := forward.PostJSONRequest(input.TokenOpEndpoint, paramBs)
+	_, _, data, err := forward.PostJSONRequest(input.TokenOpEndpoint +server.UseTokenUrl, paramBs)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
 		return
 	}
-	fmt.Println("888888888888888")
 	output.Result = data
 
 	type SellerReturn struct {
