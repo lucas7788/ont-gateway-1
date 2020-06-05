@@ -6,6 +6,7 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/qrCode"
 	"time"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 )
 
 type qrCodeDesc struct {
@@ -60,7 +61,7 @@ func BuildBuyQrCode(netType string, resourceId string, n int, buyer string) (qrC
 	if err != nil {
 		return qrCode.QrCode{}, err
 	}
-	id := common.GenerateUUId()
+	id := common.GenerateUUId(config.UUID_PRE_QRCODE_ID)
 	sig, err := BuyerMgrAccount.Sign(databs)
 	if err != nil {
 		return qrCode.QrCode{}, err
