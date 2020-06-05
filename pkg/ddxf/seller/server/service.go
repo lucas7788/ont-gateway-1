@@ -235,7 +235,12 @@ func UseTokenService(input io.SellerTokenLookupEndpointUseTokenInput) (output io
 		output.Msg = ""
 		return
 	}
-	output.Result = GetDataByOnchainIdService(ets[0].Token.OnchainItemId, ets[0].Token.Buyer, ets[0].Token.TokenTemplate)
+	output.Result, err = GetDataByOnchainIdService(ets[0].Token.OnchainItemId, ets[0].Token.Buyer, ets[0].Token.TokenTemplate)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
 	fmt.Println(ets)
 	return
 }
