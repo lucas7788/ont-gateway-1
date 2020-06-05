@@ -8,10 +8,10 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/server"
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"net/http"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/server"
 )
 
 const (
@@ -60,7 +60,7 @@ func UseTokenService(input io.BuyerUseTokenInput) (output io.BuyerUseTokenOutput
 		return
 	}
 	//向seller发请求
-	_, _, data, err := forward.PostJSONRequest(input.TokenOpEndpoint +server.UseTokenUrl, paramBs)
+	_, _, data, err := forward.PostJSONRequest(input.TokenOpEndpoint+server.UseTokenUrl, paramBs)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()

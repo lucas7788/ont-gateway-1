@@ -101,7 +101,7 @@ func TestSaveDataMeta(t *testing.T) {
 func TestSellerImpl_PublishMPItemMeta(t *testing.T) {
 	fmt.Println("seller address:", ServerAccount.Address.ToBase58())
 	//TODO
-	qrCodeId := ""
+	qrCodeId := "seller_publish9c4a0d8f-5db6-4959-8d00-10cd87998a12"
 	qc := qrCode.QrCode{}
 	filterD := bson.M{"qrCodeId": qrCodeId}
 	err := FindElt(SellerQrCodeCollection, filterD, &qc)
