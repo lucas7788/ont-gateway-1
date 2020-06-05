@@ -36,8 +36,8 @@ func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qr
 	sellerAddress, err := common.AddressFromBase58(arr[2])
 
 	// dataMeta related in data contract tx.
-	tokenTemplate := param.TokenTemplate{
-		DataIDs:    adD.DataIds,
+	tokenTemplate := &param.TokenTemplate{
+		DataID:     adD.DataIds,
 		TokenHashs: []string{adT.TokenMetaHash},
 	}
 	bs, err := ddxf.HashObject(input.ItemMeta)
@@ -104,7 +104,7 @@ func QrCodeCallBackService(param qrCode.QrCodeCallBackParam) error {
 	uuidType := utils.UUIDType(code.QrCodeId)
 	switch uuidType {
 	case utils.UUID_TOKEN_SELLER_PUBLISH:
-		resourceId, ddo, err := ParseFromBytes(code.QrCodeData)
+		resourceId, ddo,_, err := ParseFromBytes(code.QrCodeData)
 		if err != nil {
 			return err
 		}
@@ -114,12 +114,19 @@ func QrCodeCallBackService(param qrCode.QrCodeCallBackParam) error {
 		if err != nil {
 			return err
 		}
+		pp := io.PublishParam{}
+		filterD = bson.M{"qrCodeId": param.ExtraData.Id}
+		err = FindElt(PublishParamCollection, filterD, &pp)
+		if err != nil {
+			return err
+		}
 		in := io.MPEndpointPublishItemMetaInput{
 			SignedDDXFTx: param.SignedTx,
 			ItemMeta: io.PublishItemMeta{
 				OnchainItemID: resourceId,
 				ItemMeta:      adD.ItemMetaData,
 			},
+			MPEndpoint:pp.Input.MPEndpoint,
 		}
 		output := PublishMPItemMetaService(in, param.ExtraData.OntId)
 		return output.Error()

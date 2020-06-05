@@ -18,7 +18,7 @@ const (
 	getItemMetaSchema  = "/ddxf/mp/getItemMetaSchema"
 	getItemMeta        = "/ddxf/mp/getItemMeta"
 	queryItemMetas     = "/ddxf/mp/queryItemMetas"
-	publishItemMeta    = "/ddxf/mp/publishItemMeta"
+	PublishItemMeta    = "/ddxf/mp/publishItemMeta"
 )
 
 func StartMpServer() {
@@ -26,7 +26,7 @@ func StartMpServer() {
 	r.Use(cors.Cors())
 	r.POST(addRegistry, AddRegistryHandler)
 	r.POST(removeRegistry, RemoveRegistryHandler)
-	r.POST(publishItemMeta, PublishItemMetaHandler)
+	r.POST(PublishItemMeta, PublishItemMetaHandler)
 	r.POST(getItemMeta, GetItemMetaHandler)
 	r.GET(getAuditRule, GetAuditRuleHandler)
 	r.GET(getFee, GetFeeHandler)

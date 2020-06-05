@@ -11,6 +11,7 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/server"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 )
 
@@ -39,7 +40,7 @@ func TestBuyDTokenService(t *testing.T) {
 
 func TestUseTokenService(t *testing.T) {
 	template := param.TokenTemplate{
-		DataIDs:    "",
+		DataID:     "",
 		TokenHashs: []string{string(common2.UINT256_EMPTY[:])},
 	}
 	fmt.Println(hex.EncodeToString(template.ToBytes()))
@@ -57,7 +58,7 @@ func TestUseTokenService(t *testing.T) {
 	imMut.Serialization(sink)
 	input := io.BuyerUseTokenInput{
 		Tx:              hex.EncodeToString(sink.Bytes()),
-		TokenOpEndpoint: config.SellerUseTokenUrl,
+		TokenOpEndpoint: config.SellerUrl + server.UseTokenUrl,
 	}
 	output := UseTokenService(input)
 	assert.Nil(t, output.Error())

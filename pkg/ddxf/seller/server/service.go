@@ -20,6 +20,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/x/bsonx"
 	"net/http"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/mp/server"
 )
 
 var (
@@ -177,7 +178,7 @@ func PublishMPItemMetaService(input io.MPEndpointPublishItemMetaInput, ontId str
 		return
 	}
 	//TODO send mp
-	_, _, data, err := forward.JSONRequest("POST", input.MPEndpoint, mpParamBs)
+	_, _, data, err := forward.JSONRequest("POST", input.MPEndpoint+server.PublishItemMeta, mpParamBs)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()

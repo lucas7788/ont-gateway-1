@@ -8,15 +8,12 @@ import (
 	"github.com/ontio/ontology/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/zhiqiangxu/ddxf"
-	config2 "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/contract"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/qrCode"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
 	"testing"
-	"time"
 )
 
 func TestMain(t *testing.M) {
@@ -67,6 +64,7 @@ func TestSaveDataMeta(t *testing.T) {
 		TokenMeta:     TokenMeta,
 		DataMetaHash:  hex.EncodeToString(h[:]),
 		TokenMetaHash: hex.EncodeToString(ht[:]),
+		TokenEndpoint: config.SellerUrl,
 	}
 	outputt := SaveTokenMetaService(inputt, ontId)
 	assert.Equal(t, 0, outputt.Code)
@@ -86,9 +84,11 @@ func TestSaveDataMeta(t *testing.T) {
 		ItemMeta:      PublishMeta,
 		TokenMetaHash: inputt.TokenMetaHash,
 		DataMetaHash:  inputt.DataMetaHash,
-		MPEndpoint:    "xxxMPEndpoint",
+		MPEndpoint:    config.PublishItemMetaUrl,
 	}
 	res, err := PublishMetaService(inputPub, ontId)
+	//TODO
+	fmt.Println("qrCodeId:", res.Id)
 	assert.Nil(t, err)
 	fmt.Printf("token %s\n", outputt.Msg)
 
@@ -100,28 +100,14 @@ func TestSaveDataMeta(t *testing.T) {
 
 func TestSellerImpl_PublishMPItemMeta(t *testing.T) {
 	fmt.Println("seller address:", ServerAccount.Address.ToBase58())
-	tokenTemplate := param.TokenTemplate{
-		DataIDs:    "",
-		TokenHashs: []string{string(common.UINT256_EMPTY[:])},
-	}
-	itemMetaData := map[string]interface{}{
-		"item": "val",
-	}
-
-	bs, err := ddxf.HashObject(itemMetaData)
-	itemMetaHash, err := common.Uint256ParseFromBytes(bs[:])
-	expiredDate := time.Now().Unix() + 10*24*60*60
-	trt := &param.TokenResourceTyEndpoint{
-		TokenTemplate: tokenTemplate,
-		ResourceType:  0,
-		Endpoint:      "tokenendpointurl",
-	}
-	fee := param.Fee{
-		Count: 1,
-	}
-	resourceId, ddo, item := contract.ConstructPublishParam(ServerAccount.Address,
-		tokenTemplate, []*param.TokenResourceTyEndpoint{trt}, itemMetaHash, fee, uint64(expiredDate), 100,
-		"abcresourceId4")
+	//TODO
+	qrCodeId := ""
+	qc := qrCode.QrCode{}
+	filterD := bson.M{"qrCodeId": qrCodeId}
+	err := FindElt(SellerQrCodeCollection, filterD, &qc)
+	assert.Nil(t, err)
+	resourceId, ddo, item, err := ParsePublishParamFromQrCodeData(qc.QrCodeData)
+	assert.Nil(t, err)
 
 	tx, err := instance.OntSdk().DDXFContract(2000000, 500,
 		nil).BuildTx(ServerAccount, "dtokenSellerPublish", []interface{}{resourceId, ddo, item})
@@ -129,13 +115,19 @@ func TestSellerImpl_PublishMPItemMeta(t *testing.T) {
 	rawTx, _ := tx.IntoImmutable()
 	sink := common.NewZeroCopySink(nil)
 	rawTx.Serialization(sink)
+
+	pp := io.PublishParam{}
+	filterD = bson.M{"qrCodeId": qrCodeId}
+	err = FindElt(PublishParamCollection, filterD, &pp)
+	assert.Nil(t, err)
+
 	input := io.MPEndpointPublishItemMetaInput{
 		SignedDDXFTx: hex.EncodeToString(sink.Bytes()),
 		ItemMeta: io.PublishItemMeta{
-			OnchainItemID: hex.EncodeToString(resourceId),
+			OnchainItemID: resourceId,
 			ItemMeta:      map[string]interface{}{},
 		},
-		MPEndpoint: config2.PublishItemMetaUrl,
+		MPEndpoint: pp.Input.MPEndpoint,
 	}
 	output := PublishMPItemMetaService(input, "ontid")
 	assert.Nil(t, output.Error())
