@@ -3,13 +3,13 @@ package server
 import (
 	"errors"
 	common2 "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/qrCode"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.uber.org/zap"
 	"strings"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 )
 
 func LoginService() qrCode.QrCodeResponse {

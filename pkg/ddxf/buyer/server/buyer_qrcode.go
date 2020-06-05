@@ -4,9 +4,9 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/qrCode"
 	"time"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 )
 
 type qrCodeDesc struct {

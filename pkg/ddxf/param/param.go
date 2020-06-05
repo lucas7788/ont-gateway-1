@@ -40,7 +40,7 @@ func (this *CountAndAgent) FromBytes(data []byte) error {
 }
 
 type TokenTemplate struct {
-	DataIDs    string // can be empty
+	DataID     string // can be empty
 	TokenHashs []string
 }
 
@@ -54,7 +54,7 @@ func (this *TokenTemplate) Deserialize(source *common.ZeroCopySource) error {
 		if irregular || eof {
 			return fmt.Errorf("read dataids failed irregular:%v, eof:%v", irregular, eof)
 		}
-		this.DataIDs = dataIds
+		this.DataID = dataIds
 	}
 	l, _, irregular, eof := source.NextVarUint()
 	if irregular || eof {
@@ -72,11 +72,11 @@ func (this *TokenTemplate) Deserialize(source *common.ZeroCopySource) error {
 }
 
 func (this TokenTemplate) Serialize(sink *common.ZeroCopySink) {
-	if len(this.DataIDs) == 0 {
+	if len(this.DataID) == 0 {
 		sink.WriteBool(false)
 	} else {
 		sink.WriteBool(true)
-		sink.WriteString(this.DataIDs)
+		sink.WriteString(this.DataID)
 	}
 	sink.WriteVarUint(uint64(len(this.TokenHashs)))
 	for i := 0; i < len(this.TokenHashs); i++ {
@@ -91,7 +91,7 @@ func (this *TokenTemplate) ToBytes() []byte {
 }
 
 type TokenResourceTyEndpoint struct {
-	TokenTemplate TokenTemplate
+	TokenTemplate *TokenTemplate
 	ResourceType  byte
 	Endpoint      string
 }
@@ -226,18 +226,28 @@ func (this *Fee) Serialize(sink *common.ZeroCopySink) {
 	sink.WriteByte(this.ContractType)
 	sink.WriteUint64(this.Count)
 }
+func (this *Fee) Deserialize(source *common.ZeroCopySource) error {
+	var eof bool
+	this.ContractAddr, eof = source.NextAddress()
+	if eof {
+		return io.ErrUnexpectedEOF
+	}
+	this.ContractType, eof = source.NextByte()
+	if eof {
+		return io.ErrUnexpectedEOF
+	}
+	this.Count, eof = source.NextUint64()
+	if eof {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 
 type DTokenItem struct {
 	Fee         Fee
 	ExpiredDate uint64
 	Stocks      uint32
-	Templates   []TokenTemplate
-}
-
-func (this *DTokenItem) ToBytes() []byte {
-	sink := common.NewZeroCopySink(nil)
-	this.Serialize(sink)
-	return sink.Bytes()
+	Templates   []*TokenTemplate
 }
 
 func (this *DTokenItem) Serialize(sink *common.ZeroCopySink) {
@@ -248,4 +258,41 @@ func (this *DTokenItem) Serialize(sink *common.ZeroCopySink) {
 	for _, item := range this.Templates {
 		item.Serialize(sink)
 	}
+}
+func (this *DTokenItem) Deserialize(source *common.ZeroCopySource) error {
+	err := this.Fee.Deserialize(source)
+	if err != nil {
+		return err
+	}
+	var eof bool
+	this.ExpiredDate, eof = source.NextUint64()
+	if eof {
+		return io.ErrUnexpectedEOF
+	}
+	this.Stocks, eof = source.NextUint32()
+	l, _, irre, eof := source.NextVarUint()
+	if irre || eof {
+		return errors.New("")
+	}
+	tts := make([]*TokenTemplate, l)
+	for i := 0; i < int(l); i++ {
+		tt := &TokenTemplate{}
+		err = tt.Deserialize(source)
+		if err != nil {
+			return err
+		}
+		tts[i] = tt
+	}
+	return nil
+}
+
+func (this *DTokenItem) FromBytes(data []byte) error {
+	source := common.NewZeroCopySource(data)
+	return this.Deserialize(source)
+}
+
+func (this *DTokenItem) ToBytes() []byte {
+	sink := common.NewZeroCopySink(nil)
+	this.Serialize(sink)
+	return sink.Bytes()
 }

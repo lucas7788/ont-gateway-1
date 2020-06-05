@@ -8,8 +8,8 @@ const (
 )
 
 const (
-	PublishItemMetaUrl = "http://127.0.0.1:" + MpPort + "/ddxf/mp/publishItemMeta"
-	SellerUseTokenUrl  = "http://127.0.0.1:" + SellerPort + "/ddxf/seller/useToken"
+	PublishItemMetaUrl = "http://127.0.0.1:" + MpPort
+	SellerUrl          = "http://127.0.0.1:" + SellerPort
 )
 
 const (
