@@ -6,7 +6,7 @@ import (
 )
 
 func ConstructPublishParam(seller common.Address, template *param.TokenTemplate, tokenResourceType []*param.TokenResourceTyEndpoint,
-	itemMetaHash common.Uint256, fee param.Fee, expiredDate uint64, stock uint32, resourceId string) ([]byte, []byte, []byte) {
+	itemMetaHash common.Uint256, fee param.Fee, expiredDate uint64, stock uint32) ([]byte, []byte) {
 	ddo := param.ResourceDDO{
 		TokenResourceTyEndpoints: tokenResourceType,    // RT for tokens
 		Manager:                  seller,               // data owner id
@@ -23,5 +23,5 @@ func ConstructPublishParam(seller common.Address, template *param.TokenTemplate,
 		Templates:   []*param.TokenTemplate{template},
 	}
 
-	return []byte(resourceId), ddo.ToBytes(), item.ToBytes()
+	return ddo.ToBytes(), item.ToBytes()
 }

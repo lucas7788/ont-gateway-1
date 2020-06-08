@@ -1,7 +1,6 @@
 package server
 
 import (
-	"context"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -18,9 +17,6 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/x/bsonx"
 	"net/http"
 )
 
@@ -37,8 +33,7 @@ const (
 	QrCodeCallback      = "http://172.29.36.101" + config.SellerPort + "/ddxf/seller/qrCodeCallbackSendTx"
 )
 const (
-	sellerCollectionName   = "seller"
-	endpointCollectionName = "sellerendpoint"
+	sellerCollectionName = "seller"
 )
 
 func InitSellerImpl() error {
@@ -51,20 +46,6 @@ func InitSellerImpl() error {
 	Wallet = ontology_go_sdk.NewWallet("./wallet.dat")
 	Pwd = []byte("111111")
 	return nil
-}
-
-// Init for this collection
-func initDb() (err error) {
-	opts := &options.IndexOptions{}
-	opts.SetName("u-seller")
-	opts.SetUnique(true)
-	index := mongo.IndexModel{
-		Keys:    bsonx.Doc{{Key: "seller", Value: bsonx.Int32(1)}},
-		Options: opts,
-	}
-
-	_, err = instance.MongoOfficial().Collection(sellerCollectionName).Indexes().CreateOne(context.Background(), index)
-	return
 }
 
 func SaveDataMetaService(input io.SellerSaveDataMetaInput, ontId string) (output io.SellerSaveDataMetaOutput) {
@@ -131,13 +112,14 @@ func SaveDataMetaService(input io.SellerSaveDataMetaInput, ontId string) (output
 		DataEndpoint: input.DataEndpoint,
 	}
 
+	fmt.Println("dataStore: ", dataStore)
 	// store meta hash id.
 	err = InsertElt(DataMetaCollection, dataStore)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
 	}
-
+	output.DataId = dataId
 	return
 }
 
@@ -145,7 +127,12 @@ func SaveTokenMetaService(input io.SellerSaveTokenMetaInput, ontId string) (outp
 	// verify hash.
 	h, err := ddxf.HashObject(input.TokenMeta)
 
-	if err != nil || hex.EncodeToString(h[:]) != input.TokenMetaHash {
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	if hex.EncodeToString(h[:]) != input.TokenMetaHash {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
 		return

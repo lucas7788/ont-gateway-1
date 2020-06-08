@@ -21,7 +21,7 @@ var (
 )
 
 const DDXF_CONTRACT_ADDRESS = "01f6bbe1ca837336a658036ac4997efc0171495a"
-const DATA_ID_CONTRACT_ADDRESS = "ee01c44c77d9be31b4935a0d13d861f89b455094"
+const DATA_ID_CONTRACT_ADDRESS = "46445ed3f7d5a645debc7d4f26923dd624ee762a"
 
 // OntSdk deals with ont sdk related stuff
 type OntSdk struct {

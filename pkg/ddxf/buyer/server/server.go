@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	buyDtoken = "/ddxf/buyer/buyDtoken"
-	useDToken = "/ddxf/buyer/useToken"
+	BuyDtoken = "/ddxf/buyer/BuyDtoken"
+	UseDToken = "/ddxf/buyer/useToken"
 
 	loginBuyer          = "/onto/buyer/login"
 	getloginQrCode      = "/onto/buyer/getLoginQrcode/:qrCodeId"
@@ -34,8 +34,8 @@ func StartBuyerServer() {
 	r.POST(buyDtokenQrCode, BuyDtokenQrCodeHanler)
 	r.GET(getQrCodeByQrCodeId, GetQrCodeByQrCodeIdHandler)
 	r.POST(qrCodeCallBack, QrCodeCallBackHandler)
-	r.POST(buyDtoken, BuyDtokenHandler)
-	r.POST(useDToken, UseTokenHandler)
+	r.POST(BuyDtoken, BuyDtokenHandler)
+	r.POST(UseDToken, UseTokenHandler)
 	err := initDb()
 	if err != nil {
 		fmt.Println("initDb error:", err)

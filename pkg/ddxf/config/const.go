@@ -10,6 +10,7 @@ const (
 const (
 	PublishItemMetaUrl = "http://127.0.0.1:" + MpPort
 	SellerUrl          = "http://127.0.0.1:" + SellerPort
+	BuyerUrl           = "http://127.0.0.1:" + BuyerPort
 )
 
 const (
@@ -21,4 +22,5 @@ const (
 const (
 	UUID_PRE_DATAID    = "dataid_"
 	UUID_PRE_QRCODE_ID = "qrcodeid_"
+	UUID_RESOURCE_ID   = "resourceid_"
 )

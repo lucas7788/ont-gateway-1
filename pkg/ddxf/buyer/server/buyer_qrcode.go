@@ -69,7 +69,7 @@ func BuildBuyQrCode(netType string, resourceId string, n int, buyer string) (qrC
 
 	qrDesc := qrCodeDesc{
 		Type:   "invoke ddxf contract",
-		Detail: "buyDtoken",
+		Detail: "BuyDtoken",
 	}
 
 	qrDescIn, err := json.Marshal(qrDesc)

@@ -20,7 +20,7 @@ func BuildQrCodeResponse(id string) qrCode.QrCodeResponse {
 		Id: id,
 	}
 }
-func ParsePublishParamFromQrCodeData(qrCodeData string) (resourceId string, resourceDdo []byte, item []byte, err error) {
+func ParsePublishParamFromQrCodeData(qrCodeData string) (resourceId []byte, resourceDdo []byte, item []byte, err error) {
 	data := qrCode.QrCodeData{}
 	err = json.Unmarshal([]byte(qrCodeData), &data)
 	if err != nil {
@@ -35,7 +35,8 @@ func ParsePublishParamFromQrCodeData(qrCodeData string) (resourceId string, reso
 		err = errors.New("")
 		return
 	}
-	resourceId = strings.ReplaceAll(args[0].Value.(string), "ByteArray:", "")
+	resourceIdStr := strings.ReplaceAll(args[0].Value.(string), "ByteArray:", "")
+	resourceId, err = hex.DecodeString(resourceIdStr)
 	ddoStr := strings.ReplaceAll(args[1].Value.(string), "ByteArray:", "")
 	itemStr := strings.ReplaceAll(args[2].Value.(string), "ByteArray:", "")
 	resourceDdo, err = hex.DecodeString(ddoStr)
@@ -43,7 +44,7 @@ func ParsePublishParamFromQrCodeData(qrCodeData string) (resourceId string, reso
 	return
 }
 
-func ParseFromBytes(qrCodeData string) (resourceId string, resourceDdo *param.ResourceDDO, item *param.DTokenItem, err error) {
+func ParseFromBytes(qrCodeData string) (resourceId []byte, resourceDdo *param.ResourceDDO, item *param.DTokenItem, err error) {
 	var ddoBytes, itemBytes []byte
 	resourceId, ddoBytes, itemBytes, err = ParsePublishParamFromQrCodeData(qrCodeData)
 	if err != nil {
