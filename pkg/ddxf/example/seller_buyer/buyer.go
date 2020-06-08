@@ -32,7 +32,7 @@ func BuyDtoken(resourceId string) error {
 	return err
 }
 
-func UseToken(resourceId,tokenMetaHash string, dataId string) error {
+func UseToken(resourceId, tokenMetaHash string, dataId string) error {
 	tokenHashBytes, _ := hex.DecodeString(tokenMetaHash)
 	template := param.TokenTemplate{
 		DataID:     dataId,

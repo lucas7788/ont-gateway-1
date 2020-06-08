@@ -2,12 +2,9 @@ package seller_buyer
 
 import (
 	"encoding/json"
-	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 	"fmt"
+	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 )
-
-
-
 
 func SendPOST(url string, param interface{}) ([]byte, error) {
 	bs, err := json.Marshal(param)

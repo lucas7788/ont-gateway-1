@@ -36,7 +36,7 @@ func ParsePublishParamFromQrCodeData(qrCodeData string) (resourceId []byte, reso
 		return
 	}
 	resourceIdStr := strings.ReplaceAll(args[0].Value.(string), "ByteArray:", "")
-	resourceId,err = hex.DecodeString(resourceIdStr)
+	resourceId, err = hex.DecodeString(resourceIdStr)
 	ddoStr := strings.ReplaceAll(args[1].Value.(string), "ByteArray:", "")
 	itemStr := strings.ReplaceAll(args[2].Value.(string), "ByteArray:", "")
 	resourceDdo, err = hex.DecodeString(ddoStr)
