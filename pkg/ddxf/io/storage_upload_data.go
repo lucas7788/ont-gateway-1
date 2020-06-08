@@ -6,25 +6,19 @@ type StorageCommonServiceOutput struct {
 	io2.BaseResp
 }
 
-type StorageUploadInput struct {
-	DataSource string `json:"dataSource"`
-	DataName   string `json:"dataName"`
-}
-
 type StorageUploadSave struct {
 	OntId    string
-	DataName string
-	DataHash string
+	FileName string
 }
 
 type StorageUploadOutput struct {
 	io2.BaseResp
 	DataHashUrl string `json:"dataHashUrl"`
-	DataHash    string `json:"dataHash"`
+	FileName    string `json:"fileName"`
 }
 
 type StorageDownloadInput struct {
-	DataHash string `json:"dataHash"`
+	FileName string `json:"fileName"`
 }
 
 type SorageDownloadOutput struct {

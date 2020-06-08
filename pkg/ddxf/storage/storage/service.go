@@ -16,17 +16,13 @@ const (
 )
 
 func UploadDataServiceHandle(c *gin.Context) {
-	data, err := ioutil.ReadAll(c.Request.Body)
+	file, _, err := c.Request.FormFile("upload")
 	if err != nil {
-		instance.Logger().Error("UseTokenHandler:", zap.Error(err))
-		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusBadRequest, err))
+		c.String(http.StatusBadRequest, "Bad request")
 		return
 	}
 
-	param := &io.StorageUploadInput{}
-	err = json.Unmarshal(data, &param)
-
-	output := UploadDataCore(param, TestOntId)
+	output := UploadDataCore(file, TestOntId)
 	c.JSON(output.Code, output)
 }
 
