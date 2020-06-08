@@ -20,7 +20,8 @@ const (
 )
 
 const (
-	UUID_PRE_DATAID    = "dataid_"
-	UUID_PRE_QRCODE_ID = "qrcodeid_"
-	UUID_RESOURCE_ID   = "resourceid_"
+	UUID_PRE_DATAID    = "data_id_"
+	UUID_PRE_QRCODE_ID = "qrcode_id_"
+	UUID_RESOURCE_ID   = "resource_id_"
+	UUID_PUBLISH_ID   = "publish_id_"
 )
