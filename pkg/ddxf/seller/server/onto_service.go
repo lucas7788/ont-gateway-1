@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ddxf"
@@ -13,7 +12,6 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/qrCode"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"strings"
 )
@@ -111,36 +109,30 @@ func QrCodeCallBackService(param qrCode.QrCodeCallBackParam) error {
 	if err != nil {
 		return err
 	}
-	uuidType := utils.UUIDType(code.QrCodeId)
-	switch uuidType {
-	case utils.UUID_TOKEN_SELLER_PUBLISH:
-		resourceId, ddo, _, err := ParseFromBytes(code.QrCodeData)
-		if err != nil {
-			return err
-		}
-		adD := ItemMeta{}
-		filterD := bson.M{"dataMetaHash": ddo.ItemMetaHash}
-		err = FindElt(ItemMetaCollection, filterD, &adD)
-		if err != nil {
-			return err
-		}
-		pp := io.PublishParam{}
-		filterD = bson.M{"qrCodeId": param.ExtraData.Id}
-		err = FindElt(PublishParamCollection, filterD, &pp)
-		if err != nil {
-			return err
-		}
-		in := io.MPEndpointPublishItemMetaInput{
-			SignedDDXFTx: param.SignedTx,
-			ItemMeta: io.PublishItemMeta{
-				OnchainItemID: hex.EncodeToString(resourceId),
-				ItemMeta:      adD.ItemMetaData,
-			},
-			MPEndpoint: pp.Input.MPEndpoint,
-		}
-		output := PublishMPItemMetaService(in, param.ExtraData.OntId)
-		return output.Error()
-	default:
-		return errors.New("wrong uuid type")
+	resourceId, ddo, _, err := ParseFromBytes(code.QrCodeData)
+	if err != nil {
+		return err
 	}
+	adD := ItemMeta{}
+	filterD := bson.M{"dataMetaHash": ddo.ItemMetaHash}
+	err = FindElt(ItemMetaCollection, filterD, &adD)
+	if err != nil {
+		return err
+	}
+	pp := io.PublishParam{}
+	filterD = bson.M{"qrCodeId": param.ExtraData.Id}
+	err = FindElt(PublishParamCollection, filterD, &pp)
+	if err != nil {
+		return err
+	}
+	in := io.MPEndpointPublishItemMetaInput{
+		SignedDDXFTx: param.SignedTx,
+		ItemMeta: io.PublishItemMeta{
+			OnchainItemID: hex.EncodeToString(resourceId),
+			ItemMeta:      adD.ItemMetaData,
+		},
+		MPEndpoint: pp.Input.MPEndpoint,
+	}
+	output := PublishMPItemMetaService(in, param.ExtraData.OntId)
+	return output.Error()
 }

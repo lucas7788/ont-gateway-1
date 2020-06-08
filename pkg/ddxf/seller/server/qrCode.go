@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"github.com/kataras/go-errors"
 	"github.com/ontio/ontology/common"
+	common2 "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/qrCode"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/utils"
 	"strings"
 	"time"
 )
@@ -97,7 +98,7 @@ func BuildPublishQrCode(chain string, contractHash string, resourceId []byte, re
 	if err != nil {
 		return nil, err
 	}
-	id := utils.GenerateUUId(utils.UUID_TOKEN_SELLER_PUBLISH)
+	id := common2.GenerateUUId(config.UUID_PUBLISH_ID)
 	sig, err := ServerAccount.Sign(databs)
 	if err != nil {
 		return nil, err
