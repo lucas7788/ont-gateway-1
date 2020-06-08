@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/buyer/server"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"os"
@@ -9,7 +10,11 @@ import (
 )
 
 func main() {
-	server.StartBuyerServer()
+	err := server.StartBuyerServer()
+	if err != nil {
+		fmt.Println("StartBuyerServer error:", err)
+		return
+	}
 	waitToExit()
 }
 

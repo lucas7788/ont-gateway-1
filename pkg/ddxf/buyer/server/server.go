@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	BuyDtoken = "/ddxf/buyer/BuyDtoken"
+	BuyDtoken = "/ddxf/buyer/buyDtoken"
 	UseDToken = "/ddxf/buyer/useToken"
 
 	loginBuyer          = "/onto/buyer/login"
@@ -24,7 +24,7 @@ const (
 
 var BuyerMgrAccount *ontology_go_sdk.Account
 
-func StartBuyerServer() {
+func StartBuyerServer() error {
 	r := gin.Default()
 	r.Use(cors.Cors())
 	r.POST(loginBuyer, LoginHandler)
@@ -38,14 +38,14 @@ func StartBuyerServer() {
 	r.POST(UseDToken, UseTokenHandler)
 	err := initDb()
 	if err != nil {
-		fmt.Println("initDb error:", err)
-		return
+		return err
 	}
 	private := make([]byte, 32)
 	BuyerMgrAccount, err = ontology_go_sdk.NewAccountFromPrivateKey(private, signature.SHA256withECDSA)
 	if err != nil {
 		fmt.Println("NewAccountFromPrivateKey error:", err)
-		return
+		return err
 	}
 	go r.Run(":" + config.BuyerPort)
+	return nil
 }
