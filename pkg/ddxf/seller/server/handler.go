@@ -41,24 +41,29 @@ func SaveTokenMetaHandler(c *gin.Context) {
 	c.Set(middleware.TenantIDKey, "did:ont:AcVBV1zKGogf9Q54p1Ve78NSQVU5ZUUGkn")
 	ontId, ok := c.Get(middleware.TenantIDKey)
 	if !ok {
-		instance.Logger().Error("[SaveDataMetaHandle] read ontId error")
+		instance.Logger().Error("[SaveTokenMetaHandler] read ontId error")
 		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, nil))
 		return
 	}
 	bs, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
-		instance.Logger().Error("[SaveDataMetaHandle] read param error")
+		instance.Logger().Error("[SaveTokenMetaHandler] read param error")
 		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, nil))
 		return
 	}
 	param := io.SellerSaveTokenMetaInput{}
 	err = json.Unmarshal(bs, &param)
 	if err != nil {
-		instance.Logger().Error("[SaveDataMetaHandle] read param error")
+		instance.Logger().Error("[SaveTokenMetaHandler] read param error")
 		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, nil))
 		return
 	}
 	output := SaveTokenMetaService(param, ontId.(string))
+	if output.Code != 0 {
+		instance.Logger().Error("[SaveTokenMetaHandler] read param error")
+		c.JSON(output.Code, common.ResponseFailedOnto(common.PARA_ERROR, nil))
+		return
+	}
 	c.JSON(output.Code, output)
 }
 

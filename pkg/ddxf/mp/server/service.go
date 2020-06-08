@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"encoding/hex"
+	"fmt"
 	"github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology/core/types"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
@@ -180,6 +181,7 @@ func PublishItemMetaService(input io.MPEndpointPublishItemMetaInput) (output io.
 		output.Msg = err.Error()
 		return
 	}
+	fmt.Println("mp send tx:", txHash.ToHexString())
 	state, err := getSmartCodeEvent(txHash.ToHexString())
 	if err != nil {
 		output.Code = http.StatusInternalServerError

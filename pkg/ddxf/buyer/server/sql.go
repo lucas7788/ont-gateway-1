@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/qrCode"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
@@ -12,9 +13,16 @@ import (
 )
 
 const (
-	buyerCollectionName = "buyer"
-	loginCollectionName = "buyer_login_qr_code"
+	buyerCollectionName       = "buyer"
+	buyerDtokenCollectionName = "buyer_token"
+	loginCollectionName       = "buyer_login_qr_code"
+	buyerResultCollectionName = "buyer_result"
 )
+
+type BuyerToken struct {
+	TxHash string
+	Tokens []io.EndpointToken
+}
 
 func initDb() error {
 	opts := &options.IndexOptions{}
@@ -63,19 +71,19 @@ func QueryLoginResult(id string) (qrCode.LoginResultStatus, error) {
 	return res.Result, nil
 }
 
-func insertOne(data interface{}) error {
+func insertOne(collectionName string, data interface{}) error {
 	timeout := config.Load().MongoConfig.Timeout
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
-	_, err := instance.MongoOfficial().Collection(buyerCollectionName).InsertOne(ctx, data)
+	_, err := instance.MongoOfficial().Collection(collectionName).InsertOne(ctx, data)
 	return err
 }
 
-func insertMany(data []interface{}) error {
+func insertMany(collectionName string, data []interface{}) error {
 	timeout := config.Load().MongoConfig.Timeout
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
-	_, err := instance.MongoOfficial().Collection(buyerCollectionName).InsertMany(ctx, data)
+	_, err := instance.MongoOfficial().Collection(collectionName).InsertMany(ctx, data)
 	return err
 }
 

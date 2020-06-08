@@ -1,11 +1,9 @@
 package server
 
 import (
-	"context"
 	"encoding/hex"
 	"encoding/json"
 	"github.com/ontio/ontology-crypto/keypair"
-	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/server"
@@ -37,7 +35,11 @@ func BuyDTokenService(param io.BuyerBuyDtokenInput) (output io.BuyerBuyDtokenOut
 	for i := 0; i < len(output.EndpointTokens); i++ {
 		p[i] = output.EndpointTokens[i]
 	}
-	err = insertMany(p)
+	bt := BuyerToken{
+		TxHash: txHash,
+		Tokens: output.EndpointTokens,
+	}
+	err = insertOne(buyerDtokenCollectionName, bt)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -74,10 +76,7 @@ func UseTokenService(input io.BuyerUseTokenInput) (output io.BuyerUseTokenOutput
 	rr := SellerReturn{
 		Result: string(data),
 	}
-	timeout := config.Load().MongoConfig.Timeout
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-	_, err = instance.MongoOfficial().Collection(buyerCollectionName).InsertOne(ctx, rr)
+	err = insertOne(buyerResultCollectionName, rr)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()

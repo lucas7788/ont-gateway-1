@@ -86,7 +86,7 @@ func BuyDtokenQrCodeService(input BuyerBuyDtokenQrCodeInput) (qrCode.QrCodeRespo
 		Code:          code,
 		TokenEndpoint: input.TokenOpEndpoint,
 	}
-	err = insertOne(qce)
+	err = insertOne(buyerCollectionName,qce)
 	if err != nil {
 		return qrCode.QrCodeResponse{}, err
 	}

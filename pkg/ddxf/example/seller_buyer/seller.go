@@ -19,7 +19,7 @@ func SaveDataMeta() error {
 	//ontId := "did:ont:AcVBV1zKGogf9Q54p1Ve78NSQVU5ZUUGkn"
 	DataMeta := map[string]interface{}{
 		"1": "first5",
-		"2": "second4",
+		"2": "second5",
 	}
 	DataMeta["ISDN"] = "hello"
 	h, err := ddxf.HashObject(DataMeta)
@@ -95,8 +95,7 @@ func PublishMeta1(tokenMetaHash string, dataMetaHash string) error {
 	return nil
 }
 
-func PublishMeta() error {
-	qrCodeId := "seller_publishab49ad75-d6f6-4687-90e0-d7bc52eedaec"
+func PublishMeta(qrCodeId string) error {
 	qc := qrCode.QrCode{}
 	filterD := bson.M{"qrCodeId": qrCodeId}
 	err := server.FindElt(server.SellerQrCodeCollection, filterD, &qc)
@@ -109,8 +108,7 @@ func PublishMeta() error {
 	}
 	resourceId := string(resourceIdBytes)
 	fmt.Println("resourceId: ", resourceId)
-	tx, err := instance.OntSdk().DDXFContract(2000000, 500,
-		nil).BuildTx(server.ServerAccount, "dtokenSellerPublish", []interface{}{resourceIdBytes, ddo, item})
+	tx, err := instance.OntSdk().DefaultDDXFContract().BuildTx(server.ServerAccount, "dtokenSellerPublish", []interface{}{resourceIdBytes, ddo, item})
 	if err != nil {
 		return err
 	}
