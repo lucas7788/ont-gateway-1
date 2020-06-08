@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -29,6 +30,11 @@ var (
 
 func main() {
 
+	if true {
+		bs, _ := base64.RawURLEncoding.DecodeString("eyJjb2RlIjowLCJtc2ciOiIiLCJSZXN1bHQiOiJodHRwOi8vbG9jYWxob3N0L2Jvb2svaGVsbG8ifQ==")
+		fmt.Println("bs: ", string(bs))
+		return
+	}
 	if false {
 		err := upload()
 		if err != nil {
