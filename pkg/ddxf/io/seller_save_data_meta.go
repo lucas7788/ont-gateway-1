@@ -20,6 +20,7 @@ type SellerSaveDataMetaInput struct {
 // SellerSaveDataMetaOutput ...
 type SellerSaveDataMetaOutput struct {
 	io2.BaseResp
+	DataId string
 }
 
 type SellerSaveDataMeta struct {

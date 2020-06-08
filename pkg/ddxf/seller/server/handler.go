@@ -13,38 +13,76 @@ import (
 )
 
 func SaveDataMetaHandler(c *gin.Context) {
+	c.Set(middleware.TenantIDKey, "did:ont:AcVBV1zKGogf9Q54p1Ve78NSQVU5ZUUGkn")
 	ontId, ok := c.Get(middleware.TenantIDKey)
 	if !ok {
 		instance.Logger().Error("[SaveDataMetaHandle] read ontId error")
 		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, nil))
 		return
 	}
+	bs, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		instance.Logger().Error("[SaveDataMetaHandle] read param error")
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, nil))
+		return
+	}
 	param := io.SellerSaveDataMetaInput{}
+	err = json.Unmarshal(bs, &param)
+	if err != nil {
+		instance.Logger().Error("[SaveDataMetaHandle] read param error")
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, nil))
+		return
+	}
 	output := SaveDataMetaService(param, ontId.(string))
 	c.JSON(output.Code, output)
 }
 
 func SaveTokenMetaHandler(c *gin.Context) {
+	c.Set(middleware.TenantIDKey, "did:ont:AcVBV1zKGogf9Q54p1Ve78NSQVU5ZUUGkn")
 	ontId, ok := c.Get(middleware.TenantIDKey)
 	if !ok {
 		instance.Logger().Error("[SaveDataMetaHandle] read ontId error")
 		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, nil))
 		return
 	}
+	bs, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		instance.Logger().Error("[SaveDataMetaHandle] read param error")
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, nil))
+		return
+	}
 	param := io.SellerSaveTokenMetaInput{}
+	err = json.Unmarshal(bs, &param)
+	if err != nil {
+		instance.Logger().Error("[SaveDataMetaHandle] read param error")
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, nil))
+		return
+	}
 	output := SaveTokenMetaService(param, ontId.(string))
 	c.JSON(output.Code, output)
 }
 
 func PublishMPItemMetaHandler(c *gin.Context) {
+	c.Set(middleware.TenantIDKey, "did:ont:AcVBV1zKGogf9Q54p1Ve78NSQVU5ZUUGkn")
 	ontId, ok := c.Get(middleware.TenantIDKey)
 	if !ok {
 		instance.Logger().Error("PublishMPItemMetaHandle: read ontId error")
 		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusInternalServerError, nil))
 		return
 	}
+	bs, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		instance.Logger().Error("[SaveDataMetaHandle] read param error")
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, nil))
+		return
+	}
 	param := io.MPEndpointPublishItemMetaInput{}
-
+	err = json.Unmarshal(bs, &param)
+	if err != nil {
+		instance.Logger().Error("[SaveDataMetaHandle] read param error")
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, nil))
+		return
+	}
 	qrResp := PublishMPItemMetaService(param, ontId.(string))
 	if qrResp.Error() != nil {
 		instance.Logger().Error("PublishMPItemMetaHandle:", zap.Error(qrResp.Error()))
@@ -78,6 +116,7 @@ func UseTokenHandler(c *gin.Context) {
 }
 
 func PublishMetaHandler(c *gin.Context) {
+	c.Set(middleware.TenantIDKey, "did:ont:AcVBV1zKGogf9Q54p1Ve78NSQVU5ZUUGkn")
 	ontId, ok := c.Get(middleware.TenantIDKey)
 	if !ok {
 		instance.Logger().Error("PublishMetaHandler: read ontId error")

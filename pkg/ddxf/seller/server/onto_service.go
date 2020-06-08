@@ -1,10 +1,14 @@
 package server
 
 import (
+	"encoding/hex"
 	"errors"
+	"fmt"
 	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ddxf"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
+	common2 "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
+	config2 "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/contract"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
@@ -15,6 +19,7 @@ import (
 )
 
 func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qrCode.QrCodeResponse, error) {
+	fmt.Println("input: ", input)
 	adT := &io.SellerSaveTokenMeta{}
 	filterT := bson.M{"tokenMetaHash": input.TokenMetaHash, "ontId": ontId}
 	err := FindElt(TokenMetaCollection, filterT, adT)
@@ -29,16 +34,19 @@ func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qr
 		return qrCode.QrCodeResponse{}, err
 	}
 
+	fmt.Println("adD:", adD)
+
 	arr := strings.Split(ontId, ":")
 	if len(arr) != 3 {
 		return qrCode.QrCodeResponse{}, err
 	}
-	sellerAddress, err := common.AddressFromBase58(arr[2])
+	//sellerAddress, err := common.AddressFromBase58(arr[2])
 
+	tokenHash, err := hex.DecodeString(adT.TokenMetaHash)
 	// dataMeta related in data contract tx.
 	tokenTemplate := &param.TokenTemplate{
 		DataID:     adD.DataId,
-		TokenHashs: []string{adT.TokenMetaHash},
+		TokenHashs: []string{string(tokenHash)},
 	}
 	bs, err := ddxf.HashObject(input.ItemMeta)
 	itemMetaHash, err := common.Uint256ParseFromBytes(bs[:])
@@ -55,10 +63,12 @@ func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qr
 		ResourceType:  adD.ResourceType,
 		Endpoint:      adT.TokenEndpoint,
 	}
-	resourceIdBytes, resourceDDOBytes, itemBytes := contract.ConstructPublishParam(sellerAddress,
+	resourceIdBytes := []byte(common2.GenerateUUId(config2.UUID_RESOURCE_ID))
+	fmt.Println("resourceId:", string(resourceIdBytes))
+	resourceDDOBytes, itemBytes := contract.ConstructPublishParam(ServerAccount.Address,
 		tokenTemplate,
 		[]*param.TokenResourceTyEndpoint{trt},
-		itemMetaHash, adD.Fee, adD.ExpiredDate, adD.Stock, adD.DataId)
+		itemMetaHash, adD.Fee, adD.ExpiredDate, adD.Stock)
 	//TODO
 	var netType string
 	if config.Load().Prod {
@@ -104,7 +114,7 @@ func QrCodeCallBackService(param qrCode.QrCodeCallBackParam) error {
 	uuidType := utils.UUIDType(code.QrCodeId)
 	switch uuidType {
 	case utils.UUID_TOKEN_SELLER_PUBLISH:
-		resourceId, ddo,_, err := ParseFromBytes(code.QrCodeData)
+		resourceId, ddo, _, err := ParseFromBytes(code.QrCodeData)
 		if err != nil {
 			return err
 		}
@@ -123,10 +133,10 @@ func QrCodeCallBackService(param qrCode.QrCodeCallBackParam) error {
 		in := io.MPEndpointPublishItemMetaInput{
 			SignedDDXFTx: param.SignedTx,
 			ItemMeta: io.PublishItemMeta{
-				OnchainItemID: resourceId,
+				OnchainItemID: hex.EncodeToString(resourceId),
 				ItemMeta:      adD.ItemMetaData,
 			},
-			MPEndpoint:pp.Input.MPEndpoint,
+			MPEndpoint: pp.Input.MPEndpoint,
 		}
 		output := PublishMPItemMetaService(in, param.ExtraData.OntId)
 		return output.Error()

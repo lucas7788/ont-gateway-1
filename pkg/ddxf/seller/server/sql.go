@@ -5,6 +5,9 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/x/bsonx"
 )
 
 const (
@@ -14,6 +17,28 @@ const (
 	ItemMetaCollection     = "SellerItemMetaCollection"
 	PublishParamCollection = "PublishParamCollection"
 )
+
+// Init for this collection
+func initDb() (err error) {
+	opts := &options.IndexOptions{}
+	opts.SetName("u-seller")
+	opts.SetUnique(true)
+	index := mongo.IndexModel{
+		Keys:    bsonx.Doc{{Key: "seller", Value: bsonx.Int32(1)}},
+		Options: opts,
+	}
+
+	_, err = instance.MongoOfficial().Collection(sellerCollectionName).Indexes().CreateOne(context.Background(), index)
+	if err != nil {
+		return
+	}
+	index = mongo.IndexModel{
+		Keys:    bsonx.Doc{{Key: "dataMetaHash", Value: bsonx.Int32(1)}},
+		Options: opts,
+	}
+	_, err = instance.MongoOfficial().Collection(DataMetaCollection).Indexes().CreateOne(context.Background(), index)
+	return
+}
 
 func InsertElt(collectionName string, data interface{}) error {
 	timeout := config.Load().MongoConfig.Timeout

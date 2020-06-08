@@ -14,6 +14,7 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
 	"testing"
+	"time"
 )
 
 func TestMain(t *testing.M) {
@@ -34,14 +35,16 @@ func TestMain(t *testing.M) {
 func TestSaveDataMeta(t *testing.T) {
 	ontId := "did:ont:AcVBV1zKGogf9Q54p1Ve78NSQVU5ZUUGkn"
 	DataMeta := map[string]interface{}{
-		"1": "first",
-		"2": "second",
+		"1": "first3",
+		"2": "second2",
 	}
 	h, err := ddxf.HashObject(DataMeta)
 	assert.Nil(t, err)
 	input := io.SellerSaveDataMetaInput{
 		DataMeta:     DataMeta,
 		DataMetaHash: hex.EncodeToString(h[:]),
+		ExpiredDate:  uint64(time.Now().Unix() + 24*60*60),
+		Stock:        1000,
 	}
 
 	output := SaveDataMetaService(input, ontId)
@@ -62,7 +65,7 @@ func TestSaveDataMeta(t *testing.T) {
 	assert.Nil(t, err)
 	inputt := io.SellerSaveTokenMetaInput{
 		TokenMeta:     TokenMeta,
-		DataMetaHash:  hex.EncodeToString(h[:]),
+		DataMetaHash:  input.DataMetaHash,
 		TokenMetaHash: hex.EncodeToString(ht[:]),
 		TokenEndpoint: config.SellerUrl,
 	}
@@ -70,6 +73,7 @@ func TestSaveDataMeta(t *testing.T) {
 	assert.Equal(t, 0, outputt.Code)
 	fmt.Printf("token %s\n", outputt.Msg)
 
+	fmt.Println("inputt: ", inputt)
 	tokenStore := &io.SellerSaveTokenMeta{}
 	filterT := bson.M{"tokenMetaHash": inputt.TokenMetaHash}
 	err = FindElt(TokenMetaCollection, filterT, tokenStore)
@@ -83,9 +87,10 @@ func TestSaveDataMeta(t *testing.T) {
 	inputPub := io.SellerPublishMPItemMetaInput{
 		ItemMeta:      PublishMeta,
 		TokenMetaHash: inputt.TokenMetaHash,
-		DataMetaHash:  inputt.DataMetaHash,
+		DataMetaHash:  input.DataMetaHash,
 		MPEndpoint:    config.PublishItemMetaUrl,
 	}
+	fmt.Println("input:", inputPub, ontId)
 	res, err := PublishMetaService(inputPub, ontId)
 	//TODO
 	fmt.Println("qrCodeId:", res.Id)
@@ -101,7 +106,7 @@ func TestSaveDataMeta(t *testing.T) {
 func TestSellerImpl_PublishMPItemMeta(t *testing.T) {
 	fmt.Println("seller address:", ServerAccount.Address.ToBase58())
 	//TODO
-	qrCodeId := "seller_publish9c4a0d8f-5db6-4959-8d00-10cd87998a12"
+	qrCodeId := "seller_publishab49ad75-d6f6-4687-90e0-d7bc52eedaec"
 	qc := qrCode.QrCode{}
 	filterD := bson.M{"qrCodeId": qrCodeId}
 	err := FindElt(SellerQrCodeCollection, filterD, &qc)
@@ -109,9 +114,12 @@ func TestSellerImpl_PublishMPItemMeta(t *testing.T) {
 	resourceId, ddo, item, err := ParsePublishParamFromQrCodeData(qc.QrCodeData)
 	assert.Nil(t, err)
 
+	fmt.Println("resourceId:", string(resourceId))
 	tx, err := instance.OntSdk().DDXFContract(2000000, 500,
 		nil).BuildTx(ServerAccount, "dtokenSellerPublish", []interface{}{resourceId, ddo, item})
 	assert.Nil(t, err)
+	txHash := tx.Hash()
+	fmt.Println("txHash: ", txHash.ToHexString())
 	rawTx, _ := tx.IntoImmutable()
 	sink := common.NewZeroCopySink(nil)
 	rawTx.Serialization(sink)
@@ -124,7 +132,7 @@ func TestSellerImpl_PublishMPItemMeta(t *testing.T) {
 	input := io.MPEndpointPublishItemMetaInput{
 		SignedDDXFTx: hex.EncodeToString(sink.Bytes()),
 		ItemMeta: io.PublishItemMeta{
-			OnchainItemID: resourceId,
+			OnchainItemID: hex.EncodeToString(resourceId),
 			ItemMeta:      map[string]interface{}{},
 		},
 		MPEndpoint: pp.Input.MPEndpoint,
