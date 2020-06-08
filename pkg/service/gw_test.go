@@ -157,7 +157,8 @@ func TestGateway(t *testing.T) {
 		id := "testID"
 		desc := "test desc"
 		block := uint32(1)
-		hash := ddxf.Sha256Bytes(util.Slice(desc))
+		h := ddxf.Sha256Bytes(util.Slice(desc))
+		hash := string(h[:])
 		input := io.UpdateResourceInput{
 			RV: model.ResourceVersion{ID: id, Block: block, Desc: desc, Hash: hash},
 		}

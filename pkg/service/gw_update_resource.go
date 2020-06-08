@@ -13,7 +13,7 @@ import (
 func (gw *Gateway) UpdateResource(input io.UpdateResourceInput) (output io.UpdateResourceOutput) {
 
 	hash := ddxf.Sha256Bytes(util.Slice(input.RV.Desc))
-	if hash != input.RV.Hash {
+	if string(hash[:]) != input.RV.Hash {
 		output.Code = http.StatusBadRequest
 		output.Msg = "bad hash"
 		return
