@@ -30,16 +30,17 @@ var (
 
 func main() {
 
-	if true {
+	if false {
 		bs, _ := base64.RawURLEncoding.DecodeString("eyJjb2RlIjowLCJtc2ciOiIiLCJSZXN1bHQiOiJodHRwOi8vbG9jYWxob3N0L2Jvb2svaGVsbG8ifQ==")
 		fmt.Println("bs: ", string(bs))
 		return
 	}
 	if false {
-		err := upload()
+		res, err := upload()
 		if err != nil {
 			fmt.Println("error: ", err)
 		}
+		fmt.Println("res: ", res)
 		return
 	}
 	if false {
@@ -52,7 +53,11 @@ func main() {
 	wallet, _ := ontology_go_sdk.OpenWallet("/Users/sss/gopath/src/github.com/zhiqiangxu/ont-gateway/pkg/ddxf/example/wallet.dat")
 	seller, _ := wallet.GetAccountByAddress("Aejfo7ZX5PVpenRj23yChnyH64nf8T1zbu", pwd)
 	if false {
-		saveDataMetaOutPut, saveDataMetaInput, err := seller_buyer.SaveDataMeta()
+		fileKey, err := upload()
+		if err != nil {
+			fmt.Println("error: ", err)
+		}
+		saveDataMetaOutPut, saveDataMetaInput, err := seller_buyer.SaveDataMeta(fileKey)
 		if err != nil {
 			fmt.Println("error: ", err)
 			return
@@ -218,7 +223,7 @@ func downloadFile(url string, localPath string, fb func(length, downLen int64)) 
 	return err
 }
 
-func upload() error {
+func upload() (string, error) {
 	url := "http://127.0.0.1:20335/ddxf/storage/upload"
 	path := "./pkg/ddxf/example/wallet.dat"
 	params := map[string]string{
@@ -227,23 +232,28 @@ func upload() error {
 	req, err := NewFileUploadRequest(url, path, params)
 	if err != nil {
 		fmt.Printf("error to new upload file request:%s\n", err.Error())
-		return err
+		return "", err
 	}
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Printf("error to request to the server:%s\n", err.Error())
-		return err
+		return "", err
 	}
 	body := &bytes.Buffer{}
 	_, err = body.ReadFrom(resp.Body)
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return "", err
 	}
 	defer resp.Body.Close()
 	fmt.Println(body)
-	return nil
+	rr := make(map[string]interface{})
+	err = json.Unmarshal(body.Bytes(), rr)
+	if err != nil {
+		return "", nil
+	}
+	return rr["fileName"].(string), nil
 }
 
 func NewFileUploadRequest(url, path string, params map[string]string) (*http.Request, error) {

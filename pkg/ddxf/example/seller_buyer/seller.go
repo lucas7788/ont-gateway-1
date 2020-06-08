@@ -19,12 +19,12 @@ import (
 	"time"
 )
 
-func SaveDataMeta() (*io.SellerSaveDataMetaOutput, *io.SellerSaveDataMetaInput, error) {
+func SaveDataMeta(bookKey string) (*io.SellerSaveDataMetaOutput, *io.SellerSaveDataMetaInput, error) {
 	//ontId := "did:ont:AcVBV1zKGogf9Q54p1Ve78NSQVU5ZUUGkn"
 	i := rand.Int()
 	DataMeta := map[string]interface{}{
-		"1": "first6" + strconv.Itoa(i),
-		"2": "second6",
+		"downloadParam": bookKey,
+		"2":             "second6" + strconv.Itoa(i),
 	}
 	DataMeta["ISDN"] = "hello"
 	h, err := ddxf.HashObject(DataMeta)

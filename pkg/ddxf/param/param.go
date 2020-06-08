@@ -7,10 +7,6 @@ import (
 	"io"
 )
 
-type UseTokenResponse struct {
-	Url string
-	PostParam map[string]interface{}
-}
 
 type CountAndAgent struct {
 	Count  uint32
