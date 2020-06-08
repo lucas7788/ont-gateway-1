@@ -14,7 +14,7 @@ type SellerPublishMPItemMetaInput struct {
 }
 
 type PublishParam struct {
-	QrCodeId string `bson:"qrCodeId",json:"qrCodeId"`
+	QrCodeId string                       `bson:"qrCodeId",json:"qrCodeId"`
 	Input    SellerPublishMPItemMetaInput `bson:"input",json:"input"`
 }
 

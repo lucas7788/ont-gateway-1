@@ -6,6 +6,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/ontio/ontology-go-sdk"
+	"github.com/syndtr/goleveldb/leveldb"
+	"github.com/syndtr/goleveldb/leveldb/filter"
+	"github.com/syndtr/goleveldb/leveldb/opt"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/example/seller_buyer"
 	io2 "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/storage/storage"
@@ -19,11 +22,9 @@ import (
 )
 
 var (
-	dataMetaHash  = "e29dd24b167c1e14ea5283aaca199f0da1f9139ace1c5902dfbe20325ff0f61d"
-	dataId        = "data_id_12f7d87f-89e6-43fb-b166-b9b103e075bf"
-	tokenMetaHash = "e2a740fa12bd94f0e242688e29f6d803f7671eb1f81bcfbdc1c3e213878e7dd4"
-	qrCodeId      = "publish_id_845f1ea8-634f-4093-852d-8f4a4a7335f2"
-	resourceId    = "resource_id_0407bc53-c513-4e24-bb5c-cd64c9279d7f"
+	key_res_id          = []byte("resourceId")
+	key_token_meta_hash = []byte("token_meta_hash")
+	key_data_id         = []byte("dataId")
 )
 
 func main() {
@@ -35,59 +36,67 @@ func main() {
 		}
 		return
 	}
-
-	if true {
+	if false {
 		download2()
 		return
 	}
+	db, _ := initDb()
 
-	if false {
-		err := seller_buyer.SaveDataMeta()
-		if err != nil {
-			panic(err)
-		}
-		return
-	}
-	if false {
-		err := seller_buyer.SaveTokenMeta(dataMetaHash)
-		if err != nil {
-			panic(err)
-		}
-		return
-	}
-	if false {
-		err := seller_buyer.PublishMeta1(tokenMetaHash, dataMetaHash)
-		if err != nil {
-			panic(err)
-		}
-		return
-	}
-	if false {
-		err := seller_buyer.PublishMeta(qrCodeId)
-		if err != nil {
-			panic(err)
-		}
-		return
-	}
 	pwd := []byte("123456")
 	wallet, _ := ontology_go_sdk.OpenWallet("/Users/sss/gopath/src/github.com/zhiqiangxu/ont-gateway/pkg/ddxf/example/wallet.dat")
-	buyer, _ := wallet.GetAccountByAddress("AHhXa11suUgVLX1ZDFErqBd3gskKqLfa5N", pwd)
+	seller, _ := wallet.GetAccountByAddress("Aejfo7ZX5PVpenRj23yChnyH64nf8T1zbu", pwd)
 	if false {
-		err := seller_buyer.BuyDtoken(buyer, resourceId)
+		saveDataMetaOutPut, saveDataMetaInput, err := seller_buyer.SaveDataMeta()
 		if err != nil {
-			fmt.Println("error:", err)
+			fmt.Println("error: ", err)
+			return
 		}
+		fmt.Println("DataId: ", saveDataMetaOutPut.DataId)
+		db.Put(key_data_id, []byte(saveDataMetaOutPut.DataId), nil)
+		saveTokenMetaInput, err := seller_buyer.SaveTokenMeta(saveDataMetaInput.DataMetaHash)
+		if err != nil {
+			fmt.Println("error: ", err)
+			return
+		}
+		fmt.Println("TokenMetaHash:", saveTokenMetaInput.TokenMetaHash)
+		db.Put(key_token_meta_hash, []byte(saveTokenMetaInput.TokenMetaHash), nil)
+		resourceId, err := seller_buyer.PublishMeta(seller, saveDataMetaOutPut, saveDataMetaInput, saveTokenMetaInput)
+		if err != nil {
+			fmt.Println("error: ", err)
+		}
+		db.Put(key_res_id, []byte(resourceId), nil)
 		return
 	}
-	//012b 64617461   69645f32653231346632372d653539392d346663332d396233662d6336326632666231323436340120e2a740fa12bd94f0e242688e29f6d803f7671eb1f81bcfbdc1c3e213878e7dd4
-	//012c 64617461 5f69645f63316235663139352d623431342d343535632d393464332d6466303565366563373635300120e2a740fa12bd94f0e242688e29f6d803f7671eb1f81bcfbdc1c3e213878e7dd4
+
+	resourceId, _ := db.Get(key_res_id, nil)
+	tokenMetaHash, _ := db.Get(key_token_meta_hash, nil)
+	dataId, _ := db.Get(key_data_id, nil)
+
+	buyer, _ := wallet.GetAccountByAddress("AHhXa11suUgVLX1ZDFErqBd3gskKqLfa5N", pwd)
 	if true {
-		err := seller_buyer.UseToken(buyer, resourceId, tokenMetaHash, dataId)
+		err := seller_buyer.BuyDtoken(buyer, string(resourceId))
+		if err != nil {
+			fmt.Println("error:", err)
+			return
+		}
+		err = seller_buyer.UseToken(buyer, string(resourceId), string(tokenMetaHash), string(dataId))
 		if err != nil {
 			panic(err)
 		}
 		return
 	}
+}
+
+func initDb() (*leveldb.DB, error) {
+	lvlOpts := &opt.Options{
+		NoSync: false,
+		Filter: filter.NewBloomFilter(10),
+	}
+	db, err := leveldb.OpenFile("./data", lvlOpts)
+	if err != nil {
+		return nil, err
+	}
+	return db, nil
 }
 
 func download2() {
