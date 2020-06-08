@@ -12,13 +12,15 @@ import (
 )
 
 const (
-	TestOntId string = "did:ont:Ad4pjz2bqep4RhQrUAzMuZJkBC3qJ1tZuT"
+	TestOntId = "did:ont:Ad4pjz2bqep4RhQrUAzMuZJkBC3qJ1tZuT"
+	UploadKey = "upload"
 )
 
 func UploadDataServiceHandle(c *gin.Context) {
-	file, _, err := c.Request.FormFile("upload")
+	file, _, err := c.Request.FormFile(UploadKey)
 	if err != nil {
-		c.String(http.StatusBadRequest, "Bad request")
+		instance.Logger().Error("[UploadDataServiceHandle] error: ", zap.Error(err))
+		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 
@@ -29,13 +31,18 @@ func UploadDataServiceHandle(c *gin.Context) {
 func DownloadDataServiceHandle(c *gin.Context) {
 	data, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
-		instance.Logger().Error("UseTokenHandler:", zap.Error(err))
+		instance.Logger().Error("DownloadDataServiceHandle:", zap.Error(err))
 		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusBadRequest, err))
 		return
 	}
 
 	param := &io.StorageDownloadInput{}
 	err = json.Unmarshal(data, &param)
+	if err != nil {
+		instance.Logger().Error("DownloadDataServiceHandle:", zap.Error(err))
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusBadRequest, err))
+		return
+	}
 	output := DowloadDataCore(param, TestOntId)
 	c.JSON(output.Code, output)
 }

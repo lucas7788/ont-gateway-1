@@ -14,6 +14,6 @@ func StartStorageServer() {
 	r := gin.Default()
 	//r.Use(middleware.JWT)
 	r.POST(UploadDataUrl, UploadDataServiceHandle)
-	r.GET(DownloadDataUrl, DownloadDataServiceHandle)
-	go r.Run(":" + config.SellerPort)
+	r.POST(DownloadDataUrl, DownloadDataServiceHandle)
+	go r.Run(":" + config.StorePort)
 }

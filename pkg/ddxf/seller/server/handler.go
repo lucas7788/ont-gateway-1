@@ -34,7 +34,7 @@ func SaveDataMetaHandler(c *gin.Context) {
 		return
 	}
 	output := SaveDataMetaService(param, ontId.(string))
-	c.JSON(output.Code, output)
+	c.JSON(http.StatusOK, output)
 }
 
 func SaveTokenMetaHandler(c *gin.Context) {
@@ -64,7 +64,7 @@ func SaveTokenMetaHandler(c *gin.Context) {
 		c.JSON(output.Code, common.ResponseFailedOnto(common.PARA_ERROR, nil))
 		return
 	}
-	c.JSON(output.Code, output)
+	c.JSON(http.StatusOK, output)
 }
 
 func PublishMPItemMetaHandler(c *gin.Context) {

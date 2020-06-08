@@ -13,14 +13,22 @@ import (
 )
 
 const (
-	DirData           string = "./DataSource/"
+	DirData           string = "./DataSource"
 	StorageFilePrefix string = "StorageFilePrefix"
 )
 
 func UploadDataCore(file multipart.File, ontId string) (output io.StorageUploadOutput) {
 	fileName := common.GenerateUUId(StorageFilePrefix)
-	dataPath := DirData + fileName
-
+	_, err := os.Stat(DirData)
+	if err != nil {
+		err = os.Mkdir(DirData, os.ModePerm)
+		if err != nil {
+			output.Code = http.StatusBadRequest
+			output.Msg = err.Error()
+			return
+		}
+	}
+	dataPath := fmt.Sprintf("%s%s%s", DirData, string(os.PathSeparator), fileName)
 	out, err := os.Create(dataPath)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
@@ -55,7 +63,7 @@ func UploadDataCore(file multipart.File, ontId string) (output io.StorageUploadO
 }
 
 func DowloadDataCore(input *io.StorageDownloadInput, ontId string) (output io.SorageDownloadOutput) {
-	dataPath := DirData + input.FileName
+	dataPath := fmt.Sprintf("%s%s%s", DirData, string(os.PathSeparator), input.FileName)
 	_, err := os.Stat(dataPath)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
