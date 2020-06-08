@@ -1,13 +1,10 @@
 package storage
 
 import (
-	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.uber.org/zap"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -29,20 +26,16 @@ func UploadDataServiceHandle(c *gin.Context) {
 }
 
 func DownloadDataServiceHandle(c *gin.Context) {
-	data, err := ioutil.ReadAll(c.Request.Body)
-	if err != nil {
-		instance.Logger().Error("DownloadDataServiceHandle:", zap.Error(err))
-		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusBadRequest, err))
+	fileName := c.Param("fileName")
+	if fileName == "" {
+		c.JSON(http.StatusBadRequest, "fileName can not empty")
 		return
 	}
 
-	param := &io.StorageDownloadInput{}
-	err = json.Unmarshal(data, &param)
-	if err != nil {
-		instance.Logger().Error("DownloadDataServiceHandle:", zap.Error(err))
-		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusBadRequest, err))
-		return
+	input := &io.StorageDownloadInput{
+		FileName: fileName,
 	}
-	output := DowloadDataCore(param, TestOntId)
+
+	output := DowloadDataCore(input, TestOntId)
 	c.JSON(output.Code, output)
 }

@@ -7,13 +7,13 @@ import (
 
 const (
 	UploadDataUrl   = "/ddxf/storage/upload"
-	DownloadDataUrl = "/ddxf/storage/download"
+	DownloadDataUrl = "/ddxf/storage/download/:fileName"
 )
 
 func StartStorageServer() {
 	r := gin.Default()
 	//r.Use(middleware.JWT)
 	r.POST(UploadDataUrl, UploadDataServiceHandle)
-	r.POST(DownloadDataUrl, DownloadDataServiceHandle)
+	r.GET(DownloadDataUrl, DownloadDataServiceHandle)
 	go r.Run(":" + config.StorePort)
 }
