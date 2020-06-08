@@ -55,6 +55,8 @@ func UseToken(buyer *ontology_go_sdk.Account, resourceId, tokenMetaHash string, 
 		TokenOpEndpoint: config.SellerUrl,
 	}
 	fmt.Println("input: ", input)
-	_, err = SendPOST(config.BuyerUrl+server.UseDToken, input)
+	var data []byte
+	data, err = SendPOST(config.BuyerUrl+server.UseDToken, input)
+	fmt.Println("buyer use token result: ", string(data))
 	return err
 }

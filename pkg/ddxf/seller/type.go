@@ -8,7 +8,7 @@ type Seller interface {
 	SaveTokenMeta(io.SellerSaveTokenMetaInput) io.SellerSaveTokenMetaOutput
 	PublishMPItemMeta(io.SellerPublishMPItemMetaInput) io.SellerPublishMPItemMetaOutput
 
-	SetBusiness(ontid string,business SellerBusiness)
+	SetBusiness(ontid string, business SellerBusiness)
 	DataLookupEndpoint() DataLookupEndpoint
 	TokenLookupEndpoint() TokenLookupEndpoint
 	TokenOpEndpoint() TokenOpEndpoint
@@ -31,5 +31,5 @@ type TokenOpEndpoint interface {
 
 type SellerBusiness interface {
 	PublishMPItemMetaService(input io.SellerPublishMPItemMetaInput, ontId string)
-	UseToken(token io.Token)(result interface{})
+	UseToken(token io.Token) (result interface{})
 }
