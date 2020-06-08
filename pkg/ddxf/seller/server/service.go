@@ -241,5 +241,11 @@ func GetDataByOnchainIdService(onchainItemId string, buyer common.Address, templ
 	if err != nil {
 		return nil, err
 	}
-	return "http://localhost/book/" + data.DataMeta["ISDN"].(string), nil
+	ur := param.UseTokenResponse{
+		Url: "http://127.0.0.1:20335/ddxf/storage/download",
+		PostParam: map[string]interface{}{
+			"bookName": data.DataMeta["ISDN"].(string),
+		},
+	}
+	return ur, nil
 }
