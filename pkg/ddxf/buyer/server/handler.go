@@ -25,7 +25,7 @@ func BuyDtokenHandler(ctx *gin.Context) {
 		return
 	}
 	output := BuyDTokenService(param)
-	ctx.JSON(output.Code, output)
+	ctx.JSON(http.StatusOK, output)
 }
 
 func UseTokenHandler(ctx *gin.Context) {
@@ -43,5 +43,5 @@ func UseTokenHandler(ctx *gin.Context) {
 		return
 	}
 	output := UseTokenService(param)
-	ctx.JSON(output.Code, output)
+	ctx.JSON(http.StatusOK, output)
 }

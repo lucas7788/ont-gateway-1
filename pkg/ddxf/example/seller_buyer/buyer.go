@@ -35,15 +35,16 @@ func BuyDtoken(buyer *ontology_go_sdk.Account, resourceId string) error {
 
 func UseToken(buyer *ontology_go_sdk.Account, resourceId, tokenMetaHash string, dataId string) error {
 	tokenHashBytes, _ := hex.DecodeString(tokenMetaHash)
-	template := param.TokenTemplate{
+	template := &param.TokenTemplate{
 		DataID:     dataId,
 		TokenHashs: []string{string(tokenHashBytes)},
 	}
 	fmt.Println("template: ", hex.EncodeToString(template.ToBytes()))
 	userTokenParam := []interface{}{resourceId, buyer.Address, template.ToBytes(), 1}
-	tx, _ := instance.OntSdk().DDXFContract(2000000,
-		500, nil).BuildTx(buyer, "useToken", userTokenParam)
-
+	tx, err := instance.OntSdk().DefaultDDXFContract().BuildTx(buyer, "useToken", userTokenParam)
+	if err != nil {
+		return err
+	}
 	txhash := tx.Hash()
 	fmt.Println("txhash:", txhash.ToHexString())
 	imMut, _ := tx.IntoImmutable()
@@ -53,6 +54,7 @@ func UseToken(buyer *ontology_go_sdk.Account, resourceId, tokenMetaHash string, 
 		Tx:              hex.EncodeToString(sink.Bytes()),
 		TokenOpEndpoint: config.SellerUrl,
 	}
-	_, err := SendPOST(config.BuyerUrl+server.UseDToken, input)
+	fmt.Println("input: ", input)
+	_, err = SendPOST(config.BuyerUrl+server.UseDToken, input)
 	return err
 }

@@ -6,9 +6,9 @@ import (
 	"github.com/ontio/ontology/common"
 	"github.com/satori/go.uuid"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"github.com/zhiqiangxu/ont-gateway/pkg/misc"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
 )
 
 func GenerateUUId(preFix string) string {
@@ -29,7 +29,7 @@ func HandleEvent(txHash string, method string) ([]io.EndpointToken, error) {
 		//TODO ddxf contractaddress
 		if notify.ContractAddress == misc.DDXF_CONTRACT_ADDRESS {
 			states, ok := notify.States.([]interface{})
-			if !ok || len(states) != 4 {
+			if !ok {
 				return nil, errors.New("notify wrong")
 			}
 			if method == "buyDToken" {
@@ -54,14 +54,17 @@ func HandleEvent(txHash string, method string) ([]io.EndpointToken, error) {
 				if err != nil {
 					return nil, err
 				}
-				return tokenEndpoints,nil
+				return tokenEndpoints, nil
 			} else if method == "useToken" {
+				if len(states) != 5 {
+					return nil, errors.New("event failed")
+				}
 				buyer, err = common.AddressFromBase58(states[2].(string))
 				if err != nil {
 					return nil, err
 				}
 				onchainItemId = states[1].(string)
-				tokenTemplateHex := states[3].(string)
+				tokenTemplateHex := states[4].(string)
 				tokenTemplateBytes, err := hex.DecodeString(tokenTemplateHex)
 				if err != nil {
 					return nil, err
@@ -73,13 +76,13 @@ func HandleEvent(txHash string, method string) ([]io.EndpointToken, error) {
 				}
 				return []io.EndpointToken{
 					io.EndpointToken{
-						Token:io.Token{
-							TokenTemplate:tt,
-							Buyer:buyer,
-							OnchainItemId:onchainItemId,
+						Token: io.Token{
+							TokenTemplate: tt,
+							Buyer:         buyer,
+							OnchainItemId: onchainItemId,
 						},
 					},
-				},nil
+				}, nil
 			}
 		}
 	}

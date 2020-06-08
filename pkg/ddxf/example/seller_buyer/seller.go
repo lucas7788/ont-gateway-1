@@ -18,7 +18,7 @@ import (
 func SaveDataMeta() error {
 	//ontId := "did:ont:AcVBV1zKGogf9Q54p1Ve78NSQVU5ZUUGkn"
 	DataMeta := map[string]interface{}{
-		"1": "first5",
+		"1": "first6",
 		"2": "second5",
 	}
 	DataMeta["ISDN"] = "hello"

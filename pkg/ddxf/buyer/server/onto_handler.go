@@ -11,16 +11,16 @@ import (
 
 func LoginHandler(ctx *gin.Context) {
 	res := LoginService()
-	ctx.JSON(0, ResponseSuccess(res))
+	ctx.JSON(http.StatusOK, ResponseSuccess(res))
 }
 
 func GetLoginQrCodeHandler(ctx *gin.Context) {
 	qrCodeId := ctx.Param("qrCodeId")
 	code, err := GetLoginQrCodeService(qrCodeId)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, ResponseSuccess(code))
+		ctx.JSON(http.StatusInternalServerError, ResponseFailedOnto(http.StatusInternalServerError, err))
 	} else {
-		ctx.JSON(0, ResponseSuccess(code))
+		ctx.JSON(http.StatusOK, ResponseSuccess(code))
 	}
 }
 
@@ -44,7 +44,7 @@ func LoginCallBackHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, ResponseFailedOnto(http.StatusInternalServerError, err))
 		return
 	}
-	ctx.JSON(0, ResponseSuccess("SUCCESS"))
+	ctx.JSON(http.StatusOK, ResponseSuccess("SUCCESS"))
 }
 
 func GetLoginResultHandler(ctx *gin.Context) {
@@ -55,7 +55,7 @@ func GetLoginResultHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, ResponseFailedOnto(http.StatusInternalServerError, err))
 		return
 	}
-	ctx.JSON(0, ResponseSuccess(status))
+	ctx.JSON(http.StatusOK, ResponseSuccess(status))
 }
 
 func BuyDtokenQrCodeHanler(ctx *gin.Context) {
@@ -78,7 +78,7 @@ func BuyDtokenQrCodeHanler(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, ResponseFailedOnto(http.StatusInternalServerError, err))
 		return
 	}
-	ctx.JSON(0, ResponseSuccess(output))
+	ctx.JSON(http.StatusOK, ResponseSuccess(output))
 }
 
 func GetQrCodeByQrCodeIdHandler(ctx *gin.Context) {
@@ -87,7 +87,7 @@ func GetQrCodeByQrCodeIdHandler(ctx *gin.Context) {
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, ResponseFailedOnto(http.StatusInternalServerError, err))
 	} else {
-		ctx.JSON(0, ResponseSuccess(code))
+		ctx.JSON(http.StatusOK, ResponseSuccess(code))
 	}
 }
 
@@ -110,6 +110,6 @@ func QrCodeCallBackHandler(ctx *gin.Context) {
 		instance.Logger().Error("[QrCodeCallBackHandler] QrCodeCallBackService error:", zap.Error(err))
 		ctx.JSON(http.StatusInternalServerError, ResponseFailedOnto(http.StatusInternalServerError, err))
 	} else {
-		ctx.JSON(0, ResponseSuccess(output))
+		ctx.JSON(http.StatusOK, ResponseSuccess(output))
 	}
 }

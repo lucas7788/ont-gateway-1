@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"github.com/ontio/ontology-crypto/keypair"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
@@ -62,6 +63,8 @@ func UseTokenService(input io.BuyerUseTokenInput) (output io.BuyerUseTokenOutput
 		return
 	}
 	//向seller发请求
+	fmt.Println("seller param: ", string(paramBs))
+
 	_, _, data, err := forward.PostJSONRequest(input.TokenOpEndpoint+server.UseTokenUrl, paramBs)
 	if err != nil {
 		output.Code = http.StatusInternalServerError

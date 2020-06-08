@@ -41,6 +41,9 @@ func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qr
 	//sellerAddress, err := common.AddressFromBase58(arr[2])
 
 	tokenHash, err := hex.DecodeString(adT.TokenMetaHash)
+	if err != nil {
+		return qrCode.QrCodeResponse{}, err
+	}
 	// dataMeta related in data contract tx.
 	tokenTemplate := &param.TokenTemplate{
 		DataID:     adD.DataId,
@@ -67,6 +70,7 @@ func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qr
 		tokenTemplate,
 		[]*param.TokenResourceTyEndpoint{trt},
 		itemMetaHash, adD.Fee, adD.ExpiredDate, adD.Stock)
+
 	//TODO
 	var netType string
 	if config.Load().Prod {
