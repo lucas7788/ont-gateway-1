@@ -6,8 +6,9 @@ import (
 )
 
 const (
-	UploadDataUrl   = "/ddxf/storage/upload"
-	DownloadDataUrl = "/ddxf/storage/download/:fileName"
+	UploadDataUrl      = "/ddxf/storage/upload"
+	DownloadDataPrefix = "/ddxf/storage/download/"
+	DownloadDataUrl    = DownloadDataPrefix + ":fileName"
 )
 
 func StartStorageServer() {
