@@ -28,7 +28,7 @@ var (
 func main() {
 	db, _ := initDb()
 	pwd := []byte("123456")
-	wallet, _ := ontology_go_sdk.OpenWallet("/Users/sss/gopath/src/github.com/zhiqiangxu/ont-gateway/pkg/ddxf/example/wallet.dat")
+	wallet, _ := ontology_go_sdk.OpenWallet("./pkg/ddxf/example/wallet.dat")
 	seller, _ := wallet.GetAccountByAddress("Aejfo7ZX5PVpenRj23yChnyH64nf8T1zbu", pwd)
 	if false {
 		//1.upload
