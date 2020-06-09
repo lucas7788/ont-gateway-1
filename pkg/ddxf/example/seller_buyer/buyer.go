@@ -1,7 +1,9 @@
 package seller_buyer
 
 import (
+	"encoding/base64"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology/common"
@@ -20,7 +22,7 @@ func BuyDtoken(buyer *ontology_go_sdk.Account, resourceId string) error {
 		return err
 	}
 
-	fmt.Println("buyerAddress:", buyer.Address.ToBase58())
+	fmt.Println("[BuyDtoken] buyerAddress:", buyer.Address.ToBase58())
 	txImu, _ := tx.IntoImmutable()
 	sink := common.NewZeroCopySink(nil)
 	txImu.Serialization(sink)
@@ -28,7 +30,7 @@ func BuyDtoken(buyer *ontology_go_sdk.Account, resourceId string) error {
 		SignedTx: hex.EncodeToString(sink.Bytes()),
 	}
 	txHash := tx.Hash()
-	fmt.Println("txHash:", txHash.ToHexString())
+	fmt.Println("[BuyDtoken] txHash:", txHash.ToHexString())
 	_, err = SendPOST(config.BuyerUrl+server.BuyDtoken, input)
 	return err
 }
@@ -39,14 +41,14 @@ func UseToken(buyer *ontology_go_sdk.Account, resourceId, tokenMetaHash string, 
 		DataID:     dataId,
 		TokenHashs: []string{string(tokenHashBytes)},
 	}
-	fmt.Println("template: ", hex.EncodeToString(template.ToBytes()))
+	fmt.Println("[UseToken] template: ", hex.EncodeToString(template.ToBytes()))
 	userTokenParam := []interface{}{resourceId, buyer.Address, template.ToBytes(), 1}
 	tx, err := instance.OntSdk().DefaultDDXFContract().BuildTx(buyer, "useToken", userTokenParam)
 	if err != nil {
 		return err
 	}
 	txhash := tx.Hash()
-	fmt.Println("txhash:", txhash.ToHexString())
+	fmt.Println("[UseToken] txhash:", txhash.ToHexString())
 	imMut, _ := tx.IntoImmutable()
 	sink := common.NewZeroCopySink(nil)
 	imMut.Serialization(sink)
@@ -54,9 +56,21 @@ func UseToken(buyer *ontology_go_sdk.Account, resourceId, tokenMetaHash string, 
 		Tx:              hex.EncodeToString(sink.Bytes()),
 		TokenOpEndpoint: config.SellerUrl,
 	}
-	fmt.Println("input: ", input)
+	fmt.Println("[UseToken] input: ", input)
 	var data []byte
 	data, err = SendPOST(config.BuyerUrl+server.UseDToken, input)
-	fmt.Println("buyer use token result: ", string(data))
+	if err != nil {
+		return err
+	}
+	rrr := make(map[string]interface{})
+	err = json.Unmarshal(data, &rrr)
+	if err != nil {
+		return err
+	}
+	bs, err := base64.RawURLEncoding.DecodeString(rrr["Result"].(string))
+	if err != nil {
+		return err
+	}
+	fmt.Println("[UseToken] buyer use token result: ", string(bs))
 	return err
 }
