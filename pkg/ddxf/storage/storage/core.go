@@ -56,7 +56,7 @@ func UploadDataCore(file multipart.File, ontId string) (output io.StorageUploadO
 		return
 	}
 
-	output.DataHashUrl = DownloadDataUrl + "/" + fileName
+	output.DataHashUrl = DownloadDataPrefix + fileName
 	output.FileName = fileName
 
 	return
