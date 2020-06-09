@@ -11,11 +11,11 @@ import (
 )
 
 const (
-	SellerQrCodeCollection = "SellerQrCodeCollection"
-	DataMetaCollection     = "SellerDataMetaCollection"
-	TokenMetaCollection    = "SellerTokenMetaCollection"
-	ItemMetaCollection     = "SellerItemMetaCollection"
-	PublishParamCollection = "PublishParamCollection"
+	SellerQrCodeCollection = "seller_qr_code_collection"
+	DataMetaCollection     = "seller_data_meta_collection"
+	TokenMetaCollection    = "seller_token_meta_collection"
+	ItemMetaCollection     = "seller_item_meta_collection"
+	PublishParamCollection = "publish_param_collection"
 )
 
 // Init for this collection
