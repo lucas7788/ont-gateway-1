@@ -32,7 +32,7 @@ func SaveDataMeta(bookKey string) (*io.SellerSaveDataMetaOutput, *io.SellerSaveD
 		return nil, nil, err
 	}
 	dataMetaHash := hex.EncodeToString(h[:])
-	fmt.Println("dataMetaHash:", dataMetaHash)
+	fmt.Println("[SaveDataMeta] dataMetaHash:", dataMetaHash)
 	input := &io.SellerSaveDataMetaInput{
 		DataMeta:     DataMeta,
 		DataMetaHash: dataMetaHash,
@@ -64,7 +64,7 @@ func SaveTokenMeta(dataMetaHash string) (input io.SellerSaveTokenMetaInput, err 
 		return
 	}
 	tokenMetaHash := hex.EncodeToString(ht[:])
-	fmt.Println("tokenMetaHash:", tokenMetaHash)
+	fmt.Println("[SaveTokenMeta] tokenMetaHash:", tokenMetaHash)
 	input = io.SellerSaveTokenMetaInput{
 		TokenMeta:     TokenMeta,
 		DataMetaHash:  dataMetaHash,
@@ -79,7 +79,7 @@ func PublishMeta(seller *ontology_go_sdk.Account, saveDataMetaOut *io.SellerSave
 	saveDataMetaIn *io.SellerSaveDataMetaInput, saveTokenMetaIn io.SellerSaveTokenMetaInput) (string, error) {
 
 	resourceIdBytes := []byte(common2.GenerateUUId(config.UUID_RESOURCE_ID))
-	fmt.Println("resourceId:", string(resourceIdBytes))
+	fmt.Println("[PublishMeta] resourceId:", string(resourceIdBytes))
 	tokenMetaHash, _ := hex.DecodeString(saveTokenMetaIn.TokenMetaHash)
 	tokenTemplate := &param.TokenTemplate{
 		DataID:     saveDataMetaOut.DataId,
@@ -106,7 +106,7 @@ func PublishMeta(seller *ontology_go_sdk.Account, saveDataMetaOut *io.SellerSave
 		return "", err
 	}
 	txHash := tx.Hash()
-	fmt.Println("txHash: ", txHash.ToHexString())
+	fmt.Println("[PublishMeta] txHash: ", txHash.ToHexString())
 	rawTx, _ := tx.IntoImmutable()
 	sink := common.NewZeroCopySink(nil)
 	rawTx.Serialization(sink)

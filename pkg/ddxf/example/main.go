@@ -10,7 +10,6 @@ import (
 	"github.com/syndtr/goleveldb/leveldb/filter"
 	"github.com/syndtr/goleveldb/leveldb/opt"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/example/seller_buyer"
-	io2 "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/storage/storage"
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 	"io"
@@ -27,26 +26,7 @@ var (
 )
 
 func main() {
-
-	if false {
-		bs, _ := base64.RawURLEncoding.DecodeString("eyJjb2RlIjowLCJtc2ciOiIiLCJSZXN1bHQiOiJodHRwOi8vbG9jYWxob3N0L2Jvb2svaGVsbG8ifQ==")
-		fmt.Println("bs: ", string(bs))
-		return
-	}
-	if true {
-		res, err := upload()
-		if err != nil {
-			fmt.Println("error: ", err)
-		}
-		fmt.Println("res: ", res)
-		return
-	}
-	if false {
-		download2()
-		return
-	}
 	db, _ := initDb()
-
 	pwd := []byte("123456")
 	wallet, _ := ontology_go_sdk.OpenWallet("/Users/sss/gopath/src/github.com/zhiqiangxu/ont-gateway/pkg/ddxf/example/wallet.dat")
 	seller, _ := wallet.GetAccountByAddress("Aejfo7ZX5PVpenRj23yChnyH64nf8T1zbu", pwd)
@@ -55,6 +35,7 @@ func main() {
 		fileKey, err := upload()
 		if err != nil {
 			fmt.Println("error: ", err)
+			return
 		}
 		//2.SaveDataMeta
 		saveDataMetaOutPut, saveDataMetaInput, err := seller_buyer.SaveDataMeta(fileKey)
@@ -100,6 +81,24 @@ func main() {
 		}
 		return
 	}
+
+	if false {
+		bs, _ := base64.RawURLEncoding.DecodeString("eyJjb2RlIjowLCJtc2ciOiIiLCJSZXN1bHQiOiJodHRwOi8vMTI3LjAuMC4xOjIwMzM1L2RkeGYvc3RvcmFnZS9kb3dubG9hZC9TdG9yYWdlRmlsZVByZWZpeDA4YmUyZmUzLWY5NTMtNGNkOC1hMTg1LTgyNTEyODhjOGVkOSJ9")
+		fmt.Println("bs: ", string(bs))
+		return
+	}
+	if false {
+		res, err := upload()
+		if err != nil {
+			fmt.Println("error: ", err)
+		}
+		fmt.Println("res: ", res)
+		return
+	}
+	if false {
+		download2()
+		return
+	}
 }
 
 func initDb() (*leveldb.DB, error) {
@@ -115,12 +114,9 @@ func initDb() (*leveldb.DB, error) {
 }
 
 func download2() {
-	url := "http://127.0.0.1:20335/ddxf/storage/download"
-	input := io2.StorageDownloadInput{
-		FileName: "StorageFilePrefix914fb7dc-0ced-47f2-b318-d3a416eeb466",
-	}
-	bs, _ := json.Marshal(input)
-	_, _, data, err := forward.PostJSONRequest(url, bs)
+	url := "http://127.0.0.1:20335/ddxf/storage/download/" + "StorageFilePrefixcb3d9d7b-68dc-42a8-b625-01b0c650e0b9"
+
+	_, _, data, err := forward.Get(url)
 	if err != nil {
 		fmt.Println("err: ", err)
 		return
@@ -152,9 +148,9 @@ func upload() (string, error) {
 		return "", err
 	}
 	defer resp.Body.Close()
-	fmt.Println(body)
+	fmt.Println("upload: ", body)
 	rr := make(map[string]interface{})
-	err = json.Unmarshal(body.Bytes(), rr)
+	err = json.Unmarshal(body.Bytes(), &rr)
 	if err != nil {
 		return "", err
 	}
