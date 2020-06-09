@@ -19,7 +19,7 @@ import (
 	"time"
 )
 
-func SaveDataMeta(bookKey string) (*io.SellerSaveDataMetaOutput, *io.SellerSaveDataMetaInput, error) {
+func SaveDataMeta(sellerOntId string, con *ontology_go_sdk.Controller, seller *ontology_go_sdk.Account, bookKey string) (*io.SellerSaveDataMetaOutput, *io.SellerSaveDataMetaInput, error) {
 	//ontId := "did:ont:AcVBV1zKGogf9Q54p1Ve78NSQVU5ZUUGkn"
 	i := rand.Int()
 	DataMeta := map[string]interface{}{
@@ -33,13 +33,50 @@ func SaveDataMeta(bookKey string) (*io.SellerSaveDataMetaOutput, *io.SellerSaveD
 	}
 	dataMetaHash := hex.EncodeToString(h[:])
 	fmt.Println("[SaveDataMeta] dataMetaHash:", dataMetaHash)
+
+	h, err = ddxf.HashObject(DataMeta)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	dataMetaHashU, err := common.Uint256FromHexString(dataMetaHash)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	dataHash, err := common.Uint256FromHexString(dataMetaHash)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	dataId := common2.GenerateUUId(config.UUID_PRE_DATAID)
+	info := server.DataIdInfo{
+		DataId:       dataId,
+		DataType:     0,
+		DataMetaHash: dataMetaHashU,
+		DataHash:     dataHash,
+		Owner:        sellerOntId,
+	}
+
+	tx, err := instance.OntSdk().DefaultDataIdContract().BuildTx(seller, "registerDataId", []interface{}{info.ToBytes(),1})
+	if err != nil {
+		return nil, nil, err
+	}
+	instance.OntSdk().GetKit().SignToTransaction(tx, con)
+	txHash := tx.Hash()
+
+	fmt.Printf("[seller] SaveDataMeta txhash: %s", txHash.ToHexString())
+	imuTx, _ := tx.IntoImmutable()
+	sink := common.NewZeroCopySink(nil)
+	imuTx.Serialization(sink)
 	input := &io.SellerSaveDataMetaInput{
 		DataMeta:     DataMeta,
 		DataMetaHash: dataMetaHash,
 		ExpiredDate:  uint64(time.Now().Unix() + 24*60*60),
 		Stock:        1000,
+		SignedTx:     hex.EncodeToString(sink.Bytes()),
+		DataId:       dataId,
 	}
-
 	//send req to seller
 	data, err := SendPOST(config.SellerUrl+server.SaveDataMetaUrl, input)
 	if err != nil {

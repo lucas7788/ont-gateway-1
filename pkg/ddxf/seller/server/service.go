@@ -55,40 +55,14 @@ func SaveDataMetaService(input io.SellerSaveDataMetaInput, ontId string) (output
 		return
 	}
 	// verify hash.
-	h, err := ddxf.HashObject(input.DataMeta)
-	if err != nil || hex.EncodeToString(h[:]) != input.DataMetaHash {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-		return
-	}
-
-	dataMetaHash, err := common.Uint256FromHexString(input.DataMetaHash)
+	txHash, err := instance.OntSdk().SendTx(input.SignedTx)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
 		return
 	}
-	dataHash, err := common.Uint256FromHexString(input.DataMetaHash)
-	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-		return
-	}
-	dataId := common2.GenerateUUId(config.UUID_PRE_DATAID)
-	info := DataIdInfo{
-		DataId:       dataId,
-		DataType:     input.ResourceType,
-		DataMetaHash: dataMetaHash,
-		DataHash:     dataHash,
-		Owner:        ontId,
-	}
-	txHash, err := instance.OntSdk().DefaultDataIdContract().Invoke(ServerAccount, "registerDataId", []interface{}{info.ToBytes()})
-	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-		return
-	}
-	event, err := instance.OntSdk().GetSmartCodeEvent(txHash.ToHexString())
+	fmt.Printf("[seller] saveDataMeta txhash: %s\n", txHash)
+	event, err := instance.OntSdk().GetSmartCodeEvent(txHash)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -96,7 +70,7 @@ func SaveDataMetaService(input io.SellerSaveDataMetaInput, ontId string) (output
 	}
 	if event.State != 1 {
 		output.Code = http.StatusInternalServerError
-		output.Msg = fmt.Sprintf("registerDataId failed, txHash: %s", txHash.ToHexString())
+		output.Msg = fmt.Sprintf("registerDataId failed, txHash: %s", txHash)
 		return
 	}
 	// reg identity.
@@ -105,7 +79,7 @@ func SaveDataMetaService(input io.SellerSaveDataMetaInput, ontId string) (output
 		DataMetaHash: input.DataMetaHash,
 		ResourceType: input.ResourceType,
 		OntId:        ontId,
-		DataId:       dataId,
+		DataId:       input.DataId,
 		Fee:          input.Fee,
 		Stock:        input.Stock,
 		ExpiredDate:  input.ExpiredDate,
@@ -119,7 +93,7 @@ func SaveDataMetaService(input io.SellerSaveDataMetaInput, ontId string) (output
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
 	}
-	output.DataId = dataId
+	output.DataId = input.DataId
 	return
 }
 

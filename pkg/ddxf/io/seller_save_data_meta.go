@@ -15,6 +15,8 @@ type SellerSaveDataMetaInput struct {
 	ExpiredDate  uint64                 `json:"expiredDate"`
 	DataEndpoint string                 `json:"dataEndpoint"`
 	DataHash     string                 `json:"dataHash"`
+	SignedTx     string                 `json:"signedTx"`
+	DataId       string                 `json:"dataId"`
 }
 
 // SellerSaveDataMetaOutput ...

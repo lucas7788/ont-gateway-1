@@ -30,6 +30,10 @@ func main() {
 	pwd := []byte("123456")
 	wallet, _ := ontology_go_sdk.OpenWallet("./pkg/ddxf/example/wallet.dat")
 	seller, _ := wallet.GetAccountByAddress("Aejfo7ZX5PVpenRj23yChnyH64nf8T1zbu", pwd)
+
+	ide, _ := wallet.GetIdentityById("did:ont:TSzd9992bEvJ8QQfuhtGotwZhu9ZZ7abF1")
+	con, _ := ide.GetControllerByIndex(1, pwd)
+
 	if false {
 		//1.upload
 		fileKey, err := upload()
@@ -38,9 +42,13 @@ func main() {
 			return
 		}
 		//2.SaveDataMeta
-		saveDataMetaOutPut, saveDataMetaInput, err := seller_buyer.SaveDataMeta(fileKey)
+		saveDataMetaOutPut, saveDataMetaInput, err := seller_buyer.SaveDataMeta(ide.ID, con, seller, fileKey)
 		if err != nil {
 			fmt.Println("error: ", err)
+			return
+		}
+		if saveDataMetaOutPut.DataId == "" {
+			fmt.Println("saveDataMetaOutPut: ", *saveDataMetaOutPut)
 			return
 		}
 		//3.SaveTokenMeta
@@ -83,7 +91,7 @@ func main() {
 	}
 
 	if false {
-		bs, _ := base64.RawURLEncoding.DecodeString("eyJjb2RlIjowLCJtc2ciOiIiLCJSZXN1bHQiOiJodHRwOi8vMTI3LjAuMC4xOjIwMzM1L2RkeGYvc3RvcmFnZS9kb3dubG9hZC9TdG9yYWdlRmlsZVByZWZpeDA4YmUyZmUzLWY5NTMtNGNkOC1hMTg1LTgyNTEyODhjOGVkOSJ9")
+		bs, _ := base64.RawURLEncoding.DecodeString("eyJjb2RlIjowLCJtc2ciOiIiLCJSZXN1bHQiOiJodHRwOi8vMTI3LjAuMC4xOjIwMzM1L2RkeGYvc3RvcmFnZS9kb3dubG9hZC9TdG9yYWdlRmlsZVByZWZpeDhjYjU3MGY5LWJlYWQtNGE1YS1iOWYzLWIzZDFmZWFhZmQzMCJ9")
 		fmt.Println("bs: ", string(bs))
 		return
 	}
