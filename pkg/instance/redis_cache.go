@@ -9,7 +9,7 @@ import (
 
 var (
 	instanceRedisCache *storage.RedisCache
-	redisOnce     sync.Once
+	redisOnce          sync.Once
 )
 
 // RedisCache is singleton for storage.RedisCache

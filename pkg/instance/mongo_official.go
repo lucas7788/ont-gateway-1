@@ -2,28 +2,38 @@ package instance
 
 import (
 	"fmt"
-	"sync"
-
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/storage"
 	"go.mongodb.org/mongo-driver/mongo"
+	"sync"
+	"sync/atomic"
+	"unsafe"
 )
 
 var (
-	instanceMongoOfficial *mongo.Database
-	mongoOnce sync.Once
+	mongoPtr unsafe.Pointer
+	mongoMu  sync.Mutex
 )
 
 // MongoOfficial is singleton for mongo.Database
 func MongoOfficial() *mongo.Database {
-	mongoOnce.Do(func() {
-		conf := config.Load().MongoConfig
-		db, err := storage.NewMongoOfficial(&conf)
-		if err != nil {
-			panic(fmt.Sprintf("official mongo instantiate err:%v", err))
-		}
-		instanceMongoOfficial = db
-	})
+	inst := atomic.LoadPointer(&mongoPtr)
+	if inst != nil {
+		return (*mongo.Database)(inst)
+	}
+	mongoMu.Lock()
+	defer mongoMu.Unlock()
 
-	return instanceMongoOfficial
+	inst = atomic.LoadPointer(&mongoPtr)
+	if inst != nil {
+		return (*mongo.Database)(inst)
+	}
+
+	conf := config.Load().MongoConfig
+	db, err := storage.NewMongoOfficial(&conf)
+	if err != nil {
+		panic(fmt.Sprintf("official mongo instantiate err:%v", err))
+	}
+	atomic.StorePointer(&mongoPtr, unsafe.Pointer(db))
+	return db
 }
