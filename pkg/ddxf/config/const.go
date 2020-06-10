@@ -8,7 +8,7 @@ const (
 	StorePort    = "20335"
 )
 const (
-	Ping      = "/ddxf/ping"
+	Ping = "/ddxf/ping"
 )
 
 const (
