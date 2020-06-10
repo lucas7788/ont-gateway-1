@@ -1,4 +1,4 @@
-// +build dev
+// +build k8sdev
 
 package config
 
