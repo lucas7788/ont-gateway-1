@@ -18,10 +18,11 @@ require (
 	github.com/prometheus/client_golang v1.5.1
 	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/testify v1.4.0
+	github.com/syndtr/goleveldb v1.0.0
 	github.com/urfave/cli/v2 v2.2.0
 	github.com/zhiqiangxu/ddxf v0.0.0-20200603091936-74c54ce42e7d
 	github.com/zhiqiangxu/tableflip v0.0.0-20190122113937-cebf5858b483
-	github.com/zhiqiangxu/util v0.0.0-20200501101013-969298f940bf
+	github.com/zhiqiangxu/util v0.0.0-20200610162108-9a85dfa392a7
 	go.mongodb.org/mongo-driver v1.3.1
 	go.uber.org/zap v1.14.1
 	gopkg.in/dgrijalva/jwt-go.v3 v3.2.0

@@ -77,8 +77,6 @@ github.com/gorilla/websocket
 # github.com/hashicorp/golang-lru v0.5.3
 github.com/hashicorp/golang-lru
 github.com/hashicorp/golang-lru/simplelru
-# github.com/howeyc/gopass v0.0.0-20190910152052-7cb4b85ec19c
-github.com/howeyc/gopass
 # github.com/itchyny/base58-go v0.1.0
 github.com/itchyny/base58-go
 # github.com/json-iterator/go v1.1.9
@@ -113,8 +111,6 @@ github.com/ontio/go-bip32
 github.com/ontio/ontology/common
 github.com/ontio/ontology/core/signature
 github.com/ontio/ontology/core/types
-github.com/ontio/ontology/common/log
-github.com/ontio/ontology/common/password
 github.com/ontio/ontology/account
 github.com/ontio/ontology/cmd/utils
 github.com/ontio/ontology/common/constants
@@ -127,6 +123,7 @@ github.com/ontio/ontology/smartcontract/service/native/global_params
 github.com/ontio/ontology/smartcontract/service/native/ont
 github.com/ontio/ontology/core/program
 github.com/ontio/ontology/smartcontract/service/native/utils
+github.com/ontio/ontology/common/log
 github.com/ontio/ontology/cmd/abi
 github.com/ontio/ontology/common/config
 github.com/ontio/ontology/http/base/error
@@ -243,18 +240,18 @@ github.com/shurcooL/sanitized_anchor_name
 # github.com/stretchr/testify v1.4.0
 github.com/stretchr/testify/assert
 # github.com/syndtr/goleveldb v1.0.0
-github.com/syndtr/goleveldb/leveldb/util
-github.com/syndtr/goleveldb/leveldb/comparer
-github.com/syndtr/goleveldb/leveldb/errors
-github.com/syndtr/goleveldb/leveldb/iterator
 github.com/syndtr/goleveldb/leveldb
 github.com/syndtr/goleveldb/leveldb/filter
 github.com/syndtr/goleveldb/leveldb/opt
-github.com/syndtr/goleveldb/leveldb/storage
 github.com/syndtr/goleveldb/leveldb/cache
+github.com/syndtr/goleveldb/leveldb/comparer
+github.com/syndtr/goleveldb/leveldb/errors
+github.com/syndtr/goleveldb/leveldb/iterator
 github.com/syndtr/goleveldb/leveldb/journal
 github.com/syndtr/goleveldb/leveldb/memdb
+github.com/syndtr/goleveldb/leveldb/storage
 github.com/syndtr/goleveldb/leveldb/table
+github.com/syndtr/goleveldb/leveldb/util
 # github.com/tyler-smith/go-bip39 v1.0.2
 github.com/tyler-smith/go-bip39
 github.com/tyler-smith/go-bip39/wordlists
@@ -272,7 +269,7 @@ github.com/xdg/stringprep
 github.com/zhiqiangxu/ddxf
 # github.com/zhiqiangxu/tableflip v0.0.0-20190122113937-cebf5858b483
 github.com/zhiqiangxu/tableflip
-# github.com/zhiqiangxu/util v0.0.0-20200501101013-969298f940bf
+# github.com/zhiqiangxu/util v0.0.0-20200610162108-9a85dfa392a7
 github.com/zhiqiangxu/util/logger
 github.com/zhiqiangxu/util/metrics
 github.com/zhiqiangxu/util
@@ -325,7 +322,6 @@ golang.org/x/crypto/ed25519
 golang.org/x/crypto/scrypt
 golang.org/x/crypto/ripemd160
 golang.org/x/crypto/sha3
-golang.org/x/crypto/ssh/terminal
 golang.org/x/crypto/ed25519/internal/edwards25519
 golang.org/x/crypto/pbkdf2
 # golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a
