@@ -18,6 +18,12 @@ const (
 	useToken  = "useToken"
 )
 
+//BuyDTokenService buy token service, POST
+//input parameter:
+//type BuyerBuyDtokenInput struct {
+//	SignedTx string
+//}
+//this method will send transaction to ontology blockchain,
 func BuyDTokenService(param io.BuyerBuyDtokenInput) (output io.BuyerBuyDtokenOutput) {
 	txHash, err := instance.OntSdk().SendTx(param.SignedTx)
 	if err != nil {

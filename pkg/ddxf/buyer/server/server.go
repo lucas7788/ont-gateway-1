@@ -7,6 +7,7 @@ import (
 	"github.com/ontio/ontology-go-sdk"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/middleware/cors"
+	"net/http"
 )
 
 const (
@@ -27,6 +28,9 @@ var BuyerMgrAccount *ontology_go_sdk.Account
 func StartBuyerServer() error {
 	r := gin.Default()
 	r.Use(cors.Cors())
+	r.GET(config.Ping, func(context *gin.Context) {
+		context.JSON(http.StatusOK, "SUCCESS")
+	})
 	r.POST(loginBuyer, LoginHandler)
 	r.GET(getloginQrCode, GetLoginQrCodeHandler)
 	r.POST(loginCallBack, LoginCallBackHandler)

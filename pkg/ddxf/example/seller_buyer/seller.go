@@ -58,7 +58,7 @@ func SaveDataMeta(sellerOntId string, con *ontology_go_sdk.Controller, seller *o
 		Owner:        sellerOntId,
 	}
 
-	tx, err := instance.OntSdk().DefaultDataIdContract().BuildTx(seller, "registerDataId", []interface{}{info.ToBytes(),1})
+	tx, err := instance.OntSdk().DefaultDataIdContract().BuildTx(seller, "registerDataId", []interface{}{info.ToBytes(), 1})
 	if err != nil {
 		return nil, nil, err
 	}
