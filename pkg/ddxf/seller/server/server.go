@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
+	"net/http"
 )
 
 const (
@@ -18,6 +19,9 @@ const (
 func StartSellerServer() {
 	InitSellerImpl()
 	r := gin.Default()
+	r.GET(config.Ping, func(context *gin.Context) {
+		context.JSON(http.StatusOK, "SUCCESS")
+	})
 	//r.Use(middleware.JWT)
 	r.POST(SaveDataMetaUrl, SaveDataMetaHandler)
 	r.POST(SaveTokenMetaUrl, SaveTokenMetaHandler)

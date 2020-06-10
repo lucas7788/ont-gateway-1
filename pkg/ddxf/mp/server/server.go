@@ -7,6 +7,7 @@ import (
 	"github.com/ontio/ontology-go-sdk"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/middleware/cors"
+	"net/http"
 )
 
 const (
@@ -24,6 +25,9 @@ const (
 func StartMpServer() {
 	r := gin.Default()
 	r.Use(cors.Cors())
+	r.GET(config.Ping, func(context *gin.Context) {
+		context.JSON(http.StatusOK, "SUCCESS")
+	})
 	r.POST(addRegistry, AddRegistryHandler)
 	r.POST(removeRegistry, RemoveRegistryHandler)
 	r.POST(PublishItemMeta, PublishItemMetaHandler)

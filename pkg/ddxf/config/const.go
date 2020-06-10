@@ -7,6 +7,9 @@ const (
 	RegistryPort = "20334"
 	StorePort    = "20335"
 )
+const (
+	Ping      = "/ddxf/ping"
+)
 
 const (
 	PublishItemMetaUrl = "http://127.0.0.1:" + MpPort
