@@ -8,23 +8,14 @@ import (
 
 var (
 	ontSdk     *misc.OntSdk
-	ontSdkLock sync.Mutex
+	ontSdkOnce sync.Once
 )
 
 // OntSdk is singleton for misc.OntSdk
 func OntSdk() *misc.OntSdk {
-	if ontSdk != nil {
-		return ontSdk
-	}
-
-	ontSdkLock.Lock()
-	defer ontSdkLock.Unlock()
-
-	if ontSdk != nil {
-		return ontSdk
-	}
-
-	ontSdk = misc.NewOntSdk()
+	ontSdkOnce.Do(func() {
+		ontSdk = misc.NewOntSdk()
+	})
 
 	return ontSdk
 }

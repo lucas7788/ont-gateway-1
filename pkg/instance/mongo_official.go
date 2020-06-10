@@ -11,27 +11,19 @@ import (
 
 var (
 	instanceMongoOfficial *mongo.Database
-	lockMongoOfficial     sync.Mutex
+	mongoOnce sync.Once
 )
 
 // MongoOfficial is singleton for mongo.Database
 func MongoOfficial() *mongo.Database {
-	if instanceMongoOfficial != nil {
-		return instanceMongoOfficial
-	}
-
-	lockMongoOfficial.Lock()
-	defer lockMongoOfficial.Unlock()
-	if instanceMongoOfficial != nil {
-		return instanceMongoOfficial
-	}
-
-	config := config.Load().MongoConfig
-	db, err := storage.NewMongoOfficial(&config)
-	if err != nil {
-		panic(fmt.Sprintf("official mongo instantiate err:%v", err))
-	}
-	instanceMongoOfficial = db
+	mongoOnce.Do(func() {
+		conf := config.Load().MongoConfig
+		db, err := storage.NewMongoOfficial(&conf)
+		if err != nil {
+			panic(fmt.Sprintf("official mongo instantiate err:%v", err))
+		}
+		instanceMongoOfficial = db
+	})
 
 	return instanceMongoOfficial
 }

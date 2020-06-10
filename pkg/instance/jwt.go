@@ -10,25 +10,18 @@ import (
 
 var (
 	instanceJWT *misc.JWT
-	lockJWT     sync.Mutex
+	jwtOnce     sync.Once
 )
 
 // JWT is singleton for misk.JWT
 func JWT() *misc.JWT {
-	if instanceJWT != nil {
-		return instanceJWT
-	}
-
-	lockJWT.Lock()
-	defer lockJWT.Unlock()
-	if instanceJWT != nil {
-		return instanceJWT
-	}
-
-	instanceJWT, err := misc.NewJWT(time.Hour*24, "HS256", []byte("ont-gateway-sec"))
-	if err != nil {
-		panic(fmt.Sprintf("NewJWT err:%v", err))
-	}
+	jwtOnce.Do(func() {
+		jwt, err := misc.NewJWT(time.Hour*24, "HS256", []byte("ont-gateway-sec"))
+		if err != nil {
+			panic(fmt.Sprintf("NewJWT err:%v", err))
+		}
+		instanceJWT = jwt
+	})
 
 	return instanceJWT
 }
