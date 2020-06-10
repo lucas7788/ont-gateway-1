@@ -12,19 +12,19 @@ import (
 
 var (
 	jwtMu  sync.Mutex
-	jwtPtr *unsafe.Pointer
+	jwtPtr unsafe.Pointer
 )
 
 // JWT is singleton for misk.JWT
 func JWT() *misc.JWT {
-	inst := atomic.LoadPointer(jwtPtr)
+	inst := atomic.LoadPointer(&jwtPtr)
 	if inst != nil {
 		return (*misc.JWT)(inst)
 	}
 	jwtMu.Lock()
 	defer jwtMu.Unlock()
 
-	inst = atomic.LoadPointer(jwtPtr)
+	inst = atomic.LoadPointer(&jwtPtr)
 	if inst != nil {
 		return (*misc.JWT)(inst)
 	}
@@ -32,6 +32,6 @@ func JWT() *misc.JWT {
 	if err != nil {
 		panic(fmt.Sprintf("NewJWT err:%v", err))
 	}
-	atomic.StorePointer(jwtPtr, unsafe.Pointer(jwt))
+	atomic.StorePointer(&jwtPtr, unsafe.Pointer(jwt))
 	return jwt
 }

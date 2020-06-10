@@ -9,7 +9,7 @@ import (
 
 var (
 	loggerInstance *zap.Logger
-	loggerOnce sync.Once
+	loggerOnce     sync.Once
 )
 
 // Logger is singleton for zap.Logger
