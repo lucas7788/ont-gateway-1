@@ -6,29 +6,32 @@ import (
 	"time"
 
 	"github.com/zhiqiangxu/ont-gateway/pkg/misc"
+	"sync/atomic"
+	"unsafe"
 )
 
 var (
-	instanceJWT *misc.JWT
-	lockJWT     sync.Mutex
+	jwtMu  sync.Mutex
+	jwtPtr unsafe.Pointer
 )
 
 // JWT is singleton for misk.JWT
 func JWT() *misc.JWT {
-	if instanceJWT != nil {
-		return instanceJWT
+	inst := atomic.LoadPointer(&jwtPtr)
+	if inst != nil {
+		return (*misc.JWT)(inst)
 	}
+	jwtMu.Lock()
+	defer jwtMu.Unlock()
 
-	lockJWT.Lock()
-	defer lockJWT.Unlock()
-	if instanceJWT != nil {
-		return instanceJWT
+	inst = atomic.LoadPointer(&jwtPtr)
+	if inst != nil {
+		return (*misc.JWT)(inst)
 	}
-
-	instanceJWT, err := misc.NewJWT(time.Hour*24, "HS256", []byte("ont-gateway-sec"))
+	jwt, err := misc.NewJWT(time.Hour*24, "HS256", []byte("ont-gateway-sec"))
 	if err != nil {
 		panic(fmt.Sprintf("NewJWT err:%v", err))
 	}
-
-	return instanceJWT
+	atomic.StorePointer(&jwtPtr, unsafe.Pointer(jwt))
+	return jwt
 }
