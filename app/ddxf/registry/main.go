@@ -14,6 +14,7 @@ func main() {
 }
 
 func waitToExit() {
+
 	exit := make(chan bool, 0)
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
