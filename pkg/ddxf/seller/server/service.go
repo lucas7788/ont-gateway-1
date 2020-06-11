@@ -32,9 +32,6 @@ const (
 	ONTAuthScanProtocol = "http://172.29.36.101" + config.SellerPort + "/ddxf/seller/getQrCodeDataByQrCodeId"
 	QrCodeCallback      = "http://172.29.36.101" + config.SellerPort + "/ddxf/seller/qrCodeCallbackSendTx"
 )
-const (
-	sellerCollectionName = "seller"
-)
 
 func InitSellerImpl() error {
 	err := initDb()
@@ -144,19 +141,46 @@ func PublishMPItemMetaService(input io.MPEndpointPublishItemMetaInput, ontId str
 		output.Msg = err.Error()
 		return
 	}
-	//TODO send mp
-	_, _, data, err := forward.JSONRequest("POST", input.MPEndpoint+server.PublishItemMeta, mpParamBs)
+	err = InsertElt(ItemMetaCollectionDdxf, input)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
 		return
 	}
-	res := io.MPEndpointPublishItemMetaOutput{}
-	err = json.Unmarshal(data, &res)
-	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-		return
+	//TODO send mp
+	if input.MPEndpoint != "" {
+		_, _, data, err := forward.JSONRequest("POST", input.MPEndpoint+server.PublishItemMeta, mpParamBs)
+		if err != nil {
+			output.Code = http.StatusInternalServerError
+			output.Msg = err.Error()
+			return
+		}
+		res := io.MPEndpointPublishItemMetaOutput{}
+		err = json.Unmarshal(data, &res)
+		if err != nil {
+			output.Code = http.StatusInternalServerError
+			output.Msg = err.Error()
+			return
+		}
+	} else {
+		txHash, err := instance.OntSdk().SendTx(input.SignedDDXFTx)
+		if err != nil {
+			output.Code = http.StatusInternalServerError
+			output.Msg = err.Error()
+			return
+		}
+		instance.OntSdk().WaitForGenerateBlock()
+		evt, err := instance.OntSdk().GetSmartCodeEvent(txHash)
+		if err != nil {
+			output.Code = http.StatusInternalServerError
+			output.Msg = err.Error()
+			return
+		}
+		if evt.State == 0 {
+			output.Code = http.StatusInternalServerError
+			output.Msg = "tx failed"
+			return
+		}
 	}
 	return
 }

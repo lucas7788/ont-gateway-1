@@ -55,7 +55,7 @@ func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qr
 		ItemMetaHash: itemMetaHash.ToHexString(),
 		ItemMetaData: input.ItemMeta,
 	}
-	err = InsertElt(ItemMetaCollection, im)
+	err = InsertElt(ItemMetaCollectionOnto, im)
 	if err != nil {
 		return qrCode.QrCodeResponse{}, err
 	}
@@ -119,7 +119,7 @@ func QrCodeCallBackService(param qrCode.QrCodeCallBackParam) error {
 	}
 	adD := ItemMeta{}
 	filterD := bson.M{"dataMetaHash": ddo.ItemMetaHash}
-	err = FindElt(ItemMetaCollection, filterD, &adD)
+	err = FindElt(ItemMetaCollectionOnto, filterD, &adD)
 	if err != nil {
 		return err
 	}
