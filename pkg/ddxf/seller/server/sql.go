@@ -14,7 +14,8 @@ const (
 	SellerQrCodeCollection = "seller_qr_code_collection"
 	DataMetaCollection     = "seller_data_meta_collection"
 	TokenMetaCollection    = "seller_token_meta_collection"
-	ItemMetaCollection     = "seller_item_meta_collection"
+	ItemMetaCollectionOnto = "seller_item_meta_collection_onto"
+	ItemMetaCollectionDdxf = "seller_item_meta_collection_ddxf"
 	PublishParamCollection = "publish_param_collection"
 )
 
@@ -24,15 +25,6 @@ func initDb() (err error) {
 	opts.SetName("u-seller")
 	opts.SetUnique(true)
 	index := mongo.IndexModel{
-		Keys:    bsonx.Doc{{Key: "seller", Value: bsonx.Int32(1)}},
-		Options: opts,
-	}
-
-	_, err = instance.MongoOfficial().Collection(sellerCollectionName).Indexes().CreateOne(context.Background(), index)
-	if err != nil {
-		return
-	}
-	index = mongo.IndexModel{
 		Keys:    bsonx.Doc{{Key: "dataMetaHash", Value: bsonx.Int32(1)}},
 		Options: opts,
 	}
