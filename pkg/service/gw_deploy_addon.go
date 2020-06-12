@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"crypto/md5"
+	"strings"
 
 	"github.com/zhiqiangxu/ont-gateway/pkg/cicd"
 	"github.com/zhiqiangxu/ont-gateway/pkg/io"
@@ -68,8 +69,12 @@ func (gw *Gateway) DeployAddon(input io.DeployAddonInput) (output io.DeployAddon
 		return
 	}
 
-	if !input.Official {
+	if !input.Official || hasMultipleSIP(sip) {
 		output.SIP = sip
 	}
 	return
+}
+
+func hasMultipleSIP(sip string) bool {
+	return strings.Index(sip, ",") != -1
 }
