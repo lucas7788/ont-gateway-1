@@ -265,7 +265,7 @@ github.com/urfave/cli/v2
 github.com/xdg/scram
 # github.com/xdg/stringprep v1.0.0
 github.com/xdg/stringprep
-# github.com/zhiqiangxu/ddxf v0.0.0-20200603091936-74c54ce42e7d
+# github.com/zhiqiangxu/ddxf v0.0.0-20200615022619-c1233ebf7b95
 github.com/zhiqiangxu/ddxf
 # github.com/zhiqiangxu/tableflip v0.0.0-20190122113937-cebf5858b483
 github.com/zhiqiangxu/tableflip

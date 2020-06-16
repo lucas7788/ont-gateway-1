@@ -4,8 +4,10 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	"github.com/ontio/ontology-crypto/signature"
-	"github.com/ontio/ontology-go-sdk"
+	ontology_go_sdk "github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology-go-sdk/utils"
 	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ddxf"
@@ -17,7 +19,6 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
-	"net/http"
 )
 
 var (
@@ -149,7 +150,7 @@ func PublishMPItemMetaService(input io.MPEndpointPublishItemMetaInput, ontId str
 	}
 	//TODO send mp
 	if input.MPEndpoint != "" {
-		_, _, data, err := forward.JSONRequest("POST", input.MPEndpoint+server.PublishItemMeta, mpParamBs)
+		_, _, data, err := forward.JSONRequest("POST", input.MPEndpoint+server.PublishItemMeta, mpParamBs, nil)
 		if err != nil {
 			output.Code = http.StatusInternalServerError
 			output.Msg = err.Error()

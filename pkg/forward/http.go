@@ -37,21 +37,24 @@ func httpRequest(req *http.Request) (code int, contentType string, respBody []by
 }
 
 // JSONRequest for send json request
-func JSONRequest(method, uri string, data []byte) (code int, contentType string, respBody []byte, err error) {
+func JSONRequest(method, uri string, data []byte, headers map[string]string) (code int, contentType string, respBody []byte, err error) {
 	req, err := http.NewRequest(method, uri, strings.NewReader(string(data)))
 	if err != nil {
 		return
 	}
 
 	req.Header.Set("Content-Type", "application/json")
+	for k, v := range headers {
+		req.Header.Set(k, v)
+	}
 
 	code, contentType, respBody, err = httpRequest(req)
 	return
 }
 
 // PostJSONRequest for post json request
-func PostJSONRequest(uri string, data []byte) (int, string, []byte, error) {
-	return JSONRequest("POST", uri, data)
+func PostJSONRequest(uri string, data []byte, headers map[string]string) (int, string, []byte, error) {
+	return JSONRequest("POST", uri, data, headers)
 }
 
 // Get request

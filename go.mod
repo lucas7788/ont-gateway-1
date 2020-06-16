@@ -17,14 +17,17 @@ require (
 	github.com/piprate/json-gold v0.3.0
 	github.com/prometheus/client_golang v1.5.1
 	github.com/satori/go.uuid v1.2.0
+	github.com/spf13/pflag v1.0.3 // indirect
 	github.com/stretchr/testify v1.4.0
 	github.com/syndtr/goleveldb v1.0.0
 	github.com/urfave/cli/v2 v2.2.0
-	github.com/zhiqiangxu/ddxf v0.0.0-20200603091936-74c54ce42e7d
+	github.com/xdg/stringprep v1.0.0 // indirect
+	github.com/zhiqiangxu/ddxf v0.0.0-20200615022619-c1233ebf7b95
 	github.com/zhiqiangxu/tableflip v0.0.0-20190122113937-cebf5858b483
 	github.com/zhiqiangxu/util v0.0.0-20200610162108-9a85dfa392a7
 	go.mongodb.org/mongo-driver v1.3.1
 	go.uber.org/zap v1.14.1
+	golang.org/x/tools v0.0.0-20200408014516-4d14fc9c00ce // indirect
 	gopkg.in/dgrijalva/jwt-go.v3 v3.2.0
 	gotest.tools v2.2.0+incompatible
 )

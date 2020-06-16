@@ -3,6 +3,7 @@ package seller_buyer
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 )
 
@@ -11,7 +12,7 @@ func SendPOST(url string, param interface{}) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	_, _, data, err := forward.PostJSONRequest(url, bs)
+	_, _, data, err := forward.PostJSONRequest(url, bs, nil)
 	if err != nil {
 		return nil, err
 	}

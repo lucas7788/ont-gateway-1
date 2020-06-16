@@ -4,13 +4,14 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	"github.com/ontio/ontology-crypto/keypair"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/server"
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
-	"net/http"
 )
 
 const (
@@ -71,7 +72,7 @@ func UseTokenService(input io.BuyerUseTokenInput) (output io.BuyerUseTokenOutput
 	//向seller发请求
 	fmt.Println("seller param: ", string(paramBs))
 
-	_, _, data, err := forward.PostJSONRequest(input.TokenOpEndpoint+server.UseTokenUrl, paramBs)
+	_, _, data, err := forward.PostJSONRequest(input.TokenOpEndpoint+server.UseTokenUrl, paramBs, nil)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()

@@ -94,7 +94,7 @@ func (gw *Gateway) notifyTx(url, txHash string, result model.TxPollResult, pollA
 	if err != nil {
 		return
 	}
-	_, _, body, err := forward.PostJSONRequest(url, jsonBytes)
+	_, _, body, err := forward.PostJSONRequest(url, jsonBytes, nil)
 	if err != nil {
 		return
 	}

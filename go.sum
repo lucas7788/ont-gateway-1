@@ -442,6 +442,8 @@ github.com/zhiqiangxu/ddxf v0.0.0-20200513063214-5faa90a611bc h1:vudNuziMg7k2g63
 github.com/zhiqiangxu/ddxf v0.0.0-20200513063214-5faa90a611bc/go.mod h1:JXgJYGofdsOnzCMQeXQIR01T9oNNllrGp0mGcaCWOR4=
 github.com/zhiqiangxu/ddxf v0.0.0-20200603091936-74c54ce42e7d h1:BKkh43D9MIYH/xUOBmNWjQz7FHsNp+0Bm7aCBVIQ6/A=
 github.com/zhiqiangxu/ddxf v0.0.0-20200603091936-74c54ce42e7d/go.mod h1:ybHqUdJQUpK2HwImMjMZ0KcJy05KPciYyCnUrFLcLtg=
+github.com/zhiqiangxu/ddxf v0.0.0-20200615022619-c1233ebf7b95 h1:0QzuYPGRUluDt7VxM6+fQhEzNFRC+zA0kxMHDvUdgP8=
+github.com/zhiqiangxu/ddxf v0.0.0-20200615022619-c1233ebf7b95/go.mod h1:B0od9Adc2eD8LIHbTV7rKC+b5Qrfo7DwXUWtONue4+k=
 github.com/zhiqiangxu/ont-gateway v0.0.0-20200426085932-45831b83eb84/go.mod h1:FSnc601BzMPZlmCphxU8pQtWXMqB+5WF9/YgMa1XNSk=
 github.com/zhiqiangxu/rpheap v0.0.0-20191222053847-9002d7e5a1a1/go.mod h1:aYy7SAJP4LY667NfqoMR/ZJAy8HQ8KVtQTvEDrGS5ks=
 github.com/zhiqiangxu/tableflip v0.0.0-20190122113937-cebf5858b483 h1:vhRInHvRlH8c++IPcYadZUfy4P7oTx3zkXp83viZGC4=

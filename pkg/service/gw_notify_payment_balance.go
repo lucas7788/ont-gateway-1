@@ -113,7 +113,7 @@ func (gw *Gateway) notifyPaymentBalance(payment *model.Payment) (err error) {
 		return
 	}
 
-	_, _, body, err := forward.PostJSONRequest(app.PaymentNotifyURL, jsonBytes)
+	_, _, body, err := forward.PostJSONRequest(app.PaymentNotifyURL, jsonBytes, nil)
 	if err != nil {
 		return
 	}

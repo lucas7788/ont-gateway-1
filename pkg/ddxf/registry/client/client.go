@@ -2,10 +2,11 @@ package client
 
 import (
 	"encoding/json"
+	"net/http"
+
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/registry/server"
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
-	"net/http"
 )
 
 type RegistryImplClient struct {
@@ -25,7 +26,7 @@ func (this *RegistryImplClient) AddEndpoint(input io.RegistryAddEndpointInput) (
 		output.Msg = err.Error()
 		return
 	}
-	_, _, res, err := forward.PostJSONRequest(this.addr+server.AddEndpoint, paramBs)
+	_, _, res, err := forward.PostJSONRequest(this.addr+server.AddEndpoint, paramBs, nil)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -46,7 +47,7 @@ func (this *RegistryImplClient) RemoveEndpoint(input io.RegistryRemoveEndpointIn
 		output.Msg = err.Error()
 		return
 	}
-	_, _, res, err := forward.PostJSONRequest(this.addr+server.RemoveEndpoint, paramBs)
+	_, _, res, err := forward.PostJSONRequest(this.addr+server.RemoveEndpoint, paramBs, nil)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
