@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 
+	"github.com/zhiqiangxu/ont-gateway/app/ddxf/mvp/openkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.uber.org/zap"
@@ -11,11 +12,11 @@ import (
 func callback(output interface{}) {
 	outBytes, _ := json.Marshal(output)
 
-	if openKGCallbackURI == "" {
+	if config.OpenKGCallbackURI == "" {
 		return
 	}
 
-	code, _, respBytes, err := forward.PostJSONRequest(openKGCallbackURI, outBytes, nil)
+	code, _, respBytes, err := forward.PostJSONRequest(config.OpenKGCallbackURI, outBytes, nil)
 	if code != 200 {
 		instance.Logger().Error("openkg callback", zap.Int("code", code), zap.String("resp", string(respBytes)))
 	}
