@@ -139,7 +139,7 @@ func PublishMPItemMetaHandler(c *gin.Context) {
 	}
 	output := PublishMPItemMetaService(param, ontId.(string))
 	if output.Error() != nil {
-		instance.Logger().Error("PublishMPItemMetaHandle:", zap.Error(qrResp.Error()))
+		instance.Logger().Error("PublishMPItemMetaHandle:", zap.Error(output.Error()))
 		c.JSON(http.StatusInternalServerError, common.ResponseFailedOnto(http.StatusInternalServerError, qrResp.Error()))
 		return
 	}
