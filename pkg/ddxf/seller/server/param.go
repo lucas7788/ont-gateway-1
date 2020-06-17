@@ -23,3 +23,16 @@ type OpenKgRes struct {
 type FreezeParam struct {
 	SignedTx string
 }
+
+type GetDataIdParam struct {
+	DataMetaHashArray []string `json:"dataMetaHashArray"`
+}
+
+type GetDataIdRes struct {
+	DataIdAndDataMetaHashArray []*DataIdAndDataMetaHash `json:"dataMetaHashArray"`
+}
+
+type DataIdAndDataMetaHash struct {
+	DataId       string
+	DataMetaHash string
+}

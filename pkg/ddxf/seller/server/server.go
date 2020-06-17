@@ -8,6 +8,8 @@ import (
 
 const (
 	SaveDataMetaUrl            = "/ddxf/seller/saveDataMeta"
+	GetDataIdByDataMetaHashUrl = "/ddxf/seller/getDataIdByDataMetaHash"
+	SaveDataMetaArrayUrl       = "/ddxf/seller/saveDataMetaArray"
 	SaveTokenMetaUrl           = "/ddxf/seller/saveTokenMeta"
 	PublishMPItemMetaUrl       = "/ddxf/seller/publishMPItemMeta"
 	PublishForOpenKgUrl        = "/ddxf/seller/publishForOpenKg"
@@ -26,6 +28,8 @@ func StartSellerServer() {
 	})
 	//r.Use(middleware.JWT)
 	r.POST(SaveDataMetaUrl, SaveDataMetaHandler)
+	r.POST(GetDataIdByDataMetaHashUrl, GetDataIdByDataMetaHashHandler)
+	r.POST(SaveDataMetaArrayUrl, SaveDataMetaArrayHandler)
 	r.POST(SaveTokenMetaUrl, SaveTokenMetaHandler)
 	r.POST(PublishMPItemMetaUrl, PublishMPItemMetaHandler)
 	r.POST(UseTokenUrl, UseTokenHandler)
