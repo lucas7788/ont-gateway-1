@@ -1,7 +1,6 @@
 package server
 
 import (
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	io2 "github.com/zhiqiangxu/ont-gateway/pkg/io"
 )
 
@@ -10,13 +9,7 @@ type ItemMeta struct {
 	ItemMetaData map[string]interface{} `bson:"itemMetaData" json:"itemMetaData"`
 }
 
-type PublishForOpenKgParam struct {
-	SellerSaveDataMetaInput        io.SellerSaveDataMetaInput
-	SellerSaveTokenMetaInput       io.SellerSaveTokenMetaInput
-	MPEndpointPublishItemMetaInput io.MPEndpointPublishItemMetaInput
-}
-
-type OpenKgRes struct {
+type FreezeOutput struct {
 	io2.BaseResp
 }
 

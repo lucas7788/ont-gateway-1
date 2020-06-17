@@ -1,9 +1,10 @@
 package server
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
-	"net/http"
 )
 
 const (
@@ -12,7 +13,6 @@ const (
 	SaveDataMetaArrayUrl       = "/ddxf/seller/saveDataMetaArray"
 	SaveTokenMetaUrl           = "/ddxf/seller/saveTokenMeta"
 	PublishMPItemMetaUrl       = "/ddxf/seller/publishMPItemMeta"
-	PublishForOpenKgUrl        = "/ddxf/seller/publishForOpenKg"
 	FreezeUrl                  = "/ddxf/seller/freeze"
 	UseTokenUrl                = "/ddxf/seller/useToken"
 	PublishItemMetaUrl         = "/ddxf/seller/publishItemMeta"
@@ -33,7 +33,6 @@ func StartSellerServer() {
 	r.POST(SaveTokenMetaUrl, SaveTokenMetaHandler)
 	r.POST(PublishMPItemMetaUrl, PublishMPItemMetaHandler)
 	r.POST(UseTokenUrl, UseTokenHandler)
-	r.POST(PublishForOpenKgUrl, PublishForOpenKgHandler)
 	r.POST(FreezeUrl, FreezeHandler)
 	r.POST(PublishItemMetaUrl, PublishMetaHandlerOnto)
 	r.POST(getQrCodeDataByQrCodeIdUrl, GetQrCodeDataByQrCodeIdHandlerOnto)

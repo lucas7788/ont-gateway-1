@@ -8,7 +8,7 @@ import (
 
 	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 	"github.com/ontio/ontology-crypto/signature"
-	"github.com/ontio/ontology-go-sdk"
+	ontology_go_sdk "github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology-go-sdk/utils"
 	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ddxf"
@@ -48,7 +48,7 @@ func InitSellerImpl() error {
 }
 
 func GetDataIdByDataMetaHashService(param GetDataIdParam) (*GetDataIdRes, error) {
-	idHashs := make([]DataIdAndDataMetaHash, 0)
+	idHashs := make([]*DataIdAndDataMetaHash, 0)
 	for _, item := range param.DataMetaHashArray {
 		dataStore := &io.SellerSaveDataMeta{}
 		filter := bson.M{"dataMetaHash": item}
@@ -56,7 +56,7 @@ func GetDataIdByDataMetaHashService(param GetDataIdParam) (*GetDataIdRes, error)
 		if err != nil && err != mongo.ErrNoDocuments {
 			return nil, err
 		}
-		idHash := DataIdAndDataMetaHash{
+		idHash := &DataIdAndDataMetaHash{
 			DataId:       dataStore.DataId,
 			DataMetaHash: dataStore.DataMetaHash,
 		}
@@ -86,7 +86,7 @@ func SaveDataMetaArrayService(input io.SellerSaveDataMetaArrayInput,
 		output.Msg = fmt.Sprintf("registerDataId failed, txHash: %s", txHash)
 		return
 	}
-	for _,item := range input.DataMetaOneArray {
+	for _, item := range input.DataMetaOneArray {
 		dataStore := &io.SellerSaveDataMeta{
 			DataMeta:     item.DataMeta,
 			DataMetaHash: item.DataMetaHash,
@@ -191,7 +191,7 @@ func SaveTokenMetaService(input io.SellerSaveTokenMetaInput, ontId string) (outp
 	return
 }
 
-func FreezeService(param FreezeParam, ontId string) (res OpenKgRes) {
+func FreezeService(param FreezeParam, ontId string) (res FreezeOutput) {
 	tx, err := utils.TransactionFromHexString(param.SignedTx)
 	if err != nil {
 		res.Code = http.StatusInternalServerError

@@ -2,6 +2,9 @@ package server
 
 import (
 	"encoding/json"
+	"io/ioutil"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/kataras/go-errors"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
@@ -9,8 +12,6 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"github.com/zhiqiangxu/ont-gateway/pkg/rest/middleware"
 	"go.uber.org/zap"
-	"io/ioutil"
-	"net/http"
 )
 
 func SaveDataMetaHandler(c *gin.Context) {
@@ -123,43 +124,19 @@ func FreezeHandler(c *gin.Context) {
 	}
 	bs, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
-		instance.Logger().Error("[PublishForOpenKgHandler] read param error")
+		instance.Logger().Error("[FreezeHandler] read param error")
 		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, err))
 		return
 	}
 	param := FreezeParam{}
 	err = json.Unmarshal(bs, &param)
 	if err != nil {
-		instance.Logger().Error("[PublishForOpenKgHandler] unmarshal param error")
+		instance.Logger().Error("[FreezeHandler] unmarshal param error")
 		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, err))
 		return
 	}
 	res := FreezeService(param, ontId.(string))
 	c.JSON(res.Code, res)
-}
-
-func PublishForOpenKgHandler(c *gin.Context) {
-	ontId, ok := c.Get(middleware.TenantIDKey)
-	if !ok {
-		instance.Logger().Error("[SaveTokenMetaHandler] read ontId error")
-		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, errors.New("[SaveTokenMetaHandler] read ontId error")))
-		return
-	}
-	bs, err := ioutil.ReadAll(c.Request.Body)
-	if err != nil {
-		instance.Logger().Error("[PublishForOpenKgHandler] read param error")
-		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, err))
-		return
-	}
-	param := PublishForOpenKgParam{}
-	err = json.Unmarshal(bs, &param)
-	if err != nil {
-		instance.Logger().Error("[PublishForOpenKgHandler] unmarshal param error")
-		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, err))
-		return
-	}
-	res := PublishForOpenKgService(param, ontId.(string))
-	c.JSON(res.Code, res.Msg)
 }
 
 func PublishMPItemMetaHandler(c *gin.Context) {
@@ -186,7 +163,7 @@ func PublishMPItemMetaHandler(c *gin.Context) {
 	output := PublishMPItemMetaService(param, ontId.(string))
 	if output.Error() != nil {
 		instance.Logger().Error("PublishMPItemMetaHandle:", zap.Error(output.Error()))
-		c.JSON(http.StatusInternalServerError, common.ResponseFailedOnto(http.StatusInternalServerError, qrResp.Error()))
+		c.JSON(http.StatusInternalServerError, common.ResponseFailedOnto(http.StatusInternalServerError, output.Error()))
 		return
 	}
 	c.JSON(http.StatusOK, output)

@@ -2,6 +2,10 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
+	"io/ioutil"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
@@ -9,8 +13,6 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"github.com/zhiqiangxu/ont-gateway/pkg/rest/middleware"
 	"go.uber.org/zap"
-	"io/ioutil"
-	"net/http"
 )
 
 func GetQrCodeDataByQrCodeIdHandlerOnto(c *gin.Context) {
