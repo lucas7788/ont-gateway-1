@@ -2,8 +2,8 @@ package io
 
 import (
 	"github.com/ontio/ontology/common"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
 	"io"
+	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 )
 
 func ReadString(source *common.ZeroCopySource) (string, error) {
@@ -32,7 +32,7 @@ func ConstructTokensAndEndpoint(data []byte, buyer common.Address, onchainItemId
 	}
 	res := make([]EndpointToken, l)
 	for i := 0; i < int(l); i++ {
-		tt := &param.TokenTemplate{}
+		tt := &ddxf_contract.TokenTemplate{}
 		err := tt.Deserialize(source)
 		if err != nil {
 			return nil, err

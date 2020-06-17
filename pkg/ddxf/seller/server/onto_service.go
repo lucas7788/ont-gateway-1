@@ -10,10 +10,10 @@ import (
 	config2 "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/contract"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/qrCode"
 	"go.mongodb.org/mongo-driver/bson"
 	"strings"
+	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 )
 
 func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qrCode.QrCodeResponse, error) {
@@ -45,7 +45,7 @@ func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qr
 		return qrCode.QrCodeResponse{}, err
 	}
 	// dataMeta related in data contract tx.
-	tokenTemplate := &param.TokenTemplate{
+	tokenTemplate := &ddxf_contract.TokenTemplate{
 		DataID:     adD.DataId,
 		TokenHashs: []string{string(tokenHash)},
 	}
@@ -59,7 +59,7 @@ func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qr
 	if err != nil {
 		return qrCode.QrCodeResponse{}, err
 	}
-	trt := &param.TokenResourceTyEndpoint{
+	trt := &ddxf_contract.TokenResourceTyEndpoint{
 		TokenTemplate: tokenTemplate,
 		ResourceType:  adD.ResourceType,
 		Endpoint:      adT.TokenEndpoint,
@@ -68,7 +68,7 @@ func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qr
 	fmt.Println("resourceId:", string(resourceIdBytes))
 	resourceDDOBytes, itemBytes := contract.ConstructPublishParam(ServerAccount.Address,
 		tokenTemplate,
-		[]*param.TokenResourceTyEndpoint{trt},
+		[]*ddxf_contract.TokenResourceTyEndpoint{trt},
 		itemMetaHash, adD.Fee, adD.ExpiredDate, adD.Stock)
 
 	//TODO

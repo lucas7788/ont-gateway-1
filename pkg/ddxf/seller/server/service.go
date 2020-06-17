@@ -15,10 +15,10 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/mp/server"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
+	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 )
 
 var (
@@ -232,7 +232,7 @@ func UseTokenService(input io.SellerTokenLookupEndpointUseTokenInput) (output io
 }
 
 //书籍
-func GetDataByOnchainIdService(onchainItemId string, buyer common.Address, template param.TokenTemplate) (interface{}, error) {
+func GetDataByOnchainIdService(onchainItemId string, buyer common.Address, template ddxf_contract.TokenTemplate) (interface{}, error) {
 	//根据 onchainId 拿到真实的数据
 	data := io.SellerSaveDataMeta{}
 	find := bson.M{"dataId": template.DataID}

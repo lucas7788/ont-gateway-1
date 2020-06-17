@@ -1,7 +1,7 @@
 package io
 
 import (
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
+	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 	io2 "github.com/zhiqiangxu/ont-gateway/pkg/io"
 )
 
@@ -10,7 +10,7 @@ type SellerSaveDataMetaInput struct {
 	DataMeta     map[string]interface{} `json:"dataMeta"`
 	DataMetaHash string                 `json:"dataMetaHash"`
 	ResourceType byte                   `json:"resourceType"`
-	Fee          param.Fee              `json:"fee"`
+	Fee          ddxf_contract.Fee      `json:"fee"`
 	Stock        uint32                 `json:"stock"`
 	ExpiredDate  uint64                 `json:"expiredDate"`
 	DataEndpoint string                 `json:"dataEndpoint"`
@@ -31,9 +31,9 @@ type SellerSaveDataMeta struct {
 	ResourceType byte                   `bson:"resourceType" json:"resourceType"`
 	DataId       string                 `bson:"dataId" json:"dataId"`
 	// all below this shoudle save in dataId contract. did.
-	OntId        string    `bson:"ontId" json:"ontId"`
-	Fee          param.Fee `bson:"fee" json:"fee"`
-	Stock        uint32    `bson:"stock" json:"stock"`
-	ExpiredDate  uint64    `bson:"expiredDate" json:"expiredDate"`
-	DataEndpoint string    `bson:"dataEndpoint" json:"dataEndpoint"`
+	OntId        string            `bson:"ontId" json:"ontId"`
+	Fee          ddxf_contract.Fee `bson:"fee" json:"fee"`
+	Stock        uint32            `bson:"stock" json:"stock"`
+	ExpiredDate  uint64            `bson:"expiredDate" json:"expiredDate"`
+	DataEndpoint string            `bson:"dataEndpoint" json:"dataEndpoint"`
 }

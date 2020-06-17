@@ -17,6 +17,7 @@ import (
 	"go.mongodb.org/mongo-driver/x/bsonx"
 	"net/http"
 	"time"
+	"github.com/ont-bizsuite/ddxf-sdk/split_policy_contract"
 )
 
 const (
@@ -55,7 +56,7 @@ func GetAuditRuleService(io.MPEndpointGetAuditRuleInput) (output io.MPEndpointGe
 
 func GetFeeService(io.MPEndpointGetFeeInput) (output io.MPEndpointGetFeeOutput) {
 	output.Count = 10
-	output.Type = io.ONG
+	output.Fee.ContractType = split_policy_contract.ONG
 	return
 }
 
