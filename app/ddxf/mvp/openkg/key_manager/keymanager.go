@@ -1,7 +1,5 @@
 package key_manager
 
-
-
 import (
 	"github.com/ontio/go-bip32"
 )

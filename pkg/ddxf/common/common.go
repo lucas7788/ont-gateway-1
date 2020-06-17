@@ -3,19 +3,17 @@ package common
 import (
 	"encoding/hex"
 	"errors"
+	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 	"github.com/ontio/ontology/common"
 	"github.com/satori/go.uuid"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"github.com/zhiqiangxu/ont-gateway/pkg/misc"
-	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 )
-
 
 func GenerateUUId(preFix string) string {
 	return preFix + uuid.NewV4().String()
 }
-
 
 func HandleEvent(txHash string, method string) ([]io.EndpointToken, error) {
 	event, err := instance.OntSdk().GetSmartCodeEvent(txHash)

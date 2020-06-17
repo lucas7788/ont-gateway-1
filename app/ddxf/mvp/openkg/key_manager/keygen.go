@@ -1,24 +1,24 @@
 package key_manager
 
 import (
-	"github.com/ontio/ontology-crypto/keypair"
-	"github.com/ontio/ontology-crypto/ec"
-	"github.com/ontio/go-bip32"
-	"fmt"
 	"crypto/elliptic"
+	"fmt"
+	"github.com/ontio/go-bip32"
+	"github.com/ontio/ontology-crypto/ec"
+	"github.com/ontio/ontology-crypto/keypair"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.uber.org/zap"
 )
 
 func GetKeyPair(plainSeed []byte) (privKey keypair.PrivateKey, pubKey keypair.PublicKey) {
-	for i:=uint32(0);i<10;i++ {
-		pri,pub, err := getKeyPair(plainSeed, i)
+	for i := uint32(0); i < 10; i++ {
+		pri, pub, err := getKeyPair(plainSeed, i)
 		if err != nil {
 			instance.Logger().Error("getKeyPair faild:", zap.Error(err))
 			i++
 			continue
 		}
-		return pri,pub
+		return pri, pub
 	}
 	return
 }

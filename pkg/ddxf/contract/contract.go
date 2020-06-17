@@ -1,8 +1,8 @@
 package contract
 
 import (
-	"github.com/ontio/ontology/common"
 	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
+	"github.com/ontio/ontology/common"
 )
 
 func ConstructPublishParam(seller common.Address, template *ddxf_contract.TokenTemplate,
