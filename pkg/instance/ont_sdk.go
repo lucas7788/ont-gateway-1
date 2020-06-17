@@ -3,15 +3,15 @@ package instance
 import (
 	"sync"
 
-	"github.com/zhiqiangxu/ont-gateway/pkg/misc"
 	"github.com/ont-bizsuite/ddxf-sdk"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
+	"github.com/zhiqiangxu/ont-gateway/pkg/misc"
 )
 
 var (
 	ontSdk     *misc.OntSdk
 	ontSdkOnce sync.Once
-	ddxfSdk *ddxf_sdk.DdxfSdk
+	ddxfSdk    *ddxf_sdk.DdxfSdk
 )
 
 // OntSdk is singleton for misc.OntSdk

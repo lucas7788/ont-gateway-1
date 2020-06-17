@@ -1,8 +1,8 @@
 package io
 
 import (
-	"github.com/zhiqiangxu/ont-gateway/pkg/io"
 	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
+	"github.com/zhiqiangxu/ont-gateway/pkg/io"
 )
 
 // MPEndpointGetFeeInput ...

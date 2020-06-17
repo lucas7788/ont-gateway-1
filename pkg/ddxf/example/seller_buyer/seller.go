@@ -4,6 +4,8 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/ont-bizsuite/ddxf-sdk/data_id_contract"
+	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 	"github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ddxf"
@@ -16,8 +18,6 @@ import (
 	"math/rand"
 	"strconv"
 	"time"
-	"github.com/ont-bizsuite/ddxf-sdk/data_id_contract"
-	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 )
 
 func SaveDataMeta(sellerOntId string, con *ontology_go_sdk.Controller, seller *ontology_go_sdk.Account, bookKey string) (*io.SellerSaveDataMetaOutput, *io.SellerSaveDataMetaInput, error) {
@@ -56,7 +56,7 @@ func SaveDataMeta(sellerOntId string, con *ontology_go_sdk.Controller, seller *o
 		DataType:     0,
 		DataMetaHash: dataMetaHashU,
 		DataHash:     dataHash,
-		Owners:        []*data_id_contract.OntIdIndex{},
+		Owners:       []*data_id_contract.OntIdIndex{},
 	}
 
 	tx, err := instance.OntSdk().DefaultDataIdContract().BuildTx(seller, "registerDataId", []interface{}{info.ToBytes(), 1})

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
+	"github.com/ont-bizsuite/ddxf-sdk/split_policy_contract"
 	"github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology/core/types"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
@@ -17,7 +18,6 @@ import (
 	"go.mongodb.org/mongo-driver/x/bsonx"
 	"net/http"
 	"time"
-	"github.com/ont-bizsuite/ddxf-sdk/split_policy_contract"
 )
 
 const (
