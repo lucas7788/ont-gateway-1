@@ -38,6 +38,52 @@ func SaveDataMetaHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, output)
 }
 
+func GetDataIdByDataMetaHashHandler(c *gin.Context) {
+	bs, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		instance.Logger().Error("[SaveDataMetaHandle] read param error: ", zap.Error(err))
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, err))
+		return
+	}
+	param := GetDataIdParam{}
+	err = json.Unmarshal(bs, &param)
+	if err != nil {
+		instance.Logger().Error("[SaveDataMetaHandle] read param error: ", zap.Error(err))
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, err))
+		return
+	}
+	res, err := GetDataIdByDataMetaHashService(param)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+	} else {
+		c.JSON(http.StatusOK, res)
+	}
+}
+
+func SaveDataMetaArrayHandler(c *gin.Context) {
+	ontId, ok := c.Get(middleware.TenantIDKey)
+	if !ok {
+		instance.Logger().Error("[SaveDataMetaHandle] read ontId error")
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, errors.New("[SaveDataMetaHandle] read ontId error")))
+		return
+	}
+	bs, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		instance.Logger().Error("[SaveDataMetaHandle] read param error: ", zap.Error(err))
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, err))
+		return
+	}
+	param := io.SellerSaveDataMetaArrayInput{}
+	err = json.Unmarshal(bs, &param)
+	if err != nil {
+		instance.Logger().Error("[SaveDataMetaHandle] read param error: ", zap.Error(err))
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, err))
+		return
+	}
+	output := SaveDataMetaArrayService(param, ontId.(string))
+	c.JSON(http.StatusOK, output)
+}
+
 func SaveTokenMetaHandler(c *gin.Context) {
 	c.Set(middleware.TenantIDKey, "did:ont:AcVBV1zKGogf9Q54p1Ve78NSQVU5ZUUGkn")
 	ontId, ok := c.Get(middleware.TenantIDKey)

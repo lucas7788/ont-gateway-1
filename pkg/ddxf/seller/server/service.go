@@ -19,6 +19,7 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var (
@@ -44,6 +45,64 @@ func InitSellerImpl() error {
 	Wallet = ontology_go_sdk.NewWallet("./wallet.dat")
 	Pwd = []byte("111111")
 	return nil
+}
+
+func GetDataIdByDataMetaHashService(param GetDataIdParam) (*GetDataIdRes, error) {
+	idHashs := make([]DataIdAndDataMetaHash, 0)
+	for _, item := range param.DataMetaHashArray {
+		dataStore := &io.SellerSaveDataMeta{}
+		filter := bson.M{"dataMetaHash": item}
+		err := FindElt(DataMetaCollection, filter, dataStore)
+		if err != nil && err != mongo.ErrNoDocuments {
+			return nil, err
+		}
+		idHash := DataIdAndDataMetaHash{
+			DataId:       dataStore.DataId,
+			DataMetaHash: dataStore.DataMetaHash,
+		}
+		idHashs = append(idHashs, idHash)
+	}
+	return &GetDataIdRes{
+		DataIdAndDataMetaHashArray: idHashs,
+	}, nil
+}
+
+func SaveDataMetaArrayService(input io.SellerSaveDataMetaArrayInput,
+	ontid string) (output io.SellerSaveDataMetaOutput) {
+	txHash, err := instance.OntSdk().SendTx(input.SignedTx)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	event, err := instance.OntSdk().GetSmartCodeEvent(txHash)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	if event.State != 1 {
+		output.Code = http.StatusInternalServerError
+		output.Msg = fmt.Sprintf("registerDataId failed, txHash: %s", txHash)
+		return
+	}
+	for _,item := range input.DataMetaOneArray {
+		dataStore := &io.SellerSaveDataMeta{
+			DataMeta:     item.DataMeta,
+			DataMetaHash: item.DataMetaHash,
+			ResourceType: item.ResourceType,
+			OntId:        ontid,
+			DataId:       item.DataId,
+			DataEndpoint: item.DataEndpoint,
+		}
+		// store meta hash id.
+		err = InsertElt(DataMetaCollection, dataStore)
+		if err != nil {
+			output.Code = http.StatusInternalServerError
+			output.Msg = err.Error()
+		}
+	}
+	return
 }
 
 func SaveDataMetaService(input io.SellerSaveDataMetaInput, ontId string) (output io.SellerSaveDataMetaOutput) {
@@ -139,7 +198,7 @@ func FreezeService(param FreezeParam, ontId string) (res OpenKgRes) {
 		res.Msg = err.Error()
 		return
 	}
-	mutTx ,err := tx.IntoMutable()
+	mutTx, err := tx.IntoMutable()
 	if err != nil {
 		res.Code = http.StatusInternalServerError
 		res.Msg = err.Error()
@@ -159,29 +218,7 @@ func FreezeService(param FreezeParam, ontId string) (res OpenKgRes) {
 	}
 	if evt.State != 1 {
 		res.Code = http.StatusInternalServerError
-		res.Msg = "event state is not 1, txHash: "+ txHash.ToHexString()
-		return
-	}
-	return
-}
-
-func PublishForOpenKgService(param PublishForOpenKgParam, ontId string) (res OpenKgRes) {
-	output := SaveDataMetaService(param.SellerSaveDataMetaInput, ontId)
-	if output.Code != 0 {
-		res.Code = output.Code
-		res.Msg = output.Msg
-		return
-	}
-	output2 := SaveTokenMetaService(param.SellerSaveTokenMetaInput, ontId)
-	if output2.Code != 0 {
-		res.Code = output2.Code
-		res.Msg = output2.Msg
-		return
-	}
-	output3 := PublishMPItemMetaService(param.MPEndpointPublishItemMetaInput, ontId)
-	if output3.Code != 0 {
-		res.Code = output3.Code
-		res.Msg = output3.Msg
+		res.Msg = "event state is not 1, txHash: " + txHash.ToHexString()
 		return
 	}
 	return
