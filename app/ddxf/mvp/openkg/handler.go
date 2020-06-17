@@ -3,7 +3,6 @@ package main
 import (
 	"net/http"
 
-	"github.com/Workiva/go-datastructures/threadsafe/err"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,9 +15,9 @@ func publish(c *gin.Context) {
 		return
 	}
 	go func() {
-		output, err := PublishService(input)
+		PublishService(input)
 	}()
-	c.JSON(http.StatusOK, output)
+	c.JSON(http.StatusOK, "SUCCESS")
 }
 
 func buyAndUse(c *gin.Context) {
