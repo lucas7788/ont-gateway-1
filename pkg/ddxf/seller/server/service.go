@@ -78,9 +78,6 @@ func SaveDataMetaService(input io.SellerSaveDataMetaInput, ontId string) (output
 		ResourceType: input.ResourceType,
 		OntId:        ontId,
 		DataId:       input.DataId,
-		Fee:          input.Fee,
-		Stock:        input.Stock,
-		ExpiredDate:  input.ExpiredDate,
 		DataEndpoint: input.DataEndpoint,
 	}
 
