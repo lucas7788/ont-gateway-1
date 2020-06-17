@@ -68,6 +68,54 @@ func SaveTokenMetaHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, output)
 }
 
+func FreezeHandler(c *gin.Context) {
+	ontId, ok := c.Get(middleware.TenantIDKey)
+	if !ok {
+		instance.Logger().Error("[SaveTokenMetaHandler] read ontId error")
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, errors.New("[SaveTokenMetaHandler] read ontId error")))
+		return
+	}
+	bs, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		instance.Logger().Error("[PublishForOpenKgHandler] read param error")
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, err))
+		return
+	}
+	param := FreezeParam{}
+	err = json.Unmarshal(bs, &param)
+	if err != nil {
+		instance.Logger().Error("[PublishForOpenKgHandler] unmarshal param error")
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, err))
+		return
+	}
+	res := FreezeService(param, ontId.(string))
+	c.JSON(res.Code, res)
+}
+
+func PublishForOpenKgHandler(c *gin.Context) {
+	ontId, ok := c.Get(middleware.TenantIDKey)
+	if !ok {
+		instance.Logger().Error("[SaveTokenMetaHandler] read ontId error")
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, errors.New("[SaveTokenMetaHandler] read ontId error")))
+		return
+	}
+	bs, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		instance.Logger().Error("[PublishForOpenKgHandler] read param error")
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, err))
+		return
+	}
+	param := PublishForOpenKgParam{}
+	err = json.Unmarshal(bs, &param)
+	if err != nil {
+		instance.Logger().Error("[PublishForOpenKgHandler] unmarshal param error")
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, err))
+		return
+	}
+	res := PublishForOpenKgService(param, ontId.(string))
+	c.JSON(res.Code, res.Msg)
+}
+
 func PublishMPItemMetaHandler(c *gin.Context) {
 	c.Set(middleware.TenantIDKey, "did:ont:AcVBV1zKGogf9Q54p1Ve78NSQVU5ZUUGkn")
 	ontId, ok := c.Get(middleware.TenantIDKey)
@@ -89,13 +137,13 @@ func PublishMPItemMetaHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, err))
 		return
 	}
-	qrResp := PublishMPItemMetaService(param, ontId.(string))
-	if qrResp.Error() != nil {
-		instance.Logger().Error("PublishMPItemMetaHandle:", zap.Error(qrResp.Error()))
+	output := PublishMPItemMetaService(param, ontId.(string))
+	if output.Error() != nil {
+		instance.Logger().Error("PublishMPItemMetaHandle:", zap.Error(output.Error()))
 		c.JSON(http.StatusInternalServerError, common.ResponseFailedOnto(http.StatusInternalServerError, qrResp.Error()))
 		return
 	}
-	c.JSON(http.StatusOK, qrResp)
+	c.JSON(http.StatusOK, output)
 }
 
 func UseTokenHandler(c *gin.Context) {
@@ -119,34 +167,4 @@ func UseTokenHandler(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, qrResp)
-}
-
-func PublishMetaHandler(c *gin.Context) {
-	c.Set(middleware.TenantIDKey, "did:ont:AcVBV1zKGogf9Q54p1Ve78NSQVU5ZUUGkn")
-	ontId, ok := c.Get(middleware.TenantIDKey)
-	if !ok {
-		instance.Logger().Error("PublishMetaHandler: read ontId error")
-		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusInternalServerError, errors.New("PublishMPItemMetaHandle: read ontId error")))
-		return
-	}
-	paramsBs, err := ioutil.ReadAll(c.Request.Body)
-	if err != nil {
-		instance.Logger().Error("PublishMetaHandler: read post param error:", zap.Error(err))
-		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusInternalServerError, err))
-		return
-	}
-	param := io.SellerPublishMPItemMetaInput{}
-	err = json.Unmarshal(paramsBs, &param)
-	if err != nil {
-		instance.Logger().Error("PublishMetaHandler: parse post param error:", zap.Error(err))
-		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusInternalServerError, err))
-		return
-	}
-	res, err := PublishMetaService(param, ontId.(string))
-	if err != nil {
-		instance.Logger().Error("PublishMetaHandler: parse post param error:", zap.Error(err))
-		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusInternalServerError, err))
-		return
-	}
-	c.JSON(http.StatusOK, res)
 }

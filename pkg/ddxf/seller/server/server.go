@@ -10,6 +10,8 @@ const (
 	SaveDataMetaUrl            = "/ddxf/seller/saveDataMeta"
 	SaveTokenMetaUrl           = "/ddxf/seller/saveTokenMeta"
 	PublishMPItemMetaUrl       = "/ddxf/seller/publishMPItemMeta"
+	PublishForOpenKgUrl        = "/ddxf/seller/publishForOpenKg"
+	FreezeUrl                  = "/ddxf/seller/freeze"
 	UseTokenUrl                = "/ddxf/seller/useToken"
 	PublishItemMetaUrl         = "/ddxf/seller/publishItemMeta"
 	getQrCodeDataByQrCodeIdUrl = "ddxf/seller/getQrCodeDataByQrCodeId"
@@ -27,8 +29,10 @@ func StartSellerServer() {
 	r.POST(SaveTokenMetaUrl, SaveTokenMetaHandler)
 	r.POST(PublishMPItemMetaUrl, PublishMPItemMetaHandler)
 	r.POST(UseTokenUrl, UseTokenHandler)
-	r.POST(PublishItemMetaUrl, PublishMetaHandler)
-	r.POST(getQrCodeDataByQrCodeIdUrl, GetQrCodeDataByQrCodeIdHandler)
-	r.POST(qrCodeCallbackSendTxUrl, GrCodeCallbackSendTxHandler)
+	r.POST(PublishForOpenKgUrl, PublishForOpenKgHandler)
+	r.POST(FreezeUrl, FreezeHandler)
+	r.POST(PublishItemMetaUrl, PublishMetaHandlerOnto)
+	r.POST(getQrCodeDataByQrCodeIdUrl, GetQrCodeDataByQrCodeIdHandlerOnto)
+	r.POST(qrCodeCallbackSendTxUrl, GrCodeCallbackSendTxHandlerOnto)
 	go r.Run(":" + config.SellerPort)
 }

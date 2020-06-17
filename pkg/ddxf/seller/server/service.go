@@ -8,7 +8,7 @@ import (
 
 	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 	"github.com/ontio/ontology-crypto/signature"
-	ontology_go_sdk "github.com/ontio/ontology-go-sdk"
+	"github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology-go-sdk/utils"
 	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ddxf"
@@ -131,6 +131,61 @@ func SaveTokenMetaService(input io.SellerSaveTokenMetaInput, ontId string) (outp
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
+	}
+	return
+}
+
+func FreezeService(param FreezeParam, ontId string) (res OpenKgRes) {
+	tx, err := utils.TransactionFromHexString(param.SignedTx)
+	if err != nil {
+		res.Code = http.StatusInternalServerError
+		res.Msg = err.Error()
+		return
+	}
+	mutTx ,err := tx.IntoMutable()
+	if err != nil {
+		res.Code = http.StatusInternalServerError
+		res.Msg = err.Error()
+		return
+	}
+	txHash, err := instance.OntSdk().GetKit().SendTransaction(mutTx)
+	if err != nil {
+		res.Code = http.StatusInternalServerError
+		res.Msg = err.Error()
+		return
+	}
+	evt, err := instance.DDXFSdk().GetSmartCodeEvent(txHash.ToHexString())
+	if err != nil {
+		res.Code = http.StatusInternalServerError
+		res.Msg = err.Error()
+		return
+	}
+	if evt.State != 1 {
+		res.Code = http.StatusInternalServerError
+		res.Msg = "event state is not 1, txHash: "+ txHash.ToHexString()
+		return
+	}
+	return
+}
+
+func PublishForOpenKgService(param PublishForOpenKgParam, ontId string) (res OpenKgRes) {
+	output := SaveDataMetaService(param.SellerSaveDataMetaInput, ontId)
+	if output.Code != 0 {
+		res.Code = output.Code
+		res.Msg = output.Msg
+		return
+	}
+	output2 := SaveTokenMetaService(param.SellerSaveTokenMetaInput, ontId)
+	if output2.Code != 0 {
+		res.Code = output2.Code
+		res.Msg = output2.Msg
+		return
+	}
+	output3 := PublishMPItemMetaService(param.MPEndpointPublishItemMetaInput, ontId)
+	if output3.Code != 0 {
+		res.Code = output3.Code
+		res.Msg = output3.Msg
+		return
 	}
 	return
 }
