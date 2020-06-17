@@ -69,7 +69,7 @@ func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qr
 	resourceDDOBytes, itemBytes := contract.ConstructPublishParam(ServerAccount.Address,
 		tokenTemplate,
 		[]*ddxf_contract.TokenResourceTyEndpoint{trt},
-		itemMetaHash, adD.Fee, adD.ExpiredDate, adD.Stock)
+		itemMetaHash, input.Fee, input.ExpiredDate, input.Stock)
 
 	//TODO
 	var netType string

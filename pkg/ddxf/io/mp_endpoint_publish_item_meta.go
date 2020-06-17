@@ -1,6 +1,8 @@
 package io
 
-import io2 "github.com/zhiqiangxu/ont-gateway/pkg/io"
+import (
+	io2 "github.com/zhiqiangxu/ont-gateway/pkg/io"
+)
 
 // MPEndpointPublishItemMetaInput ...
 type MPEndpointPublishItemMetaInput struct {
