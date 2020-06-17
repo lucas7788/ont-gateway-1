@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/middleware/jwt"
 )
 
 const (
@@ -15,9 +16,9 @@ const (
 	PublishMPItemMetaUrl       = "/ddxf/seller/publishMPItemMeta"
 	FreezeUrl                  = "/ddxf/seller/freeze"
 	UseTokenUrl                = "/ddxf/seller/useToken"
-	PublishItemMetaUrl         = "/ddxf/seller/publishItemMeta"
-	getQrCodeDataByQrCodeIdUrl = "ddxf/seller/getQrCodeDataByQrCodeId"
-	qrCodeCallbackSendTxUrl    = "ddxf/seller/qrCodeCallbackSendTx"
+	PublishItemMetaUrl         = "/onto/ddxf/seller/publishItemMeta"
+	getQrCodeDataByQrCodeIdUrl = "/onto/ddxf/seller/getQrCodeDataByQrCodeId"
+	qrCodeCallbackSendTxUrl    = "/onto/ddxf/seller/qrCodeCallbackSendTx"
 )
 
 func StartSellerServer() {
@@ -26,6 +27,7 @@ func StartSellerServer() {
 	r.GET(config.Ping, func(context *gin.Context) {
 		context.JSON(http.StatusOK, "SUCCESS")
 	})
+	r.Use(jwt.JWT())
 	//r.Use(middleware.JWT)
 	r.POST(SaveDataMetaUrl, SaveDataMetaHandler)
 	r.POST(GetDataIdByDataMetaHashUrl, GetDataIdByDataMetaHashHandler)

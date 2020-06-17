@@ -20,6 +20,7 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/middleware/jwt"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/server"
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
@@ -37,6 +38,14 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		}
 		callback(output)
 	}()
+
+	jwtToken, err := jwt.GenerateJwt("ontID")
+	if err != nil {
+		return
+	}
+	headers := map[string]string{
+		"Authorization": jwtToken,
+	}
 
 	// 抽取openKGID
 	openKGID := input.OpenKGID
@@ -81,7 +90,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		if err != nil {
 			return
 		}
-		_, _, data, err = forward.PostJSONRequest(config.SellerUrl+server.FreezeUrl, bs, nil)
+		_, _, data, err = forward.PostJSONRequest(config.SellerUrl+server.FreezeUrl, bs, headers)
 		if err != nil {
 			return
 		}
@@ -114,7 +123,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	if err != nil {
 		return
 	}
-	_, _, data, err = forward.PostJSONRequest(config.SellerUrl+server.GetDataIdByDataMetaHashUrl, paramBs, nil)
+	_, _, data, err = forward.PostJSONRequest(config.SellerUrl+server.GetDataIdByDataMetaHashUrl, paramBs, headers)
 	if err != nil {
 		return
 	}
@@ -195,7 +204,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	if err != nil {
 		return
 	}
-	_, _, data, err = forward.PostJSONRequest(config.SellerUrl+server.SaveDataMetaArrayUrl, bs, nil)
+	_, _, data, err = forward.PostJSONRequest(config.SellerUrl+server.SaveDataMetaArrayUrl, bs, headers)
 
 	templates := make([]*ddxf_contract.TokenTemplate, 0)
 	trte := make([]*ddxf_contract.TokenResourceTyEndpoint, len(dataMetas))
@@ -283,7 +292,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	}
 
 	// send req to seller
-	_, _, data, err = forward.PostJSONRequest(config.SellerUrl+server.PublishMPItemMetaUrl, bs, nil)
+	_, _, data, err = forward.PostJSONRequest(config.SellerUrl+server.PublishMPItemMetaUrl, bs, headers)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
