@@ -129,15 +129,15 @@ func PublishService(input PublishInput) (output PublishOutput) {
 				Owners:       []*data_id_contract.OntIdIndex{},
 			}
 		}
-		tx, err := instance.DDXFSdk().DefDataIdKit().BuildRegisterDataIdInfoArrayTx(infos)
+		txMut, err := instance.DDXFSdk().DefDataIdKit().BuildRegisterDataIdInfoArrayTx(infos)
 		if err != nil {
 			return
 		}
-		tx, err = instance.DDXFSdk().SignTx(tx, seller)
+		txMut, err = instance.DDXFSdk().SignTx(txMut, seller)
 		if err != nil {
 			return
 		}
-		iMutTx, err := tx.IntoImmutable()
+		iMutTx, err := txMut.IntoImmutable()
 		saveDataMetaArray := io.SellerSaveDataMetaArrayInput{
 			DataMetaOneArray: ones,
 			SignedTx:         hex.EncodeToString(common2.SerializeToBytes(iMutTx)),
