@@ -29,7 +29,7 @@ type GetDataIdParam struct {
 }
 
 type GetDataIdRes struct {
-	DataIdAndDataMetaHashArray []DataIdAndDataMetaHash `json:"dataMetaHashArray"`
+	DataIdAndDataMetaHashArray []*DataIdAndDataMetaHash `json:"dataMetaHashArray"`
 }
 
 type DataIdAndDataMetaHash struct {

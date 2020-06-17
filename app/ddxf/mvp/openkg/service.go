@@ -109,6 +109,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 							DataId:       dataId,
 						}
 						ones = append(ones, one)
+						hash.DataId = dataId
 					}
 				}
 			}
@@ -149,15 +150,27 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		}
 		_, _, data, err = forward.PostJSONRequest(config.SellerUrl+server.SaveDataMetaArrayUrl, bs, nil)
 
+		templates := make([]*ddxf_contract.TokenTemplate, 0)
 		trte := make([]*ddxf_contract.TokenResourceTyEndpoint, len(dataMetas))
 		for i := 0; i < len(dataMetas); i++ {
-			trte[1] = &ddxf_contract.TokenResourceTyEndpoint{
-				TokenTemplate: &ddxf_contract.TokenTemplate{
-					DataID:     "",
-					TokenHashs: []string{},
-				},
-				ResourceType: 0,
-				Endpoint:     config.SellerUrl,
+			dataMetaHash, err := ddxf.HashObject(dataMetas[i])
+			if err != nil {
+				return
+			}
+			for j := 0; j < len(res.DataIdAndDataMetaHashArray); j++ {
+				if res.DataIdAndDataMetaHashArray[i].DataMetaHash == string(dataMetaHash[:]) {
+					tt := &ddxf_contract.TokenTemplate{
+						DataID:     res.DataIdAndDataMetaHashArray[j].DataId,
+						TokenHashs: []string{},
+					}
+					trte[i] = &ddxf_contract.TokenResourceTyEndpoint{
+						TokenTemplate: tt,
+						ResourceType:  0,
+						Endpoint:      config.SellerUrl,
+					}
+					templates = append(templates, tt)
+					break
+				}
 			}
 		}
 
@@ -175,15 +188,12 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		}
 
 		item := ddxf_contract.DTokenItem{
-			Fee:         ddxf_contract.Fee{},
+			Fee: ddxf_contract.Fee{
+				ContractType: split_policy_contract.ONG,
+			},
 			ExpiredDate: uint64(time.Now().Unix()) + uint64(time.Hour*24*30),
 			Stocks:      1000,
-			Templates: []*ddxf_contract.TokenTemplate{
-				&ddxf_contract.TokenTemplate{
-					DataID:     "",
-					TokenHashs: []string{},
-				},
-			},
+			Templates:   templates,
 		}
 		split := split_policy_contract.SplitPolicyRegisterParam{}
 		var tx *types.MutableTransaction
