@@ -6,14 +6,16 @@ import (
 	"github.com/ontio/ontology/common"
 	"github.com/satori/go.uuid"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"github.com/zhiqiangxu/ont-gateway/pkg/misc"
+	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 )
+
 
 func GenerateUUId(preFix string) string {
 	return preFix + uuid.NewV4().String()
 }
+
 
 func HandleEvent(txHash string, method string) ([]io.EndpointToken, error) {
 	event, err := instance.OntSdk().GetSmartCodeEvent(txHash)
@@ -69,7 +71,7 @@ func HandleEvent(txHash string, method string) ([]io.EndpointToken, error) {
 				if err != nil {
 					return nil, err
 				}
-				tt := param.TokenTemplate{}
+				tt := ddxf_contract.TokenTemplate{}
 				err = tt.FromBytes(tokenTemplateBytes)
 				if err != nil {
 					return nil, err

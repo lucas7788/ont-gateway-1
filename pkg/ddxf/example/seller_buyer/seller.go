@@ -11,12 +11,13 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/contract"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/server"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"math/rand"
 	"strconv"
 	"time"
+	"github.com/ont-bizsuite/ddxf-sdk/data_id_contract"
+	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 )
 
 func SaveDataMeta(sellerOntId string, con *ontology_go_sdk.Controller, seller *ontology_go_sdk.Account, bookKey string) (*io.SellerSaveDataMetaOutput, *io.SellerSaveDataMetaInput, error) {
@@ -50,12 +51,12 @@ func SaveDataMeta(sellerOntId string, con *ontology_go_sdk.Controller, seller *o
 	}
 
 	dataId := common2.GenerateUUId(config.UUID_PRE_DATAID)
-	info := server.DataIdInfo{
+	info := data_id_contract.DataIdInfo{
 		DataId:       dataId,
 		DataType:     0,
 		DataMetaHash: dataMetaHashU,
 		DataHash:     dataHash,
-		Owner:        sellerOntId,
+		Owners:        []*data_id_contract.OntIdIndex{},
 	}
 
 	tx, err := instance.OntSdk().DefaultDataIdContract().BuildTx(seller, "registerDataId", []interface{}{info.ToBytes(), 1})
@@ -118,7 +119,7 @@ func PublishMeta(seller *ontology_go_sdk.Account, saveDataMetaOut *io.SellerSave
 	resourceIdBytes := []byte(common2.GenerateUUId(config.UUID_RESOURCE_ID))
 	fmt.Println("[PublishMeta] resourceId:", string(resourceIdBytes))
 	tokenMetaHash, _ := hex.DecodeString(saveTokenMetaIn.TokenMetaHash)
-	tokenTemplate := &param.TokenTemplate{
+	tokenTemplate := &ddxf_contract.TokenTemplate{
 		DataID:     saveDataMetaOut.DataId,
 		TokenHashs: []string{string(tokenMetaHash)},
 	}
@@ -131,7 +132,7 @@ func PublishMeta(seller *ontology_go_sdk.Account, saveDataMetaOut *io.SellerSave
 	itemMetaHash, err := common.Uint256ParseFromBytes(bs[:])
 	resourceDDOBytes, itemBytes := contract.ConstructPublishParam(seller.Address,
 		tokenTemplate,
-		[]*param.TokenResourceTyEndpoint{&param.TokenResourceTyEndpoint{
+		[]*ddxf_contract.TokenResourceTyEndpoint{&ddxf_contract.TokenResourceTyEndpoint{
 			TokenTemplate: tokenTemplate,
 			ResourceType:  saveDataMetaIn.ResourceType,
 			Endpoint:      saveDataMetaIn.DataEndpoint,

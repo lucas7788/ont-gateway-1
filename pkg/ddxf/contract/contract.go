@@ -2,12 +2,13 @@ package contract
 
 import (
 	"github.com/ontio/ontology/common"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
+	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 )
 
-func ConstructPublishParam(seller common.Address, template *param.TokenTemplate, tokenResourceType []*param.TokenResourceTyEndpoint,
-	itemMetaHash common.Uint256, fee param.Fee, expiredDate uint64, stock uint32) ([]byte, []byte) {
-	ddo := param.ResourceDDO{
+func ConstructPublishParam(seller common.Address, template *ddxf_contract.TokenTemplate,
+	tokenResourceType []*ddxf_contract.TokenResourceTyEndpoint,
+	itemMetaHash common.Uint256, fee ddxf_contract.Fee, expiredDate uint64, stock uint32) ([]byte, []byte) {
+	ddo := ddxf_contract.ResourceDDO{
 		TokenResourceTyEndpoints: tokenResourceType,    // RT for tokens
 		Manager:                  seller,               // data owner id
 		ItemMetaHash:             itemMetaHash,         // required if len(Templates) > 1
@@ -16,11 +17,11 @@ func ConstructPublishParam(seller common.Address, template *param.TokenTemplate,
 		Split:                    common.ADDRESS_EMPTY,
 	}
 
-	item := param.DTokenItem{
+	item := ddxf_contract.DTokenItem{
 		Fee:         fee,
 		ExpiredDate: expiredDate,
 		Stocks:      stock,
-		Templates:   []*param.TokenTemplate{template},
+		Templates:   []*ddxf_contract.TokenTemplate{template},
 	}
 
 	return ddo.ToBytes(), item.ToBytes()

@@ -10,8 +10,8 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
+	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 )
 
 var (
@@ -48,7 +48,7 @@ func TestBuyDTokenService(t *testing.T) {
 
 func TestUseTokenService(t *testing.T) {
 	tokenHashBytes, _ := hex.DecodeString(tokenHash)
-	template := param.TokenTemplate{
+	template := ddxf_contract.TokenTemplate{
 		DataID:     DataID,
 		TokenHashs: []string{string(tokenHashBytes)},
 	}

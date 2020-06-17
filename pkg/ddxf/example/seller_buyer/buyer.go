@@ -10,8 +10,8 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/buyer/server"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/param"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
+	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 )
 
 func BuyDtoken(buyer *ontology_go_sdk.Account, resourceId string) error {
@@ -37,7 +37,7 @@ func BuyDtoken(buyer *ontology_go_sdk.Account, resourceId string) error {
 
 func UseToken(buyer *ontology_go_sdk.Account, resourceId, tokenMetaHash string, dataId string) error {
 	tokenHashBytes, _ := hex.DecodeString(tokenMetaHash)
-	template := &param.TokenTemplate{
+	template := &ddxf_contract.TokenTemplate{
 		DataID:     dataId,
 		TokenHashs: []string{string(tokenHashBytes)},
 	}
