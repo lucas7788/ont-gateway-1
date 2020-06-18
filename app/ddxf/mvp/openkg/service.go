@@ -29,38 +29,59 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func GenerateOntIdService(input GenerateOntIdInput) (UserInfo, error) {
+func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput) {
+	output.ReqID = input.ReqID
+	var err error
+	defer func() {
+		if err != nil {
+			output.Code = http.StatusInternalServerError
+			output.Msg = err.Error()
+		}
+		callback(output)
+	}()
+
 	ui := UserInfo{}
 	filter := bson.M{"user_id": input.UserId}
-	err := FindElt(UserInfoCollection, filter, &ui)
+	err = FindElt(UserInfoCollection, filter, &ui)
 	if err != nil && err != mongo.ErrNilDocument {
-		return ui, err
+		return
 	}
-	err = InsertElt(UserInfoCollection, ui)
-	if err != nil && err != mongo.ErrNilDocument {
-		return ui, err
+	if err == nil {
+		output.OntId = ui.OntId
+		return
+	}
+	if err == mongo.ErrNilDocument {
+		err = nil
 	}
 
 	plainSeed := []byte(defPlainSeed + input.UserId)
 	pri, _ := key_manager.GetSerializedKeyPair(plainSeed)
 	account, err := ontology_go_sdk.NewAccountFromPrivateKey(pri, signature.SHA256withECDSA)
 	if err != nil {
-		return ui, err
+		return
 	}
 	ontid := "did:ont:" + account.Address.ToBase58()
 	txHash, err := instance.DDXFSdk().GetOntologySdk().Native.OntId.RegIDWithPublicKey(defGasPrice,
 		defGasLimit, payer, ontid, account)
 	if err != nil {
-		return ui, err
+		return
 	}
 	evt, err := instance.DDXFSdk().GetSmartCodeEvent(txHash.ToHexString())
 	if err != nil {
-		return ui, err
+		return
 	}
 	if evt.State != 1 {
-		return ui, errors.New("event state is not 1")
+		err = errors.New("event state is not 1")
+		return
 	}
-	return ui, nil
+
+	ui.OntId = ontid
+	err = InsertElt(UserInfoCollection, ui)
+	if err == nil {
+		output.OntId = ontid
+	}
+
+	return
 }
 
 func PublishService(input PublishInput) (output PublishOutput) {

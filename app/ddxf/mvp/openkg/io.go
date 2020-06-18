@@ -1,7 +1,15 @@
 package main
 
 type GenerateOntIdInput struct {
+	ReqID  string `bson:"req_id" json:"req_id"`
 	UserId string `json:"user_id"`
+}
+
+type GenerateOntIdOutput struct {
+	Code  int
+	Msg   string
+	ReqID string
+	OntId string `json:"ont_id"`
 }
 
 // PublishInput ...
