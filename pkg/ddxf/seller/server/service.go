@@ -320,6 +320,47 @@ func UseTokenService(input io.SellerTokenLookupEndpointUseTokenInput) (output io
 	return
 }
 
+func BuyAndUseDTokenService(input io.BuyerBuyAndUseDtokenInput) (output io.BuyerBuyAndUseDtokenOutput) {
+	tx, err := utils.TransactionFromHexString(input.SignedTx)
+	if err != nil {
+		output.Code = http.StatusBadRequest
+		output.Msg = err.Error()
+		return
+	}
+	mutTx, err := tx.IntoMutable()
+	if err != nil {
+		output.Code = http.StatusBadRequest
+		output.Msg = err.Error()
+		return
+	}
+	txHash, err := instance.OntSdk().SendRawTx(mutTx)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	ets, err := common2.HandleEvent(txHash, "buyAndUseDToken")
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	//TODO
+	if len(ets) == 0 {
+		output.Code = http.StatusInternalServerError
+		output.Msg = ""
+		return
+	}
+	output.Result, err = GetDataByOnchainIdService(ets[0].Token.OnchainItemId, ets[0].Token.Buyer, ets[0].Token.TokenTemplate)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	fmt.Println(ets)
+	return
+}
+
 //书籍
 func GetDataByOnchainIdService(onchainItemId string, buyer common.Address, template ddxf_contract.TokenTemplate) (interface{}, error) {
 	//根据 onchainId 拿到真实的数据

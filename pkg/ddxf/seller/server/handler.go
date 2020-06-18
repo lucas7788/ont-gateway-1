@@ -191,3 +191,26 @@ func UseTokenHandler(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, qrResp)
 }
+
+func BuyAndUseDTokenHandler(c *gin.Context) {
+	data, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		instance.Logger().Error("BuyAndUseDTokenHandler:", zap.Error(err))
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusBadRequest, err))
+		return
+	}
+	param := io.BuyerBuyAndUseDtokenInput{}
+	err = json.Unmarshal(data, &param)
+	if err != nil {
+		instance.Logger().Error("BuyAndUseDTokenHandler:", zap.Error(err))
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusBadRequest, err))
+		return
+	}
+	qrResp := BuyAndUseDTokenService(param)
+	if qrResp.Error() != nil {
+		instance.Logger().Error("BuyAndUseDTokenHandler:", zap.Error(qrResp.Error()))
+		c.JSON(http.StatusInternalServerError, common.ResponseFailedOnto(http.StatusInternalServerError, qrResp.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, qrResp)
+}

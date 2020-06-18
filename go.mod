@@ -3,6 +3,7 @@ module github.com/zhiqiangxu/ont-gateway
 go 1.12
 
 require (
+	github.com/cloudflare/tableflip v1.2.0 // indirect
 	github.com/gin-contrib/pprof v1.2.1
 	github.com/gin-gonic/gin v1.6.2
 	github.com/go-kit/kit v0.10.0
