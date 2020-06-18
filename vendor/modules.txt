@@ -120,18 +120,19 @@ github.com/ontio/ontology/core/signature
 github.com/ontio/ontology/account
 github.com/ontio/ontology/cmd/utils
 github.com/ontio/ontology/common/constants
-github.com/ontio/ontology/common/serialization
 github.com/ontio/ontology/core/payload
 github.com/ontio/ontology/core/utils
 github.com/ontio/ontology/http/base/common
 github.com/ontio/ontology/smartcontract/event
 github.com/ontio/ontology/smartcontract/service/native/global_params
 github.com/ontio/ontology/smartcontract/service/native/ont
-github.com/ontio/ontology/core/program
+github.com/ontio/ontology/smartcontract/service/native/ontid
 github.com/ontio/ontology/smartcontract/service/native/utils
+github.com/ontio/ontology/core/program
 github.com/ontio/ontology/common/log
 github.com/ontio/ontology/cmd/abi
 github.com/ontio/ontology/common/config
+github.com/ontio/ontology/common/serialization
 github.com/ontio/ontology/http/base/error
 github.com/ontio/ontology/smartcontract/service/neovm
 github.com/ontio/ontology/smartcontract/states
@@ -164,7 +165,6 @@ github.com/ontio/ontology/core/store/leveldbstore
 github.com/ontio/ontology/merkle
 github.com/ontio/ontology/smartcontract
 github.com/ontio/ontology/smartcontract/service/native/init
-github.com/ontio/ontology/smartcontract/service/native/ontid
 github.com/ontio/ontology/smartcontract/service/wasmvm
 github.com/ontio/ontology/p2pserver/message/types
 github.com/ontio/ontology/p2pserver
@@ -196,7 +196,7 @@ github.com/ontio/ontology-eventbus/log
 github.com/ontio/ontology-eventbus/mailbox
 github.com/ontio/ontology-eventbus/internal/queue/goring
 github.com/ontio/ontology-eventbus/internal/queue/mpsc
-# github.com/ontio/ontology-go-sdk v1.11.1
+# github.com/ontio/ontology-go-sdk v1.11.2-0.20200615094056-8c296c479e8d
 github.com/ontio/ontology-go-sdk
 github.com/ontio/ontology-go-sdk/utils
 github.com/ontio/ontology-go-sdk/common
