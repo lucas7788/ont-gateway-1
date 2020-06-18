@@ -8,6 +8,7 @@ import (
 
 	"crypto/sha256"
 
+	"github.com/kataras/go-errors"
 	"github.com/ont-bizsuite/ddxf-sdk/data_id_contract"
 	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 	"github.com/ont-bizsuite/ddxf-sdk/split_policy_contract"
@@ -27,6 +28,40 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
+
+func GenerateOntIdService(input GenerateOntIdInput) (UserInfo, error) {
+	ui := UserInfo{}
+	filter := bson.M{"user_id": input.UserId}
+	err := FindElt(UserInfoCollection, filter, &ui)
+	if err != nil && err != mongo.ErrNilDocument {
+		return ui, err
+	}
+	err = InsertElt(UserInfoCollection, ui)
+	if err != nil && err != mongo.ErrNilDocument {
+		return ui, err
+	}
+
+	plainSeed := []byte(defPlainSeed + input.UserId)
+	pri, _ := key_manager.GetSerializedKeyPair(plainSeed)
+	account, err := ontology_go_sdk.NewAccountFromPrivateKey(pri, signature.SHA256withECDSA)
+	if err != nil {
+		return ui, err
+	}
+	ontid := "did:ont:" + account.Address.ToBase58()
+	txHash, err := instance.DDXFSdk().GetOntologySdk().Native.OntId.RegIDWithPublicKey(defGasPrice,
+		defGasLimit, payer, ontid, account)
+	if err != nil {
+		return ui, err
+	}
+	evt, err := instance.DDXFSdk().GetSmartCodeEvent(txHash.ToHexString())
+	if err != nil {
+		return ui, err
+	}
+	if evt.State != 1 {
+		return ui, errors.New("event state is not 1")
+	}
+	return ui, nil
+}
 
 func PublishService(input PublishInput) (output PublishOutput) {
 	output.ReqID = input.ReqID

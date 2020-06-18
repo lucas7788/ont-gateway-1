@@ -12,6 +12,7 @@ import (
 
 const (
 	OpenKgPublishParamCollection = "open_kg_publish_collection"
+	UserInfoCollection           = "user_info_collection"
 )
 
 // Init for this collection

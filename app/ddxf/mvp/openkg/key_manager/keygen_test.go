@@ -4,6 +4,7 @@ import (
 	"math/rand"
 	"strconv"
 	"testing"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetKeyPair(t *testing.T) {
@@ -17,5 +18,9 @@ func TestGetKeyPair(t *testing.T) {
 }
 
 func Test_getKeyPair(t *testing.T) {
-
+	pri,_ := GetKeyPair([]byte("123"))
+	for i:=0;i<100000;i++ {
+		pri2,_ := GetKeyPair([]byte("123"))
+		assert.Equal(t, pri, pri2)
+	}
 }

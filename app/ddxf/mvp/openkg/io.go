@@ -1,5 +1,9 @@
 package main
 
+type GenerateOntIdInput struct {
+	UserId string `json:"user_id"`
+}
+
 // PublishInput ...
 type PublishInput struct {
 	ReqID     string                   `bson:"req_id" json:"req_id"`
