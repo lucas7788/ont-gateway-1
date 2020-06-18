@@ -14,6 +14,7 @@ const (
 	openkgPort   = "10999"
 	publishURI   = "/publish"
 	buyAndUseURI = "/buyAndUse"
+	generateOntIdByUserIdURI = "/generateOntIdByUserId"
 )
 
 var (
@@ -24,6 +25,7 @@ var (
 // MVP for openkg
 func main() {
 	r := gin.Default()
+	r.POST(generateOntIdByUserIdURI,generateOntIdByUserId)
 	r.POST(publishURI, publish)
 	r.POST(buyAndUseURI, buyAndUse)
 

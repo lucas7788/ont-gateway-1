@@ -28,6 +28,20 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+func GenerateOntIdService(input GenerateOntIdInput) (UserInfo, error) {
+	ui := UserInfo{}
+	filter := bson.M{"user_id": input.UserId}
+	err := FindElt(UserInfoCollection, filter, &ui)
+	if err != nil && err != mongo.ErrNilDocument {
+		return ui, err
+	}
+	err = InsertElt(UserInfoCollection, ui)
+	if err != nil && err != mongo.ErrNilDocument {
+		return ui, err
+	}
+	return ui, nil
+}
+
 func PublishService(input PublishInput) (output PublishOutput) {
 	output.ReqID = input.ReqID
 	var err error
