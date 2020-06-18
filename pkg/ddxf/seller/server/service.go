@@ -370,5 +370,10 @@ func GetDataByOnchainIdService(onchainItemId string, buyer common.Address, templ
 	if err != nil {
 		return nil, err
 	}
+
+	if data.DataMeta["url"] != nil {
+		return data.DataMeta["url"].(string), nil
+	}
+
 	return "http://127.0.0.1:20335/ddxf/storage/download/" + data.DataMeta["downloadParam"].(string), nil
 }
