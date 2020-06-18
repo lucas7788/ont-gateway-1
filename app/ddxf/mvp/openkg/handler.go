@@ -14,10 +14,12 @@ func generateOntIdByUserId(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
-	go func() {
-		PublishService(input)
-	}()
-	c.JSON(http.StatusOK, "SUCCESS")
+	ui, err := GenerateOntIdService(input)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, ui)
 }
 
 func publish(c *gin.Context) {

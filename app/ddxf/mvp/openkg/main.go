@@ -11,21 +11,23 @@ import (
 )
 
 const (
-	openkgPort   = "10999"
-	publishURI   = "/publish"
-	buyAndUseURI = "/buyAndUse"
+	openkgPort               = "10999"
+	publishURI               = "/publish"
+	buyAndUseURI             = "/buyAndUse"
 	generateOntIdByUserIdURI = "/generateOntIdByUserId"
 )
 
 var (
 	payer        *ontology_go_sdk.Account
 	defPlainSeed string
+	defGasPrice  = uint64(500)
+	defGasLimit  = uint64(20000000)
 )
 
 // MVP for openkg
 func main() {
 	r := gin.Default()
-	r.POST(generateOntIdByUserIdURI,generateOntIdByUserId)
+	r.POST(generateOntIdByUserIdURI, generateOntIdByUserId)
 	r.POST(publishURI, publish)
 	r.POST(buyAndUseURI, buyAndUse)
 
