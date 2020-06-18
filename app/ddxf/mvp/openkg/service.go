@@ -95,14 +95,6 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		callback(output)
 	}()
 
-	jwtToken, err := jwt.GenerateJwt("ontID")
-	if err != nil {
-		return
-	}
-	headers := map[string]string{
-		"Authorization": jwtToken,
-	}
-
 	// 抽取openKGID
 	openKGID := input.OpenKGID
 	filter := bson.M{"open_kg_id": openKGID}
@@ -118,6 +110,15 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	seller, err := ontology_go_sdk.NewAccountFromPrivateKey(pri, signature.SHA256withECDSA)
 	if err != nil {
 		return
+	}
+	ontID := "did:ont:" + seller.Address.ToBase58()
+	jwtToken, err := jwt.GenerateJwt(ontID)
+	if err != nil {
+		return
+	}
+
+	headers := map[string]string{
+		"Authorization": jwtToken,
 	}
 
 	if input.Delete {
@@ -377,6 +378,18 @@ func buyAndUseService(input BuyAndUseInput) (output BuyAndUseOutput) {
 		output.Code = http.StatusInternalServerError
 		return
 	}
+	ontID := "did:ont:" + user.Address.ToBase58()
+	jwtToken, err := jwt.GenerateJwt(ontID)
+	if err != nil {
+		output.Msg = err.Error()
+		output.Code = http.StatusInternalServerError
+		return
+	}
+
+	headers := map[string]string{
+		"Authorization": jwtToken,
+	}
+
 	filter := bson.M{"open_kg_id": input.OpenKGID}
 	param := PublishInput{}
 	err = FindElt(OpenKgPublishParamCollection, filter, &param)
@@ -409,5 +422,36 @@ func buyAndUseService(input BuyAndUseInput) (output BuyAndUseOutput) {
 		output.Code = http.StatusInternalServerError
 		return
 	}
+
+	iMutTx, err := tx.IntoImmutable()
+	if err != nil {
+		output.Msg = err.Error()
+		output.Code = http.StatusInternalServerError
+		return
+	}
+	bs, err := json.Marshal(io.BuyerBuyAndUseDtokenInput{SignedTx: hex.EncodeToString(common2.SerializeToBytes(iMutTx))})
+	if err != nil {
+		output.Msg = err.Error()
+		output.Code = http.StatusInternalServerError
+		return
+	}
+
+	// send req to seller
+	_, _, data, err := forward.PostJSONRequest(config.SellerUrl+server.BuyAndUseDTokenUrl, bs, headers)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+
+	var buyAndUseOutput io.BuyerBuyAndUseDtokenOutput
+	err = json.Unmarshal(data, &buyAndUseOutput)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+
+	err = buyAndUseOutput.Error()
 	return
 }
