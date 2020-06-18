@@ -165,6 +165,10 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	dataMetas := input.Datas
 	dataMetaHashArray := make([]string, len(dataMetas))
 	for i := 0; i < len(dataMetas); i++ {
+		if dataMetas[i]["url"] == nil {
+			err = errors.New("url empty")
+			return
+		}
 		var hash [sha256.Size]byte
 		hash, err = ddxf.HashObject(dataMetas[i])
 		if err != nil {
