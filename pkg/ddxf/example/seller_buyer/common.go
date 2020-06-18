@@ -12,7 +12,7 @@ func SendPOST(url string, param interface{}) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	_, _, data, err := forward.PostJSONRequest(url, bs, nil)
+	_, _, data, err := forward.PostJSONRequest(url, bs, map[string]string{"Authorization":jwt.})
 	if err != nil {
 		return nil, err
 	}

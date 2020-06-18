@@ -8,6 +8,7 @@ require (
 	github.com/gin-gonic/gin v1.6.2
 	github.com/go-kit/kit v0.10.0
 	github.com/go-redis/redis v6.15.7+incompatible
+	github.com/jfcote87/esign v0.9.0
 	github.com/kataras/go-errors v0.0.3
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
 	github.com/magiconair/properties v1.8.1

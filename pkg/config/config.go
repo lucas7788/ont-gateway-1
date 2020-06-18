@@ -44,6 +44,20 @@ type (
 	LoggerConfig struct {
 		LogLevel string
 	}
+
+	// DocuConfig for docu
+	DocuConfig struct {
+		IntegratorKey string
+		PrivateKey    string
+		KeyPairID     string
+		APIAccountID  string
+		APIUserID     string
+	}
+
+	// EsignConfig for esign
+	EsignConfig struct {
+		DocuConfig DocuConfig
+	}
 	// Value is combined config info
 	Value struct {
 		Prod             bool
@@ -52,6 +66,7 @@ type (
 		RedisCacheConfig RedisConfig
 		MongoConfig      MongoConfig
 		CICDConfig       CICDConfig
+		EsignConfig      EsignConfig
 	}
 )
 
