@@ -38,6 +38,7 @@ func NewApp() *gin.Engine {
 	addon.POST("/deploy", DeployAddon)
 	addon.GET("/deploy/check", CheckDeploy)
 	addon.POST("/shell", Shell)
+	addon.POST("/python", Python)
 
 	tx := aksk.Group("/tx")
 	tx.POST("/poll", EnqueTx)
