@@ -339,25 +339,26 @@ func BuyAndUseDTokenService(input io.BuyerBuyAndUseDtokenInput) (output io.Buyer
 		output.Msg = err.Error()
 		return
 	}
-	ets, err := common2.HandleEvent(txHash, "buyAndUseDToken")
+	buy, use, err := common2.HanleBuyAndUseToken(txHash)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
 		return
 	}
 	//TODO
-	if len(ets) == 0 {
+	if len(buy) == 0 || len(use) == 0 {
 		output.Code = http.StatusInternalServerError
 		output.Msg = ""
 		return
 	}
-	output.Result, err = GetDataByOnchainIdService(ets[0].Token.OnchainItemId, ets[0].Token.Buyer, ets[0].Token.TokenTemplate)
+	output.EndpointTokens = buy
+	output.Result, err = GetDataByOnchainIdService(use[0].Token.OnchainItemId, use[0].Token.Buyer, use[0].Token.TokenTemplate)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
 		return
 	}
-	fmt.Println(ets)
+	fmt.Println(buy, use)
 	return
 }
 
