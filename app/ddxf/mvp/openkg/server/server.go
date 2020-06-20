@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"crypto/sha256"
@@ -25,18 +25,18 @@ var (
 )
 
 // MVP for openkg
-func main() {
+func StartServer() {
 	r := gin.Default()
-	r.POST(generateOntIdByUserIdURI, generateOntIdByUserId)
-	r.POST(publishURI, publish)
-	r.POST(buyAndUseURI, buyAndUse)
+	r.POST(generateOntIdByUserIdURI, GenerateOntIdByUserId)
+	r.POST(publishURI, Publish)
+	r.POST(buyAndUseURI, BuyAndUse)
 
 	wallet, err := instance.OntSdk().GetKit().OpenWallet("./wallet.dat")
 	if err != nil {
 		fmt.Println("OpenWallet failed: ", err)
 		return
 	}
-	payer, err = wallet.GetAccountByAddress("", []byte("123456"))
+	payer, err = wallet.GetAccountByAddress("Aejfo7ZX5PVpenRj23yChnyH64nf8T1zbu", []byte("123456"))
 	if err != nil {
 		fmt.Println("GetAccountByAddress failed: ", err)
 		return

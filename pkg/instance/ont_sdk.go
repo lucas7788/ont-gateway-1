@@ -9,9 +9,10 @@ import (
 )
 
 var (
-	ontSdk     *misc.OntSdk
-	ontSdkOnce sync.Once
-	ddxfSdk    *ddxf_sdk.DdxfSdk
+	ontSdk      *misc.OntSdk
+	ontSdkOnce  sync.Once
+	ddxfSdkOnce sync.Once
+	ddxfSdk     *ddxf_sdk.DdxfSdk
 )
 
 // OntSdk is singleton for misc.OntSdk
@@ -25,7 +26,7 @@ func OntSdk() *misc.OntSdk {
 
 // OntSdk is singleton for misc.OntSdk
 func DDXFSdk() *ddxf_sdk.DdxfSdk {
-	ontSdkOnce.Do(func() {
+	ddxfSdkOnce.Do(func() {
 		if config.Load().Prod {
 			ddxfSdk = ddxf_sdk.NewDdxfSdk("http://dappnode1.ont.io:20336")
 		} else {

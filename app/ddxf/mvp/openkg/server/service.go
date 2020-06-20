@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"encoding/hex"
@@ -295,7 +295,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	resourceId := common.GenerateUUId(config.UUID_RESOURCE_ID)
 	input.OnChainId = resourceId
 	InsertElt(OpenKgPublishParamCollection, input)
-	// 2. save data metas and publish item
+	// 2. save data metas and Publish item
 	// send request to seller
 	var itemMetaHash [32]byte
 	itemMetaHash, err = ddxf.HashObject(input.Item)

@@ -31,10 +31,9 @@ type SellerSaveDataMeta struct {
 	DataEndpoint string `bson:"dataEndpoint" json:"dataEndpoint"`
 }
 
-
 type SellerSaveDataMetaArrayInput struct {
 	DataMetaOneArray []DataMetaOne `json:"dataMetaOne"`
-	SignedTx    string      `json:"signedTx"`
+	SignedTx         string        `json:"signedTx"`
 }
 
 type DataMetaOne struct {

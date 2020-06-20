@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"net/http"
@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func generateOntIdByUserId(c *gin.Context) {
+func GenerateOntIdByUserId(c *gin.Context) {
 	var (
 		input GenerateOntIdInput
 	)
@@ -23,7 +23,7 @@ func generateOntIdByUserId(c *gin.Context) {
 
 }
 
-func publish(c *gin.Context) {
+func Publish(c *gin.Context) {
 	var (
 		input PublishInput
 	)
@@ -37,7 +37,7 @@ func publish(c *gin.Context) {
 	c.JSON(http.StatusOK, "SUCCESS")
 }
 
-func buyAndUse(c *gin.Context) {
+func BuyAndUse(c *gin.Context) {
 	var (
 		input BuyAndUseInput
 	)
