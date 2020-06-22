@@ -1,9 +1,10 @@
 package config
 
 import (
-	"github.com/ontio/ontology-crypto/signature"
-	"github.com/ontio/ontology-go-sdk"
 	"encoding/hex"
+
+	"github.com/ontio/ontology-crypto/signature"
+	ontology_go_sdk "github.com/ontio/ontology-go-sdk"
 )
 
 var defDDXFConfig *DDXFConfig
@@ -19,7 +20,7 @@ func DefDDXFConfig() *DDXFConfig {
 		acc, _ := ontology_go_sdk.NewAccountFromPrivateKey(pri, signature.SHA256withECDSA)
 		defDDXFConfig = &DDXFConfig{
 			OperatorAccount: acc,
-			OperatorOntid:   "did:id:",
+			OperatorOntid:   "did:ont:" + acc.Address.ToBase58(),
 		}
 	}
 	return defDDXFConfig

@@ -1,4 +1,4 @@
-// +build !prod
+// +build !prod,!k8sdev
 
 package config
 
