@@ -8,6 +8,7 @@ import (
 
 	"crypto/sha256"
 
+	"fmt"
 	"github.com/kataras/go-errors"
 	"github.com/ont-bizsuite/ddxf-sdk/data_id_contract"
 	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
@@ -43,23 +44,19 @@ func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput)
 	ui := UserInfo{}
 	filter := bson.M{"user_id": input.UserId}
 	err = FindElt(UserInfoCollection, filter, &ui)
-	if err != nil && err != mongo.ErrNilDocument {
+	if err != nil && err != mongo.ErrNilDocument && err != mongo.ErrNoDocuments {
+		fmt.Println(err)
 		return
 	}
 	if err == nil {
 		output.OntId = ui.OntId
 		return
 	}
-	if err == mongo.ErrNilDocument {
+	if err == mongo.ErrNilDocument || err == mongo.ErrNoDocuments {
 		err = nil
 	}
 
-	plainSeed := []byte(defPlainSeed + input.UserId)
-	pri, _ := key_manager.GetSerializedKeyPair(plainSeed)
-	account, err := ontology_go_sdk.NewAccountFromPrivateKey(pri, signature.SHA256withECDSA)
-	if err != nil {
-		return
-	}
+	account := GetAccount(input.UserId)
 	ontid := "did:ont:" + account.Address.ToBase58()
 	txHash, err := instance.DDXFSdk().GetOntologySdk().Native.OntId.RegIDWithPublicKey(defGasPrice,
 		defGasLimit, payer, ontid, account)
@@ -105,12 +102,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		err = findError
 		return
 	}
-	plainSeed := []byte(defPlainSeed + input.UserID)
-	pri, _ := key_manager.GetSerializedKeyPair(plainSeed)
-	seller, err := ontology_go_sdk.NewAccountFromPrivateKey(pri, signature.SHA256withECDSA)
-	if err != nil {
-		return
-	}
+	seller := GetAccount(input.UserID)
 	ontID := "did:ont:" + seller.Address.ToBase58()
 	jwtToken, err := jwt.GenerateJwt(ontID)
 	if err != nil {

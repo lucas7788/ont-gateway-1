@@ -56,14 +56,14 @@ func BuildLoginQrCode(id string) (QrCode, error) {
 	if err != nil {
 		return QrCode{}, err
 	}
-	sig, err := config.DefDDXFConfig.OperatorAccount.Sign(qcdBs)
+	sig, err := config.DefDDXFConfig().OperatorAccount.Sign(qcdBs)
 	if err != nil {
 		return QrCode{}, err
 	}
 	qrCode := QrCode{
 		QrCodeId:     id,
 		Ver:          "v2.0.0",
-		Requester:    config.DefDDXFConfig.OperatorOntid,
+		Requester:    config.DefDDXFConfig().OperatorOntid,
 		Signature:    hex.EncodeToString(sig),
 		Signer:       "",
 		QrCodeData:   string(qcdBs),
