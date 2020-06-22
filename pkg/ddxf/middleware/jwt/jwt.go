@@ -55,7 +55,7 @@ func validateToken(token string, admin bool) (*Payload, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = signature.Verify(config.DefDDXFConfig.OperatorAccount.GetPublicKey(), []byte(data), sig)
+	err = signature.Verify(config.DefDDXFConfig().OperatorAccount.GetPublicKey(), []byte(data), sig)
 	if err != nil {
 		return nil, err
 	}

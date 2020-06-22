@@ -52,7 +52,7 @@ func GenerateJwt(userInfo string) (string, error) {
 		return "", err
 	}
 	raw := base64.RawURLEncoding.EncodeToString(hBs) + "." + base64.RawURLEncoding.EncodeToString(pBs)
-	sig, err := config.DefDDXFConfig.OperatorAccount.Sign([]byte(raw))
+	sig, err := config.DefDDXFConfig().OperatorAccount.Sign([]byte(raw))
 	if err != nil {
 		return "", err
 	}
