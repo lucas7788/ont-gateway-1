@@ -54,6 +54,16 @@ type (
 		APIUserID     string
 	}
 
+	// MySQLConfig for mysql
+	MySQLConfig struct {
+		ConnectionString string
+		ConnMaxLifetime  int
+		MaxOpenConn      int
+		MaxIdleConn      int
+		ShowSQL          bool
+		Slaves           []MySQLConfig
+	}
+
 	// EsignConfig for esign
 	EsignConfig struct {
 		DocuConfig DocuConfig
@@ -67,6 +77,7 @@ type (
 		MongoConfig      MongoConfig
 		CICDConfig       CICDConfig
 		EsignConfig      EsignConfig
+		MySQLConfig      MySQLConfig
 	}
 )
 

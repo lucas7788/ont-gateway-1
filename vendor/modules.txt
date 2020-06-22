@@ -52,8 +52,12 @@ github.com/go-redis/redis/internal/hashtag
 github.com/go-redis/redis/internal/pool
 github.com/go-redis/redis/internal/proto
 github.com/go-redis/redis/internal/util
+# github.com/go-sql-driver/mysql v1.5.0
+github.com/go-sql-driver/mysql
 # github.com/go-stack/stack v1.8.0
 github.com/go-stack/stack
+# github.com/go-xorm/xorm v0.7.9
+github.com/go-xorm/xorm
 # github.com/gogo/protobuf v1.3.1
 github.com/gogo/protobuf/gogoproto
 github.com/gogo/protobuf/proto
@@ -192,9 +196,9 @@ github.com/ontio/ontology/p2pserver/actor/req
 github.com/ontio/ontology/p2pserver/common/set
 github.com/ontio/ontology/p2pserver/link
 # github.com/ontio/ontology-crypto v1.0.7
+github.com/ontio/ontology-crypto/ec
 github.com/ontio/ontology-crypto/keypair
 github.com/ontio/ontology-crypto/signature
-github.com/ontio/ontology-crypto/ec
 github.com/ontio/ontology-crypto/sm2
 github.com/ontio/ontology-crypto/sm3
 github.com/ontio/ontology-crypto/vrf
@@ -334,9 +338,9 @@ go.uber.org/zap/buffer
 go.uber.org/zap/internal/color
 go.uber.org/zap/internal/exit
 # golang.org/x/crypto v0.0.0-20191219195013-becbf705a915
+golang.org/x/crypto/ripemd160
 golang.org/x/crypto/ed25519
 golang.org/x/crypto/scrypt
-golang.org/x/crypto/ripemd160
 golang.org/x/crypto/sha3
 golang.org/x/crypto/ed25519/internal/edwards25519
 golang.org/x/crypto/pbkdf2
@@ -369,3 +373,7 @@ gotest.tools/assert/cmp
 gotest.tools/internal/format
 gotest.tools/internal/source
 gotest.tools/internal/difflib
+# xorm.io/builder v0.3.6
+xorm.io/builder
+# xorm.io/core v0.7.2-0.20190928055935-90aeac8d08eb
+xorm.io/core

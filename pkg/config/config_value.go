@@ -28,6 +28,7 @@ var config = Value{
 			URI:  "/api/v1/ss",
 		},
 	},
+	MySQLConfig: MySQLConfig{ConnMaxLifetime: 120, ConnectionString: "openkg:some_pass@tcp(172.168.3.46:3307)/openkg?readTimeout=3s&charset=utf8mb4", ShowSQL: true},
 	EsignConfig: EsignConfig{
 		DocuConfig: DocuConfig{
 			IntegratorKey: "b68ab0de-9f7f-4567-a2cf-40161f2ac975",
