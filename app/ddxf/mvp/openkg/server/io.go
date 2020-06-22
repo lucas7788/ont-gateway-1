@@ -15,10 +15,10 @@ type GenerateOntIdOutput struct {
 // PublishInput ...
 type PublishInput struct {
 	ReqID     string                   `bson:"req_id" json:"req_id"`
-	OpenKGID  string                   `bson:"open_kg_id" json:"open_kg_id"`
+	OpenKGID  string                   `bson:"openkg_id" json:"openkg_id"`
 	UserID    string                   `bson:"user_id" json:"user_id"` // seller id
 	Item      map[string]interface{}   `bson:"item" json:"item"`
-	Datas     []map[string]interface{} `bson:"data_s" json:"data_s"`
+	Datas     []map[string]interface{} `bson:"datas" json:"datas"`
 	Delete    bool                     `bson:"delete" json:"delete"`
 	OnChainId string                   `bson:"on_chain_id" json:"on_chain_id"`
 }
