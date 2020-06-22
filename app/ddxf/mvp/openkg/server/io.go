@@ -1,4 +1,4 @@
-package main
+package server
 
 type GenerateOntIdInput struct {
 	ReqID  string `bson:"req_id" json:"req_id"`

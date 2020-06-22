@@ -1,4 +1,4 @@
-package main
+package server
 
 type UserInfo struct {
 	UserId string `bson:"user_id" json:"user_id"`
