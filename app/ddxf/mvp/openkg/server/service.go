@@ -32,6 +32,8 @@ import (
 
 func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput) {
 	output.ReqID = input.ReqID
+	callback(output)
+	return
 	var err error
 	defer func() {
 		if err != nil {
@@ -83,6 +85,8 @@ func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput)
 
 func PublishService(input PublishInput) (output PublishOutput) {
 	output.ReqID = input.ReqID
+	callback(output)
+	return
 	var err error
 	defer func() {
 		if err != nil {
@@ -364,6 +368,9 @@ func PublishService(input PublishInput) (output PublishOutput) {
 }
 
 func buyAndUseService(input BuyAndUseInput) (output BuyAndUseOutput) {
+	callback(output)
+	return
+
 	defer callback(output)
 	output.ReqID = input.ReqID
 	plainSeed := []byte(defPlainSeed + input.UserID)
