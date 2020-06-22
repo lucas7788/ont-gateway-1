@@ -3,12 +3,16 @@ package common
 import (
 	"encoding/hex"
 	"errors"
+
 	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 	"github.com/ontio/ontology/common"
-	"github.com/satori/go.uuid"
+	"github.com/ontio/ontology/core/types"
+	uuid "github.com/satori/go.uuid"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
+	io2 "github.com/zhiqiangxu/ont-gateway/pkg/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/misc"
+	"github.com/zhiqiangxu/ont-gateway/pkg/service"
 )
 
 func GenerateUUId(preFix string) string {
@@ -135,4 +139,30 @@ func handleBuyDtokenEvt(states []interface{}) ([]io.EndpointToken, error) {
 		return nil, err
 	}
 	return tokenEndpoints, nil
+}
+
+var ConsortiumAddr string
+
+// SendTx for send to main-net and Consortium
+func SendTx(tx string) (txHash string, err error) {
+	addrs := []string{misc.GetOntNode()}
+	if ConsortiumAddr != "" {
+		addrs = append(addrs, ConsortiumAddr)
+	}
+	input := io2.SendTxInput{SignedTx: tx, Addrs: addrs}
+	output := service.Instance().SendTx(input)
+	txHash, err = output.TxHash, output.Error()
+	return
+}
+
+// SendRawTx for send to main-net and Consortium
+func SendRawTx(tx *types.MutableTransaction) (txHash string, err error) {
+	addrs := []string{misc.GetOntNode()}
+	if ConsortiumAddr != "" {
+		addrs = append(addrs, ConsortiumAddr)
+	}
+	input := io2.SendRawTxInput{Tx: tx, Addrs: addrs}
+	output := service.Instance().SendRawTx(input)
+	txHash, err = output.TxHash, output.Error()
+	return
 }

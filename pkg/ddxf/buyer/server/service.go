@@ -8,10 +8,10 @@ import (
 
 	"github.com/ontio/ontology-crypto/keypair"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
+	common2 "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/server"
 	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
-	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 )
 
 const (
@@ -26,7 +26,7 @@ const (
 //}
 //this method will send transaction to ontology blockchain,
 func BuyDTokenService(param io.BuyerBuyDtokenInput) (output io.BuyerBuyDtokenOutput) {
-	txHash, err := instance.OntSdk().SendTx(param.SignedTx)
+	txHash, err := common2.SendTx(param.SignedTx)
 	if err != nil {
 		output.Code = http.StatusBadRequest
 		output.Msg = err.Error()

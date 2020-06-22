@@ -20,13 +20,7 @@ func (gw *Gateway) SendRawTx(input io.SendRawTxInput) (output io.SendRawTxOutput
 	for _, addr := range input.Addrs {
 		kit := osdk.NewOntologySdk()
 		kit.NewRpcClient().SetAddress(addr)
-		mutTx, err := input.Tx.IntoMutable()
-		if err != nil {
-			output.Code = http.StatusBadRequest
-			output.Msg = err.Error()
-			return
-		}
-		txHash, err := kit.SendTransaction(mutTx)
+		txHash, err := kit.SendTransaction(input.Tx)
 		if err != nil {
 			output.Code = http.StatusBadRequest
 			output.Msg = err.Error()

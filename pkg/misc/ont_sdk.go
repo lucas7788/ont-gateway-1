@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"fmt"
+
 	osdk "github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology-go-sdk/common"
 	"github.com/ontio/ontology-go-sdk/utils"
@@ -47,6 +48,11 @@ func (sdk *OntSdk) init() {
 
 // GetOntNode returns the ont node
 func (sdk *OntSdk) GetOntNode() string {
+	return GetOntNode()
+}
+
+// GetOntNode for direct usage
+func GetOntNode() string {
 	if config.Load().Prod {
 		return "http://dappnode1.ont.io:20336"
 	}

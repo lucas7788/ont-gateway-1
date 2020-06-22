@@ -8,7 +8,7 @@ import (
 
 // SendRawTxInput for input
 type SendRawTxInput struct {
-	Tx    *types.Transaction
+	Tx    *types.MutableTransaction
 	Addrs []string
 }
 

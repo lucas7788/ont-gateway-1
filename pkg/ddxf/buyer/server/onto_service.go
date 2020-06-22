@@ -2,6 +2,8 @@ package server
 
 import (
 	"errors"
+	"strings"
+
 	common2 "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
@@ -9,7 +11,6 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.uber.org/zap"
-	"strings"
 )
 
 func LoginService() qrCode.QrCodeResponse {
@@ -56,7 +57,7 @@ func LoginCallBackService(param QrCodeCallBackParam) error {
 }
 
 func sendTx(tx string) error {
-	txHash, err := instance.OntSdk().SendTx(tx)
+	txHash, err := common2.SendTx(tx)
 	if err != nil {
 		return err
 	}

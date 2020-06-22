@@ -69,7 +69,7 @@ func GetDataIdByDataMetaHashService(param GetDataIdParam) (*GetDataIdRes, error)
 
 func SaveDataMetaArrayService(input io.SellerSaveDataMetaArrayInput,
 	ontid string) (output io.SellerSaveDataMetaOutput) {
-	txHash, err := instance.OntSdk().SendTx(input.SignedTx)
+	txHash, err := common2.SendTx(input.SignedTx)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -112,7 +112,7 @@ func SaveDataMetaService(input io.SellerSaveDataMetaInput, ontId string) (output
 		return
 	}
 	// verify hash.
-	txHash, err := instance.OntSdk().SendTx(input.SignedTx)
+	txHash, err := common2.SendTx(input.SignedTx)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -253,7 +253,7 @@ func PublishMPItemMetaService(input io.MPEndpointPublishItemMetaInput, ontId str
 			return
 		}
 	} else {
-		txHash, err := instance.OntSdk().SendTx(input.SignedDDXFTx)
+		txHash, err := common2.SendTx(input.SignedDDXFTx)
 		if err != nil {
 			output.Code = http.StatusInternalServerError
 			output.Msg = err.Error()
@@ -292,7 +292,7 @@ func UseTokenService(input io.SellerTokenLookupEndpointUseTokenInput) (output io
 		output.Msg = err.Error()
 		return
 	}
-	txHash, err := instance.OntSdk().SendRawTx(mutTx)
+	txHash, err := common2.SendRawTx(mutTx)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -333,7 +333,7 @@ func BuyAndUseDTokenService(input io.BuyerBuyAndUseDtokenInput) (output io.Buyer
 		output.Msg = err.Error()
 		return
 	}
-	txHash, err := instance.OntSdk().SendRawTx(mutTx)
+	txHash, err := common2.SendRawTx(mutTx)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
