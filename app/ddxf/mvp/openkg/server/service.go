@@ -9,6 +9,7 @@ import (
 	"crypto/sha256"
 
 	"fmt"
+
 	"github.com/kataras/go-errors"
 	"github.com/ont-bizsuite/ddxf-sdk/data_id_contract"
 	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
@@ -46,7 +47,7 @@ func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput)
 	ui := UserInfo{}
 	filter := bson.M{"user_id": input.UserId}
 	err = FindElt(UserInfoCollection, filter, &ui)
-	if err != nil && err != mongo.ErrNilDocument && err != mongo.ErrNoDocuments {
+	if err != nil && err != mongo.ErrNoDocuments {
 		fmt.Println(err)
 		return
 	}
@@ -54,7 +55,7 @@ func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput)
 		output.OntId = ui.OntId
 		return
 	}
-	if err == mongo.ErrNilDocument || err == mongo.ErrNoDocuments {
+	if err == mongo.ErrNoDocuments {
 		err = nil
 	}
 
@@ -313,7 +314,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	var (
 		tx *types.MutableTransaction
 	)
-	if findError == mongo.ErrNilDocument {
+	if findError == mongo.ErrNoDocuments {
 		tx, err = instance.DDXFSdk().DefDDXFKit().BuildPublishTx([]byte(resourceId), ddo, item, split)
 		if err != nil {
 			return
