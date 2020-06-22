@@ -19,7 +19,7 @@ var config = Value{
 		Addr: "172.168.3.46:6379",
 	},
 	MongoConfig: MongoConfig{
-		ConnectionString: "mongodb://172.168.3.46:27017/ont",
+		ConnectionString: "mongodb://172.168.3.47:27017/ont",
 		Timeout:          time.Second * 3,
 	},
 	CICDConfig: CICDConfig{
