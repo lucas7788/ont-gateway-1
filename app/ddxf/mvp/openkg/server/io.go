@@ -2,14 +2,14 @@ package server
 
 type GenerateOntIdInput struct {
 	ReqID  string `bson:"req_id" json:"req_id"`
-	UserId string `json:"user_id"`
+	UserId string `bson:"user_id" json:"user_id"`
 }
 
 type GenerateOntIdOutput struct {
-	Code  int
-	Msg   string
-	ReqID string
-	OntId string `json:"ont_id"`
+	Code  int    `bson:"code" json:"code"`
+	Msg   string `bson:"msg" json:"msg"`
+	ReqID string `bson:"req_id" json:"req_id"`
+	OntId string `bson:"ont_id" json:"ont_id"`
 }
 
 // PublishInput ...
@@ -25,22 +25,22 @@ type PublishInput struct {
 
 // PublishOutput ...
 type PublishOutput struct {
-	Code  int
-	Msg   string
-	ReqID string
+	Code  int    `bson:"code" json:"code"`
+	Msg   string `bson:"msg" json:"msg"`
+	ReqID string `bson:"req_id" json:"req_id"`
 }
 
 // BuyAndUseInput ...
 type BuyAndUseInput struct {
-	ReqID    string
-	OpenKGID string
-	DataID   string
-	UserID   string // buyer id
+	ReqID    string `bson:"req_id" json:"req_id"`
+	OpenKGID string `bson:"openkg_id" json:"openkg_id"`
+	DataID   string `bson:"data_id" json:"data_id"`
+	UserID   string `bson:"user_id" json:"user_id"` // buyer id
 }
 
 // BuyAndUseOutput ...
 type BuyAndUseOutput struct {
-	Code  int
-	Msg   string
-	ReqID string
+	Code  int    `bson:"code" json:"code"`
+	Msg   string `bson:"msg" json:"msg"`
+	ReqID string `bson:"req_id" json:"req_id"`
 }
