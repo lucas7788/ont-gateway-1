@@ -20,6 +20,8 @@ const (
 	PublishItemMetaUrl         = "/onto/ddxf/seller/publishItemMeta"
 	getQrCodeDataByQrCodeIdUrl = "/onto/ddxf/seller/getQrCodeDataByQrCodeId"
 	qrCodeCallbackSendTxUrl    = "/onto/ddxf/seller/qrCodeCallbackSendTx"
+	deleteUrl = "/onto/ddxf/seller/delete"
+	updateUrl = "/onto/ddxf/seller/update"
 )
 
 func StartSellerServer() {
@@ -30,6 +32,8 @@ func StartSellerServer() {
 	})
 	r.Use(jwt.JWT())
 	//r.Use(middleware.JWT)
+	r.POST(deleteUrl, DeleteHandler)
+	r.POST(updateUrl, UpdateHandler)
 	r.POST(SaveDataMetaUrl, SaveDataMetaHandler)
 	r.POST(GetDataIdByDataMetaHashUrl, GetDataIdByDataMetaHashHandler)
 	r.POST(SaveDataMetaArrayUrl, SaveDataMetaArrayHandler)

@@ -88,7 +88,7 @@ func TestSaveDataMeta(t *testing.T) {
 		ItemMeta:      PublishMeta,
 		TokenMetaHash: inputt.TokenMetaHash,
 		DataMetaHash:  input.DataMetaHash,
-		MPEndpoint:    config.PublishItemMetaUrl,
+		MPEndpoint:    config.MpUrl,
 	}
 	fmt.Println("input:", inputPub, ontId)
 	res, err := PublishMetaService(inputPub, ontId)

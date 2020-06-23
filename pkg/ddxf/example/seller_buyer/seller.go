@@ -155,7 +155,7 @@ func PublishMeta(seller *ontology_go_sdk.Account, saveDataMetaOut *io.SellerSave
 			OnchainItemID: hex.EncodeToString(resourceIdBytes),
 			ItemMeta:      map[string]interface{}{},
 		},
-		MPEndpoint: config.PublishItemMetaUrl,
+		MPEndpoint: config.MpUrl,
 	}
 	_, err = SendPOST(config.SellerUrl+server.PublishMPItemMetaUrl, input)
 	return string(resourceIdBytes), err
