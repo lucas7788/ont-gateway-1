@@ -30,8 +30,8 @@ import (
 
 func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput) {
 	output.ReqID = input.ReqID
-	callback(output)
-	return
+	// callback(output)
+	// return
 	var err error
 	defer func() {
 		if err != nil {
@@ -83,8 +83,8 @@ func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput)
 
 func PublishService(input PublishInput) (output PublishOutput) {
 	output.ReqID = input.ReqID
-	callback(output)
-	return
+	// callback(output)
+	// return
 	var err error
 	defer func() {
 		if err != nil {
@@ -293,8 +293,8 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	var itemMetaHash [32]byte
 	itemMetaHash, err = ddxf.HashObject(input.Item)
 	ddo := market_place_contract.ResourceDDO{
-		Manager:                  seller.Address,
-		ItemMetaHash:             itemMetaHash,
+		Manager:      seller.Address,
+		ItemMetaHash: itemMetaHash,
 	}
 
 	item := market_place_contract.DTokenItem{
@@ -376,11 +376,14 @@ func deleteService(input DeleteInput) (output DeleteOutput) {
 }
 
 func buyAndUseService(input BuyAndUseInput) (output BuyAndUseOutput) {
-	callback(output)
-	return
+	// callback(output)
+	// return
 
-	defer callback(output)
 	output.ReqID = input.ReqID
+	defer func() {
+		callback(output)
+	}()
+
 	user := GetAccount(input.UserID)
 
 	ontID := "did:ont:" + user.Address.ToBase58()
