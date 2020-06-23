@@ -1,8 +1,8 @@
 package io
 
 import (
-	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 	io2 "github.com/zhiqiangxu/ont-gateway/pkg/io"
+	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 )
 
 // SellerPublishMPItemMetaInput ...
@@ -12,7 +12,7 @@ type SellerPublishMPItemMetaInput struct {
 	DataMetaHash   string                 `bson:"dataMetaHash",json:"dataMetaHash"`
 	MPContractHash string                 `bson:"mpContractHash",json:"mpContractHash"`
 	MPEndpoint     string                 `bson:"mpEndpoint",json:"mpEndpoint"`
-	Fee            ddxf_contract.Fee      `bson:"fee" json:"fee"`
+	Fee            market_place_contract.Fee      `bson:"fee" json:"fee"`
 	Stock          uint32                 `bson:"stock" json:"stock"`
 	ExpiredDate    uint64                 `bson:"expiredDate" json:"expiredDate"`
 }

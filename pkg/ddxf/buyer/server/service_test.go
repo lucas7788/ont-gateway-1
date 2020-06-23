@@ -5,13 +5,13 @@ import (
 
 	"encoding/hex"
 	"fmt"
-	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 	common2 "github.com/ontio/ontology/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
+	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 )
 
 var (
@@ -48,7 +48,7 @@ func TestBuyDTokenService(t *testing.T) {
 
 func TestUseTokenService(t *testing.T) {
 	tokenHashBytes, _ := hex.DecodeString(tokenHash)
-	template := ddxf_contract.TokenTemplate{
+	template := market_place_contract.TokenTemplate{
 		DataID:     DataID,
 		TokenHashs: []string{string(tokenHashBytes)},
 	}

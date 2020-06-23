@@ -3,7 +3,6 @@ package server
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ddxf"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
@@ -14,6 +13,7 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/qrCode"
 	"go.mongodb.org/mongo-driver/bson"
 	"strings"
+	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 )
 
 func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qrCode.QrCodeResponse, error) {
@@ -45,7 +45,7 @@ func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qr
 		return qrCode.QrCodeResponse{}, err
 	}
 	// dataMeta related in data contract tx.
-	tokenTemplate := &ddxf_contract.TokenTemplate{
+	tokenTemplate := &market_place_contract.TokenTemplate{
 		DataID:     adD.DataId,
 		TokenHashs: []string{string(tokenHash)},
 	}
@@ -59,16 +59,10 @@ func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qr
 	if err != nil {
 		return qrCode.QrCodeResponse{}, err
 	}
-	trt := &ddxf_contract.TokenResourceTyEndpoint{
-		TokenTemplate: tokenTemplate,
-		ResourceType:  adD.ResourceType,
-		Endpoint:      adT.TokenEndpoint,
-	}
 	resourceIdBytes := []byte(common2.GenerateUUId(config2.UUID_RESOURCE_ID))
 	fmt.Println("resourceId:", string(resourceIdBytes))
 	resourceDDOBytes, itemBytes := contract.ConstructPublishParam(ServerAccount.Address,
 		tokenTemplate,
-		[]*ddxf_contract.TokenResourceTyEndpoint{trt},
 		itemMetaHash, input.Fee, input.ExpiredDate, input.Stock)
 
 	//TODO

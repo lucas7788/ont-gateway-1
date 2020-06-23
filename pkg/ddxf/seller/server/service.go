@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 	"github.com/ontio/ontology-crypto/signature"
 	ontology_go_sdk "github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology-go-sdk/utils"
@@ -20,6 +19,7 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 )
 
 var (
@@ -363,7 +363,7 @@ func BuyAndUseDTokenService(input io.BuyerBuyAndUseDtokenInput) (output io.Buyer
 }
 
 //书籍
-func GetDataByOnchainIdService(onchainItemId string, buyer common.Address, template ddxf_contract.TokenTemplate) (interface{}, error) {
+func GetDataByOnchainIdService(onchainItemId string, buyer common.Address, template market_place_contract.TokenTemplate) (interface{}, error) {
 	//根据 onchainId 拿到真实的数据
 	data := io.SellerSaveDataMeta{}
 	find := bson.M{"dataId": template.DataID}

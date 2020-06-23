@@ -5,13 +5,13 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 	"github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/buyer/server"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
+	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 )
 
 func BuyDtoken(buyer *ontology_go_sdk.Account, resourceId string) error {
@@ -37,7 +37,7 @@ func BuyDtoken(buyer *ontology_go_sdk.Account, resourceId string) error {
 
 func UseToken(buyer *ontology_go_sdk.Account, resourceId, tokenMetaHash string, dataId string) error {
 	tokenHashBytes, _ := hex.DecodeString(tokenMetaHash)
-	template := &ddxf_contract.TokenTemplate{
+	template := &market_place_contract.TokenTemplate{
 		DataID:     dataId,
 		TokenHashs: []string{string(tokenHashBytes)},
 	}

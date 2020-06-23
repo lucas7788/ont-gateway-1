@@ -3,8 +3,6 @@ package common
 import (
 	"encoding/hex"
 	"errors"
-
-	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 	"github.com/ontio/ontology/common"
 	"github.com/ontio/ontology/core/types"
 	uuid "github.com/satori/go.uuid"
@@ -13,6 +11,7 @@ import (
 	io2 "github.com/zhiqiangxu/ont-gateway/pkg/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/misc"
 	"github.com/zhiqiangxu/ont-gateway/pkg/service"
+	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 )
 
 func GenerateUUId(preFix string) string {
@@ -97,7 +96,7 @@ func handleUseTokenEvt(states []interface{}) ([]io.EndpointToken, error) {
 	if err != nil {
 		return nil, err
 	}
-	tt := ddxf_contract.TokenTemplate{}
+	tt := market_place_contract.TokenTemplate{}
 	err = tt.FromBytes(tokenTemplateBytes)
 	if err != nil {
 		return nil, err

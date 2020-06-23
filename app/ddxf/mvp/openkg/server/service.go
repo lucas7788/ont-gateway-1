@@ -12,14 +12,11 @@ import (
 
 	"github.com/kataras/go-errors"
 	"github.com/ont-bizsuite/ddxf-sdk/data_id_contract"
-	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
+	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 	"github.com/ont-bizsuite/ddxf-sdk/split_policy_contract"
-	"github.com/ontio/ontology-crypto/signature"
-	ontology_go_sdk "github.com/ontio/ontology-go-sdk"
 	common2 "github.com/ontio/ontology/common"
 	"github.com/ontio/ontology/core/types"
 	"github.com/zhiqiangxu/ddxf"
-	"github.com/zhiqiangxu/ont-gateway/app/ddxf/mvp/openkg/key_manager"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
@@ -125,7 +122,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 			iMutTx   *types.Transaction
 			bs, data []byte
 		)
-		tx, err = instance.DDXFSdk().DefDDXFKit().BuildFreezeTx([]byte(param.OnChainId))
+		tx, err = instance.DDXFSdk().DefMpKit().BuildFreezeTx([]byte(param.OnChainId))
 		if err != nil {
 			return
 		}
@@ -230,7 +227,6 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		}
 		infos[i] = data_id_contract.DataIdInfo{
 			DataId:       ones[i].DataId,
-			DataType:     ones[i].ResourceType,
 			DataMetaHash: hash,
 			DataHash:     dataHash,
 			Owners:       []*data_id_contract.OntIdIndex{},
@@ -264,8 +260,8 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	}
 	_, _, data, err = forward.PostJSONRequest(config.SellerUrl+server.SaveDataMetaArrayUrl, bs, headers)
 
-	templates := make([]*ddxf_contract.TokenTemplate, 0)
-	trte := make([]*ddxf_contract.TokenResourceTyEndpoint, len(dataMetas))
+	templates := make([]*market_place_contract.TokenTemplate, 0)
+	trte := make([]*market_place_contract.TokenResourceTyEndpoint, len(dataMetas))
 	for i := 0; i < len(dataMetas); i++ {
 		var dataMetaHash [sha256.Size]byte
 		dataMetaHash, err = ddxf.HashObject(dataMetas[i])
@@ -274,11 +270,11 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		}
 		for j := 0; j < len(res.DataIdAndDataMetaHashArray); j++ {
 			if res.DataIdAndDataMetaHashArray[i].DataMetaHash == string(dataMetaHash[:]) {
-				tt := &ddxf_contract.TokenTemplate{
+				tt := &market_place_contract.TokenTemplate{
 					DataID:     res.DataIdAndDataMetaHashArray[j].DataId,
 					TokenHashs: []string{},
 				}
-				trte[i] = &ddxf_contract.TokenResourceTyEndpoint{
+				trte[i] = &market_place_contract.TokenResourceTyEndpoint{
 					TokenTemplate: tt,
 					ResourceType:  0,
 					Endpoint:      config.SellerUrl,
@@ -296,14 +292,13 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	// send request to seller
 	var itemMetaHash [32]byte
 	itemMetaHash, err = ddxf.HashObject(input.Item)
-	ddo := ddxf_contract.ResourceDDO{
+	ddo := market_place_contract.ResourceDDO{
 		Manager:                  seller.Address,
-		TokenResourceTyEndpoints: trte,
 		ItemMetaHash:             itemMetaHash,
 	}
 
-	item := ddxf_contract.DTokenItem{
-		Fee: ddxf_contract.Fee{
+	item := market_place_contract.DTokenItem{
+		Fee: market_place_contract.Fee{
 			ContractType: split_policy_contract.ONG,
 		},
 		ExpiredDate: uint64(time.Now().Unix()) + uint64(time.Hour*24*30),
@@ -315,7 +310,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		tx *types.MutableTransaction
 	)
 	if findError == mongo.ErrNoDocuments {
-		tx, err = instance.DDXFSdk().DefDDXFKit().BuildPublishTx([]byte(resourceId), ddo, item, split)
+		tx, err = instance.DDXFSdk().DefMpKit().BuildPublishTx([]byte(resourceId), ddo, item, split)
 		if err != nil {
 			return
 		}
@@ -324,7 +319,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 			return
 		}
 	} else {
-		tx, err = instance.DDXFSdk().DefDDXFKit().BuildFreezeAndPublishTx(
+		tx, err = instance.DDXFSdk().DefMpKit().BuildFreezeAndPublishTx(
 			[]byte(param.OnChainId), []byte(resourceId), ddo, item, split)
 		if err != nil {
 			return
@@ -368,20 +363,30 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	return
 }
 
+func deleteService(input DeleteInput) (output DeleteOutput) {
+	user := GetAccount(input.UserID)
+	txHash, err := instance.DDXFSdk().DefMpKit().Delete(user, []byte(input.ResourceID))
+	if err != nil {
+		return
+	}
+	evt, err := instance.DDXFSdk().GetSmartCodeEvent(txHash.ToHexString())
+	if err != nil {
+		return
+	}
+	if evt.State != 1 {
+		return
+	}
+	return
+}
+
 func buyAndUseService(input BuyAndUseInput) (output BuyAndUseOutput) {
 	callback(output)
 	return
 
 	defer callback(output)
 	output.ReqID = input.ReqID
-	plainSeed := []byte(defPlainSeed + input.UserID)
-	pri, _ := key_manager.GetSerializedKeyPair(plainSeed)
-	user, err := ontology_go_sdk.NewAccountFromPrivateKey(pri, signature.SHA256withECDSA)
-	if err != nil {
-		output.Msg = err.Error()
-		output.Code = http.StatusInternalServerError
-		return
-	}
+	user := GetAccount(input.UserID)
+
 	ontID := "did:ont:" + user.Address.ToBase58()
 	jwtToken, err := jwt.GenerateJwt(ontID)
 	if err != nil {
@@ -402,12 +407,12 @@ func buyAndUseService(input BuyAndUseInput) (output BuyAndUseOutput) {
 		output.Code = http.StatusInternalServerError
 		return
 	}
-	tokenTemplate := ddxf_contract.TokenTemplate{
+	tokenTemplate := market_place_contract.TokenTemplate{
 		DataID:     input.DataID,
 		TokenHashs: []string{},
 	}
 	var tx *types.MutableTransaction
-	tx, err = instance.DDXFSdk().DefDDXFKit().BuildBuyAndUseTokenTx(user.Address,
+	tx, err = instance.DDXFSdk().DefMpKit().BuildBuyAndUseTokenTx(user.Address,
 		payer.Address, []byte(param.OnChainId), 1, tokenTemplate)
 	if err != nil {
 		output.Msg = err.Error()
