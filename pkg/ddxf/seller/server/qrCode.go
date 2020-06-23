@@ -4,13 +4,13 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"github.com/kataras/go-errors"
-	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 	"github.com/ontio/ontology/common"
 	common2 "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/qrCode"
 	"strings"
 	"time"
+	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 )
 
 func BuildQrCodeResponse(id string) qrCode.QrCodeResponse {
@@ -45,19 +45,19 @@ func ParsePublishParamFromQrCodeData(qrCodeData string) (resourceId []byte, reso
 	return
 }
 
-func ParseFromBytes(qrCodeData string) (resourceId []byte, resourceDdo *ddxf_contract.ResourceDDO, item *ddxf_contract.DTokenItem, err error) {
+func ParseFromBytes(qrCodeData string) (resourceId []byte, resourceDdo *market_place_contract.ResourceDDO, item *market_place_contract.DTokenItem, err error) {
 	var ddoBytes, itemBytes []byte
 	resourceId, ddoBytes, itemBytes, err = ParsePublishParamFromQrCodeData(qrCodeData)
 	if err != nil {
 		return
 	}
 	source := common.NewZeroCopySource(ddoBytes)
-	resourceDdo = &ddxf_contract.ResourceDDO{}
+	resourceDdo = &market_place_contract.ResourceDDO{}
 	err = resourceDdo.Deserialize(source)
 	if err != nil {
 		return
 	}
-	item = &ddxf_contract.DTokenItem{}
+	item = &market_place_contract.DTokenItem{}
 	err = item.FromBytes(itemBytes)
 	return
 }

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/ont-bizsuite/ddxf-sdk/data_id_contract"
-	"github.com/ont-bizsuite/ddxf-sdk/ddxf_contract"
 	"github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ddxf"
@@ -18,6 +17,7 @@ import (
 	"math/rand"
 	"strconv"
 	"time"
+	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 )
 
 func SaveDataMeta(sellerOntId string, con *ontology_go_sdk.Controller, seller *ontology_go_sdk.Account, bookKey string) (*io.SellerSaveDataMetaOutput, *io.SellerSaveDataMetaInput, error) {
@@ -119,7 +119,7 @@ func PublishMeta(seller *ontology_go_sdk.Account, saveDataMetaOut *io.SellerSave
 	resourceIdBytes := []byte(common2.GenerateUUId(config.UUID_RESOURCE_ID))
 	fmt.Println("[PublishMeta] resourceId:", string(resourceIdBytes))
 	tokenMetaHash, _ := hex.DecodeString(saveTokenMetaIn.TokenMetaHash)
-	tokenTemplate := &ddxf_contract.TokenTemplate{
+	tokenTemplate := &market_place_contract.TokenTemplate{
 		DataID:     saveDataMetaOut.DataId,
 		TokenHashs: []string{string(tokenMetaHash)},
 	}
@@ -132,7 +132,7 @@ func PublishMeta(seller *ontology_go_sdk.Account, saveDataMetaOut *io.SellerSave
 	itemMetaHash, err := common.Uint256ParseFromBytes(bs[:])
 	resourceDDOBytes, itemBytes := contract.ConstructPublishParam(seller.Address,
 		tokenTemplate,
-		[]*ddxf_contract.TokenResourceTyEndpoint{&ddxf_contract.TokenResourceTyEndpoint{
+		[]*market_place_contract.TokenResourceTyEndpoint{&market_place_contract.TokenResourceTyEndpoint{
 			TokenTemplate: tokenTemplate,
 			ResourceType:  saveDataMetaIn.ResourceType,
 			Endpoint:      saveDataMetaIn.DataEndpoint,
