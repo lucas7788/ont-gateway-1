@@ -192,35 +192,41 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	if err != nil {
 		return
 	}
-	res := server.GetDataIdRes{}
-	err = json.Unmarshal(data, &res)
-	if err != nil {
-		return
-	}
 
+	res := make(map[string]interface{})
+	if data != nil {
+		err = json.Unmarshal(data, &res)
+		if err != nil {
+			return
+		}
+	}
 	ones := make([]io.DataMetaOne, 0)
 	for i := 0; i < len(dataMetas); i++ {
 		var dataMetaHash [sha256.Size]byte
 		dataMetaHash, err = ddxf.HashObject(dataMetas[i])
 		if err != nil {
+			err = fmt.Errorf("1 HashObject error: %s", err)
 			return
 		}
-		for _, hash := range res.DataIdAndDataMetaHashArray {
-			if hash.DataMetaHash == string(dataMetaHash[:]) {
-				if hash.DataId == "" {
-					dataId := common.GenerateUUId(config.UUID_PRE_DATAID)
-					one := io.DataMetaOne{
-						DataMeta:     dataMetas[i],
-						DataMetaHash: string(dataMetaHash[:]),
-						DataEndpoint: config.SellerUrl,
-						ResourceType: 0,
-						DataHash:     "",
-						DataId:       dataId,
-					}
-					ones = append(ones, one)
-					hash.DataId = dataId
-				}
+		var hash common2.Uint256
+		hash, err = common2.Uint256ParseFromBytes(dataMetaHash[:])
+		if err !=nil {
+			err = fmt.Errorf("2 Uint256ParseFromBytes error: %s", err)
+			return
+		}
+		dataId := res[hash.ToHexString()]
+		if dataId == nil {
+			dataId := common.GenerateUUId(config.UUID_PRE_DATAID)
+			one := io.DataMetaOne{
+				DataMeta:     dataMetas[i],
+				DataMetaHash: hash.ToHexString(),
+				DataEndpoint: config.SellerUrl,
+				ResourceType: 0,
+				DataHash:     common2.UINT256_EMPTY.ToHexString(),
+				DataId:       dataId,
 			}
+			ones = append(ones, one)
+			res[hash.ToHexString()] = dataId
 		}
 	}
 	// invoke seller saveDataMeta
@@ -229,10 +235,12 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		var hash, dataHash common2.Uint256
 		hash, err = common2.Uint256FromHexString(ones[i].DataMetaHash)
 		if err != nil {
+			err = fmt.Errorf("3 Uint256FromHexString error: %s", err)
 			return
 		}
 		dataHash, err = common2.Uint256FromHexString(ones[i].DataHash)
 		if err != nil {
+			err = fmt.Errorf("3 Uint256FromHexString error: %s", err)
 			return
 		}
 		infos[i] = data_id_contract.DataIdInfo{
@@ -274,29 +282,23 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	}
 
 	templates := make([]*market_place_contract.TokenTemplate, 0)
-	trte := make([]*market_place_contract.TokenResourceTyEndpoint, len(dataMetas))
 	for i := 0; i < len(dataMetas); i++ {
 		var dataMetaHash [sha256.Size]byte
 		dataMetaHash, err = ddxf.HashObject(dataMetas[i])
 		if err != nil {
 			return
 		}
-		for j := 0; j < len(res.DataIdAndDataMetaHashArray); j++ {
-			if res.DataIdAndDataMetaHashArray[i].DataMetaHash == string(dataMetaHash[:]) {
-				tt := &market_place_contract.TokenTemplate{
-					DataID:     res.DataIdAndDataMetaHashArray[j].DataId,
-					TokenHashs: []string{},
-				}
-				trte[i] = &market_place_contract.TokenResourceTyEndpoint{
-					TokenTemplate: tt,
-					ResourceType:  0,
-					Endpoint:      config.SellerUrl,
-				}
-				templates = append(templates, tt)
-				break
-			}
+		u,_ := common2.Uint256ParseFromBytes(dataMetaHash[:])
+		dataId := res[u.ToHexString()]
+		tt := &market_place_contract.TokenTemplate{
+			DataID:     dataId.(string),
+			TokenHashs: []string{"1"},
+			Endpoint:"aaaa",
 		}
+		templates = append(templates, tt)
 	}
+
+	fmt.Println("******templates:", templates)
 
 	resourceId := common.GenerateUUId(config.UUID_RESOURCE_ID)
 	input.OnChainId = resourceId
@@ -318,7 +320,15 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		Stocks:      10000,
 		Templates:   templates,
 	}
-	split := split_policy_contract.SplitPolicyRegisterParam{}
+	split := split_policy_contract.SplitPolicyRegisterParam{
+		AddrAmts:[]*split_policy_contract.AddrAmt{
+			&split_policy_contract.AddrAmt{
+				To:seller.Address,
+				Percent:100,
+			},
+		},
+		TokenTy:split_policy_contract.ONG,
+	}
 	var (
 		tx *types.MutableTransaction
 	)

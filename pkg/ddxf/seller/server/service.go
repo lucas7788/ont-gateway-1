@@ -47,8 +47,8 @@ func InitSellerImpl() error {
 	return nil
 }
 
-func GetDataIdByDataMetaHashService(param GetDataIdParam) (*GetDataIdRes, error) {
-	idHashs := make([]*DataIdAndDataMetaHash, 0)
+func GetDataIdByDataMetaHashService(param GetDataIdParam) (map[string]string, error) {
+	res := make(map[string]string)
 	for _, item := range param.DataMetaHashArray {
 		dataStore := &io.SellerSaveDataMeta{}
 		filter := bson.M{"dataMetaHash": item}
@@ -57,15 +57,12 @@ func GetDataIdByDataMetaHashService(param GetDataIdParam) (*GetDataIdRes, error)
 			fmt.Println("seller: ", err)
 			return nil, err
 		}
-		idHash := &DataIdAndDataMetaHash{
-			DataId:       dataStore.DataId,
-			DataMetaHash: dataStore.DataMetaHash,
+		if err == mongo.ErrNoDocuments {
+			continue
 		}
-		idHashs = append(idHashs, idHash)
+		res[dataStore.DataMetaHash] = dataStore.DataId
 	}
-	return &GetDataIdRes{
-		DataIdAndDataMetaHashArray: idHashs,
-	}, nil
+	return res, nil
 }
 
 func SaveDataMetaArrayService(input io.SellerSaveDataMetaArrayInput,
@@ -260,8 +257,7 @@ func PublishMPItemMetaService(input io.MPEndpointPublishItemMetaInput, ontId str
 			output.Msg = err.Error()
 			return
 		}
-		instance.OntSdk().WaitForGenerateBlock()
-		evt, err := instance.OntSdk().GetSmartCodeEvent(txHash)
+		evt, err := instance.DDXFSdk().GetSmartCodeEvent(txHash)
 		if err != nil {
 			output.Code = http.StatusInternalServerError
 			output.Msg = err.Error()

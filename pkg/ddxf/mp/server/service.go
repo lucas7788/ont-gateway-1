@@ -8,6 +8,7 @@ import (
 	"github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology/core/types"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/registry/client"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
@@ -179,17 +180,17 @@ func sendTx(txHex string) error {
 	if err != nil {
 		return err
 	}
-	txHash, err := instance.OntSdk().GetKit().SendTransaction(muTx)
+	txHash, err := common.SendRawTx(muTx)
 	if err != nil {
 		return err
 	}
-	fmt.Println("mp send tx:", txHash.ToHexString())
-	state, err := getSmartCodeEvent(txHash.ToHexString())
+	fmt.Println("mp send tx:", txHash)
+	evt, err := instance.DDXFSdk().GetSmartCodeEvent(txHash)
 	if err != nil {
 		return err
 	}
-	if state != 1 {
-		return fmt.Errorf("tx failed, txHash: %s", txHash.ToHexString())
+	if evt.State != 1 {
+		return fmt.Errorf("tx failed, txHash: %s", txHash)
 	}
 	return nil
 }
