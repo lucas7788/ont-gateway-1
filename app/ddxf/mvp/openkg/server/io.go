@@ -59,3 +59,4 @@ type DeleteOutput struct {
 	Code  int    `bson:"code" json:"code"`
 	Msg   string `bson:"msg" json:"msg"`
 }
+
