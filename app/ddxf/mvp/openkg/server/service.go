@@ -63,7 +63,8 @@ func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput)
 	if err != nil {
 		return
 	}
-	evt, err := instance.DDXFSdk().GetSmartCodeEvent(txHash.ToHexString())
+	var evt *common2.SmartContactEvent
+	evt, err = instance.DDXFSdk().GetSmartCodeEvent(txHash.ToHexString())
 	if err != nil {
 		return
 	}
