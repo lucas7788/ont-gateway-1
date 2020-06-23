@@ -2,20 +2,20 @@ package ddxf_sdk
 
 import (
 	"fmt"
+	"github.com/ont-bizsuite/ddxf-sdk/any_contract"
 	"github.com/ont-bizsuite/ddxf-sdk/base_contract"
 	"github.com/ont-bizsuite/ddxf-sdk/data_id_contract"
+	"github.com/ont-bizsuite/ddxf-sdk/dtoken_contract"
 	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 	"github.com/ontio/ontology-go-sdk"
 	common2 "github.com/ontio/ontology-go-sdk/common"
 	"github.com/ontio/ontology/common"
 	"github.com/ontio/ontology/core/types"
 	"time"
-	"github.com/ont-bizsuite/ddxf-sdk/dtoken_contract"
-	"github.com/ont-bizsuite/ddxf-sdk/any_contract"
 )
 
 const (
-	mpContractAddress     = "f92bc4c42f9c5d10664901b77de3ef87f9e0dd61"
+	mpContractAddress     = "9d0203fc1c1a5019c53fdf62ae3232f5a72f5d80"
 	dataIdContractAddress = "03d07edc239d6c8cd99543bdef7a4bc407f9d44c"
 	dtokenContractAddress = "466b94488bf2ad1b1eec0ae7e49e40708e71a35d"
 )
@@ -108,7 +108,7 @@ func (sdk *DdxfSdk) DefDataIdKit() *data_id_contract.DataIdKit {
 	return sdk.defDataIdKit
 }
 
-func (sdk *DdxfSdk) DefDTokenKit() *dtoken_contract.DTokenKit{
+func (sdk *DdxfSdk) DefDTokenKit() *dtoken_contract.DTokenKit {
 	if sdk.defDTokenKit == nil {
 		contractAddress, _ := common.AddressFromHexString(dtokenContractAddress)
 		sdk.defDTokenKit = dtoken_contract.NewDTokenKit(contractAddress,

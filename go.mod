@@ -15,7 +15,7 @@ require (
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
 	github.com/magiconair/properties v1.8.1
 	github.com/oklog/run v1.0.0
-	github.com/ont-bizsuite/ddxf-sdk v0.0.0-20200623120126-9ac9275ebf31
+	github.com/ont-bizsuite/ddxf-sdk v0.0.0-20200623123646-cc8c40c50bdb
 	github.com/ontio/go-bip32 v0.0.0-20190520025953-d3cea6894a2b
 	github.com/ontio/ontology v1.8.2
 	github.com/ontio/ontology-crypto v1.0.7

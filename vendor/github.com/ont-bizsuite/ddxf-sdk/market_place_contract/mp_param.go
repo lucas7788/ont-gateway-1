@@ -185,7 +185,6 @@ type ResourceDDO struct {
 	DTC                      common.Address             // can be empty
 	MP                       common.Address             // can be empty
 	Split                    common.Address             // can be empty
-	IsFreeze                 bool
 }
 
 func (this *ResourceDDO) Serialize(sink *common.ZeroCopySink) {
@@ -210,7 +209,6 @@ func (this *ResourceDDO) Serialize(sink *common.ZeroCopySink) {
 	} else {
 		sink.WriteBool(false)
 	}
-	sink.WriteBool(this.IsFreeze)
 }
 func (this *ResourceDDO) Deserialize(source *common.ZeroCopySource) error {
 	var eof bool
@@ -253,17 +251,6 @@ func (this *ResourceDDO) Deserialize(source *common.ZeroCopySource) error {
 			return io.ErrUnexpectedEOF
 		}
 	}
-	isFreeze, irregular, eof := source.NextBool()
-	if irregular || eof {
-		return fmt.Errorf("read isFreeze failed irregular:%v, eof:%v", irregular, eof)
-	}
-	if data {
-		this.Split, eof = source.NextAddress()
-		if eof {
-			return io.ErrUnexpectedEOF
-		}
-	}
-	this.IsFreeze = isFreeze
 	return nil
 }
 
