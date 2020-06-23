@@ -14,6 +14,7 @@ import (
 	"github.com/ont-bizsuite/ddxf-sdk/data_id_contract"
 	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 	"github.com/ont-bizsuite/ddxf-sdk/split_policy_contract"
+	common3 "github.com/ontio/ontology-go-sdk/common"
 	common2 "github.com/ontio/ontology/common"
 	"github.com/ontio/ontology/core/types"
 	"github.com/zhiqiangxu/ddxf"
@@ -63,7 +64,7 @@ func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput)
 	if err != nil {
 		return
 	}
-	var evt *common2.SmartContactEvent
+	var evt *common3.SmartContactEvent
 	evt, err = instance.DDXFSdk().GetSmartCodeEvent(txHash.ToHexString())
 	if err != nil {
 		return
