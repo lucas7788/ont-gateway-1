@@ -28,6 +28,7 @@ func main() {
 		if !ontid(u.ID) {
 			panic(fmt.Sprintf("ontid fail for %s", u.ID))
 		}
+		return
 	}
 
 	var resources []resource
@@ -58,6 +59,8 @@ type user struct {
 	ID string `xorm:"id"`
 }
 
+const domain = "http://openkg-dev.ontfs.io"
+
 func publish(r resource) bool {
 	dataMeta := map[string]interface{}{
 		"id":            r.ID,
@@ -80,13 +83,15 @@ func publish(r resource) bool {
 	}
 
 	bytes, _ := json.Marshal(input)
-	code, _, _, err := forward.PostJSONRequest("http://openkg-dev.ontfs.io/"+server.PublishURI, bytes, nil)
+	code, _, _, err := forward.PostJSONRequest(domain+server.PublishURI, bytes, nil)
 	return code == 200 && err == nil
 }
 
 func ontid(userID string) bool {
 	input := server.GenerateOntIdInput{ReqID: uuid.NewV4().String(), UserId: userID}
 	bytes, _ := json.Marshal(input)
-	code, _, _, err := forward.PostJSONRequest("http://openkg-dev.ontfs.io/"+server.GenerateOntIdByUserIdURI, bytes, nil)
+	code, _, _, err := forward.PostJSONRequest(domain+server.GenerateOntIdByUserIdURI, bytes, nil)
+
+	fmt.Println("code", code, "err", err)
 	return code == 200 && err == nil
 }
