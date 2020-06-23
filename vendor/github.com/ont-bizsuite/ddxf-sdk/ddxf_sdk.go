@@ -15,9 +15,9 @@ import (
 )
 
 const (
-	dDXFContractAddress   = "90982cd1d33ec7b33bffe54b289f5acaf02815a8"
-	dataIdContractAddress = "e854316627dfc44bef9c0eb583e941804d0716d5"
-	dtokenContractAddress = "d80184492a900e554c5c17f0c51c27ea1dd363f6"
+	mpContractAddress     = "f92bc4c42f9c5d10664901b77de3ef87f9e0dd61"
+	dataIdContractAddress = "03d07edc239d6c8cd99543bdef7a4bc407f9d44c"
+	dtokenContractAddress = "466b94488bf2ad1b1eec0ae7e49e40708e71a35d"
 )
 
 const (
@@ -119,7 +119,7 @@ func (sdk *DdxfSdk) DefDTokenKit() *dtoken_contract.DTokenKit{
 
 func (sdk *DdxfSdk) DefMpKit() *market_place_contract.MpKit {
 	if sdk.defDDXFKit == nil {
-		contractAddress, _ := common.AddressFromHexString(dDXFContractAddress)
+		contractAddress, _ := common.AddressFromHexString(mpContractAddress)
 		sdk.defDDXFKit = market_place_contract.NewDDXFContractKit(contractAddress,
 			sdk.bc)
 	}

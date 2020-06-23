@@ -24,12 +24,12 @@ func main() {
 	}
 	fmt.Println(users)
 
-	for _, u := range users {
-		if !ontid(u.ID) {
-			panic(fmt.Sprintf("ontid fail for %s", u.ID))
-		}
-		return
-	}
+	// for _, u := range users {
+	// 	if !ontid(u.ID) {
+	// 		panic(fmt.Sprintf("ontid fail for %s", u.ID))
+	// 	}
+	// 	return
+	// }
 
 	var resources []resource
 	err = engine.SQL("select a.*, b.creator_user_id from resource a join package b on a.package_id=b.id").Find(&resources)
@@ -42,6 +42,7 @@ func main() {
 		if !publish(r) {
 			panic(fmt.Sprintf("publish fail for %s", r.ID))
 		}
+		return
 	}
 }
 
@@ -59,7 +60,9 @@ type user struct {
 	ID string `xorm:"id"`
 }
 
-const domain = "http://openkg-dev.ontfs.io"
+// const domain = "http://openkg-dev.ontfs.io"
+
+const domain = "http://192.168.0.228:10999"
 
 func publish(r resource) bool {
 	dataMeta := map[string]interface{}{

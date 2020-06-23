@@ -119,7 +119,7 @@ github.com/modern-go/concurrent
 github.com/modern-go/reflect2
 # github.com/oklog/run v1.0.0
 github.com/oklog/run
-# github.com/ont-bizsuite/ddxf-sdk v0.0.0-20200623095511-1c50da220845
+# github.com/ont-bizsuite/ddxf-sdk v0.0.0-20200623120126-9ac9275ebf31
 github.com/ont-bizsuite/ddxf-sdk/data_id_contract
 github.com/ont-bizsuite/ddxf-sdk/market_place_contract
 github.com/ont-bizsuite/ddxf-sdk/split_policy_contract
@@ -214,8 +214,8 @@ github.com/ontio/ontology-eventbus/internal/queue/goring
 github.com/ontio/ontology-eventbus/internal/queue/mpsc
 # github.com/ontio/ontology-go-sdk v1.11.2-0.20200615094056-8c296c479e8d
 github.com/ontio/ontology-go-sdk
-github.com/ontio/ontology-go-sdk/utils
 github.com/ontio/ontology-go-sdk/common
+github.com/ontio/ontology-go-sdk/utils
 github.com/ontio/ontology-go-sdk/bip44
 github.com/ontio/ontology-go-sdk/client
 # github.com/ontio/wagon v0.4.2
