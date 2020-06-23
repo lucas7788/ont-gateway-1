@@ -38,6 +38,7 @@ func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput)
 		if err != nil {
 			output.Code = http.StatusInternalServerError
 			output.Msg = err.Error()
+			fmt.Println("err", err)
 		}
 		callback(output)
 	}()
