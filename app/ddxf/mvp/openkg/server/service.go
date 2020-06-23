@@ -73,6 +73,7 @@ func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput)
 	}
 
 	ui.OntId = ontid
+	ui.UserId = input.UserId
 	err = InsertElt(UserInfoCollection, ui)
 	if err == nil {
 		output.OntId = ontid
@@ -371,7 +372,7 @@ func deleteService(input DeleteInput) (output DeleteOutput) {
 	}
 	instance.DDXFSdk().SignTx(tx, user)
 	//send tx to seller
-	forward.PostJSONRequest(config.SellerUrl+server.DeleteUrl,[]byte{},nil)
+	forward.PostJSONRequest(config.SellerUrl+server.DeleteUrl, []byte{}, nil)
 	return
 }
 
