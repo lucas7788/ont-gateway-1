@@ -51,3 +51,16 @@ func BuyAndUse(c *gin.Context) {
 	}()
 	c.JSON(http.StatusOK, "SUCCESS")
 }
+
+func Delete(c *gin.Context) {
+	var input DeleteInput
+	if err := c.ShouldBind(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	output := deleteService(input)
+	if output.Code == 0 {
+		output.Code = http.StatusOK
+	}
+	c.JSON(output.Code, output)
+}

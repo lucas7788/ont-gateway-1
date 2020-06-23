@@ -365,17 +365,13 @@ func PublishService(input PublishInput) (output PublishOutput) {
 
 func deleteService(input DeleteInput) (output DeleteOutput) {
 	user := GetAccount(input.UserID)
-	txHash, err := instance.DDXFSdk().DefMpKit().Delete(user, []byte(input.ResourceID))
+	tx, err := instance.DDXFSdk().DefMpKit().BuildDeleteTx([]byte(input.ResourceID))
 	if err != nil {
 		return
 	}
-	evt, err := instance.DDXFSdk().GetSmartCodeEvent(txHash.ToHexString())
-	if err != nil {
-		return
-	}
-	if evt.State != 1 {
-		return
-	}
+	instance.DDXFSdk().SignTx(tx, user)
+	//send tx to seller
+	forward.PostJSONRequest(config.SellerUrl+server.DeleteUrl,[]byte{},nil)
 	return
 }
 
