@@ -1,4 +1,4 @@
-package ddxf_contract
+package market_place_contract
 
 import (
 	"errors"
@@ -93,6 +93,7 @@ func (this *CountAndAgent) FromBytes(data []byte) error {
 type TokenTemplate struct {
 	DataID     string // can be empty
 	TokenHashs []string
+	Endpoint   string
 }
 
 func (this *TokenTemplate) Deserialize(source *common.ZeroCopySource) error {
@@ -119,6 +120,12 @@ func (this *TokenTemplate) Deserialize(source *common.ZeroCopySource) error {
 		}
 	}
 	this.TokenHashs = tokenHashs
+
+	endpoint,_,irr,eof := source.NextString()
+	if irr || eof {
+		return fmt.Errorf("read endpoint failed irregular:%v, eof:%v", irregular, eof)
+	}
+	this.Endpoint = endpoint
 	return nil
 }
 
@@ -133,6 +140,7 @@ func (this TokenTemplate) Serialize(sink *common.ZeroCopySink) {
 	for i := 0; i < len(this.TokenHashs); i++ {
 		sink.WriteString(this.TokenHashs[i])
 	}
+	sink.WriteString(this.Endpoint)
 }
 
 func (this *TokenTemplate) ToBytes() []byte {
@@ -173,7 +181,6 @@ func (this *TokenResourceTyEndpoint) Deserialize(source *common.ZeroCopySource) 
 // ResourceDDO is ddo for resource
 type ResourceDDO struct {
 	Manager                  common.Address             // data owner id
-	TokenResourceTyEndpoints []*TokenResourceTyEndpoint // RT for tokens
 	ItemMetaHash             common.Uint256             //
 	DTC                      common.Address             // can be empty
 	MP                       common.Address             // can be empty
@@ -183,10 +190,6 @@ type ResourceDDO struct {
 
 func (this *ResourceDDO) Serialize(sink *common.ZeroCopySink) {
 	sink.WriteAddress(this.Manager)
-	sink.WriteVarUint(uint64(len(this.TokenResourceTyEndpoints)))
-	for _, v := range this.TokenResourceTyEndpoints {
-		v.Serialize(sink)
-	}
 	//TODO
 	sink.WriteHash(this.ItemMetaHash)
 	if this.DTC != common.ADDRESS_EMPTY {
@@ -215,21 +218,7 @@ func (this *ResourceDDO) Deserialize(source *common.ZeroCopySource) error {
 	if eof {
 		return io.ErrUnexpectedEOF
 	}
-	l, _, irregular, eof := source.NextVarUint()
-	if irregular || eof {
-		return errors.New("1. ResourceDDO Deserialize l error")
-	}
-	tokenResourceTypes := make([]*TokenResourceTyEndpoint, l)
-	for i := 0; i < int(l); i++ {
-		tt := &TokenResourceTyEndpoint{}
-		err := tt.Deserialize(source)
-		if err != nil {
-			return err
-		}
-		tokenResourceTypes[i] = tt
-	}
-	this.TokenResourceTyEndpoints = tokenResourceTypes
-
+	var irregular bool
 	this.ItemMetaHash, eof = source.NextHash()
 	if irregular || eof {
 		return errors.New("2. ResourceDDO Deserialize l error")

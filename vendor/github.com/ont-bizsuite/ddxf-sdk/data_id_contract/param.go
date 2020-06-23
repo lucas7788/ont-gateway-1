@@ -7,7 +7,6 @@ import (
 
 type DataIdInfo struct {
 	DataId       string
-	DataType     byte
 	DataMetaHash common.Uint256
 	DataHash     common.Uint256
 	Owners       []*OntIdIndex
@@ -37,7 +36,6 @@ func (this *OntIdIndex) Deserialize(source *common.ZeroCopySource) error {
 
 func (this DataIdInfo) Serialize(sink *common.ZeroCopySink) {
 	sink.WriteString(this.DataId)
-	sink.WriteByte(this.DataType)
 	sink.WriteHash(this.DataMetaHash)
 	sink.WriteHash(this.DataHash)
 	sink.WriteVarUint(uint64(len(this.Owners)))
@@ -52,11 +50,6 @@ func (this *DataIdInfo) Deserialize(source *common.ZeroCopySource) error {
 		return fmt.Errorf("read data id error, irregular :%v,eof: %v", irregular, eof)
 	}
 	this.DataId = dataId
-	dataTy, eof := source.NextByte()
-	if eof {
-		return fmt.Errorf("read data type error,eof: %v", eof)
-	}
-	this.DataType = dataTy
 	this.DataMetaHash, eof = source.NextHash()
 	this.DataHash, eof = source.NextHash()
 	l, _, irregular, eof := source.NextVarUint()

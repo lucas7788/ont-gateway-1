@@ -49,7 +49,8 @@ func (this *BaseContract) PreInvoke(contractAddr common.Address, method string, 
 	return res.Result, nil
 }
 
-func (this *BaseContract) Invoke(contractAddr common.Address, signer *ontology_go_sdk.Account, method string, param []interface{}) (common.Uint256, error) {
+func (this *BaseContract) Invoke(contractAddr common.Address, signer *ontology_go_sdk.Account, method string,
+	param []interface{}) (common.Uint256, error) {
 	txhash, err := this.sdk.WasmVM.InvokeWasmVMSmartContract(this.gasPrice, this.gasLimit, this.payer, signer, contractAddr, method, param)
 	if err != nil {
 		return common.UINT256_EMPTY, err
