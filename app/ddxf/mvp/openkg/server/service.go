@@ -18,6 +18,7 @@ import (
 	common2 "github.com/ontio/ontology/common"
 	"github.com/ontio/ontology/core/types"
 	"github.com/zhiqiangxu/ddxf"
+	config2 "github.com/zhiqiangxu/ont-gateway/app/ddxf/mvp/openkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
@@ -87,13 +88,12 @@ func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput)
 
 func PublishService(input PublishInput) (output PublishOutput) {
 	output.ReqID = input.ReqID
-	// callback(output)
-	// return
 	var err error
 	defer func() {
 		if err != nil {
 			output.Code = http.StatusInternalServerError
 			output.Msg = err.Error()
+			fmt.Println("error: ", err)
 		}
 		callback(output)
 	}()
@@ -126,7 +126,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 			iMutTx   *types.Transaction
 			bs, data []byte
 		)
-		tx, err = instance.DDXFSdk().DefMpKit().BuildFreezeTx([]byte(param.OnChainId))
+		tx, err = instance.DDXFSdk().DefMpKit().BuildDeleteTx([]byte(param.OnChainId))
 		if err != nil {
 			return
 		}
@@ -140,7 +140,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 			return
 		}
 
-		param := server.FreezeParam{SignedTx: hex.EncodeToString(common2.SerializeToBytes(iMutTx))}
+		param := server.DeleteParam{SignedTx: hex.EncodeToString(common2.SerializeToBytes(iMutTx))}
 		bs, err = json.Marshal(param)
 		if err != nil {
 			return
@@ -150,7 +150,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 			return
 		}
 
-		res := server.FreezeOutput{}
+		res := server.DeleteOutput{}
 		err = json.Unmarshal(data, &res)
 		if err != nil {
 			return
@@ -182,12 +182,13 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	if err != nil {
 		return
 	}
+	//查询哪些data id需要上链
 	_, _, data, err = forward.PostJSONRequest(config.SellerUrl+server.GetDataIdByDataMetaHashUrl, paramBs, headers)
 	if err != nil {
 		return
 	}
 	res := server.GetDataIdRes{}
-	err = json.Unmarshal(data, res)
+	err = json.Unmarshal(data, &res)
 	if err != nil {
 		return
 	}
@@ -262,7 +263,10 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	if err != nil {
 		return
 	}
-	_, _, data, err = forward.PostJSONRequest(config.SellerUrl+server.SaveDataMetaArrayUrl, bs, headers)
+	_, _, data, err = forward.PostJSONRequest(config2.SellerUrl+server.SaveDataMetaArrayUrl, bs, headers)
+	if err != nil {
+		return
+	}
 
 	templates := make([]*market_place_contract.TokenTemplate, 0)
 	trte := make([]*market_place_contract.TokenResourceTyEndpoint, len(dataMetas))
@@ -342,6 +346,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	publishInput := io.MPEndpointPublishItemMetaInput{
 		SignedDDXFTx: hex.EncodeToString(common2.SerializeToBytes(iMutTx)),
 		ItemMeta:     io.PublishItemMeta{ItemMeta: input.Item, OnchainItemID: resourceId},
+		MPEndpoint:   config2.MPEndpoint,
 	}
 	bs, err = json.Marshal(publishInput)
 	if err != nil {
@@ -349,7 +354,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	}
 
 	// send req to seller
-	_, _, data, err = forward.PostJSONRequest(config.SellerUrl+server.PublishMPItemMetaUrl, bs, headers)
+	_, _, data, err = forward.PostJSONRequest(config2.SellerUrl+server.PublishMPItemMetaUrl, bs, headers)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()

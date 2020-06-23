@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/hex"
 	"fmt"
+	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ddxf"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
@@ -13,7 +14,6 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/qrCode"
 	"go.mongodb.org/mongo-driver/bson"
 	"strings"
-	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 )
 
 func PublishMetaService(input io.SellerPublishMPItemMetaInput, ontId string) (qrCode.QrCodeResponse, error) {

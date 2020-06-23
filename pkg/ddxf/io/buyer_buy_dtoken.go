@@ -1,9 +1,9 @@
 package io
 
 import (
+	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 	"github.com/ontio/ontology/common"
 	io2 "github.com/zhiqiangxu/ont-gateway/pkg/io"
-	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 )
 
 // BuyerBuyDtokenInput ...
@@ -24,6 +24,6 @@ type EndpointToken struct {
 
 type Token struct {
 	TokenTemplate market_place_contract.TokenTemplate `bson:"token_template" json:"token_template"`
-	Buyer         common.Address              `bson:"buyer" json:"buyer"`
-	OnchainItemId string                      `bson:"onchain_item_id" json:"onchain_item_id"`
+	Buyer         common.Address                      `bson:"buyer" json:"buyer"`
+	OnchainItemId string                              `bson:"onchain_item_id" json:"onchain_item_id"`
 }

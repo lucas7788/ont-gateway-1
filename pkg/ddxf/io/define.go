@@ -1,9 +1,9 @@
 package io
 
 import (
+	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 	"github.com/ontio/ontology/common"
 	"io"
-	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 )
 
 func ReadString(source *common.ZeroCopySource) (string, error) {

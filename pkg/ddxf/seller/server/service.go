@@ -54,6 +54,7 @@ func GetDataIdByDataMetaHashService(param GetDataIdParam) (*GetDataIdRes, error)
 		filter := bson.M{"dataMetaHash": item}
 		err := FindElt(DataMetaCollection, filter, dataStore)
 		if err != nil && err != mongo.ErrNoDocuments {
+			fmt.Println("seller: ", err)
 			return nil, err
 		}
 		idHash := &DataIdAndDataMetaHash{
@@ -191,7 +192,7 @@ func SaveTokenMetaService(input io.SellerSaveTokenMetaInput, ontId string) (outp
 	return
 }
 
-func FreezeService(param FreezeParam, ontId string) (res FreezeOutput) {
+func FreezeService(param DeleteParam, ontId string) (res FreezeOutput) {
 	tx, err := utils.TransactionFromHexString(param.SignedTx)
 	if err != nil {
 		res.Code = http.StatusInternalServerError
