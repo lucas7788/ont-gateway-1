@@ -37,7 +37,6 @@ func Publish(c *gin.Context) {
 	c.JSON(http.StatusOK, "SUCCESS")
 }
 
-
 func BuyAndUse(c *gin.Context) {
 	var (
 		input BuyAndUseInput

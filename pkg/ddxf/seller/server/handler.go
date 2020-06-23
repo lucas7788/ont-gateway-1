@@ -128,7 +128,7 @@ func FreezeHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, err))
 		return
 	}
-	param := FreezeParam{}
+	param := DeleteParam{}
 	err = json.Unmarshal(bs, &param)
 	if err != nil {
 		instance.Logger().Error("[FreezeHandler] unmarshal param error")

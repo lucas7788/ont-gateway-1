@@ -2,7 +2,6 @@ package jwt
 
 import (
 	"encoding/base64"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -51,10 +50,6 @@ func validateToken(token string, admin bool) (*Payload, error) {
 	}
 
 	data := arr[0] + "." + arr[1]
-	sig, err = hex.DecodeString(string(sig))
-	if err != nil {
-		return nil, err
-	}
 	err = signature.Verify(config.DefDDXFConfig().OperatorAccount.GetPublicKey(), []byte(data), sig)
 	if err != nil {
 		return nil, err

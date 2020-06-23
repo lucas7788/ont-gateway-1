@@ -13,7 +13,7 @@ type FreezeOutput struct {
 	io2.BaseResp
 }
 
-type FreezeParam struct {
+type DeleteParam struct {
 	SignedTx string
 }
 
