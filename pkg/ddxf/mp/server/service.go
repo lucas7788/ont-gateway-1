@@ -142,56 +142,73 @@ func QueryItemMetasService(input io.MPEndpointQueryItemMetasInput) (output io.MP
 	return
 }
 
-func PublishItemMetaService(input io.MPEndpointPublishItemMetaInput) (output io.MPEndpointPublishItemMetaOutput) {
-	txBs, err := hex.DecodeString(input.SignedDDXFTx)
+func DeleteService(input DeleteInput) (output DeleteOutput) {
+	err := sendTx(input.SignedTx)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
 		return
+	}
+	return
+}
+
+func UpdateService(input UpdateInput) (output UpdateOutput) {
+	err := sendTx(input.SignedTx)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	return
+}
+
+func sendTx(txHex string) error {
+	txBs, err := hex.DecodeString(txHex)
+	if err != nil {
+		return err
 	}
 	tx, err := types.TransactionFromRawBytes(txBs)
 	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-		return
+		return err
 	}
 	muTx, err := tx.IntoMutable()
 	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-		return
-	}
-	timeout := config.Load().MongoConfig.Timeout
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-	_, err = instance.MongoOfficial().Collection(endpointCollectionName).InsertOne(ctx, input.ItemMeta)
-	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-		return
+		return err
 	}
 	err = instance.OntSdk().GetKit().SignToTransaction(muTx, MpAccount)
 	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-		return
+		return err
 	}
 	txHash, err := instance.OntSdk().GetKit().SendTransaction(muTx)
 	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-		return
+		return err
 	}
 	fmt.Println("mp send tx:", txHash.ToHexString())
 	state, err := getSmartCodeEvent(txHash.ToHexString())
 	if err != nil {
+		return err
+	}
+	if state != 1 {
+		return fmt.Errorf("tx failed, txHash: %s", txHash.ToHexString())
+	}
+	return nil
+}
+
+func PublishItemMetaService(input io.MPEndpointPublishItemMetaInput) (output io.MPEndpointPublishItemMetaOutput) {
+	timeout := config.Load().MongoConfig.Timeout
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	_, err := instance.MongoOfficial().Collection(endpointCollectionName).InsertOne(ctx, input.ItemMeta)
+	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
 		return
 	}
-	if state == 0 {
+	err = sendTx(input.SignedDDXFTx)
+	if err != nil {
 		output.Code = http.StatusInternalServerError
-		output.Msg = "tx failed"
+		output.Msg = err.Error()
+		return
 	}
 	return
 }

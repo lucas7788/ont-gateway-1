@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 	"github.com/ontio/ontology-crypto/signature"
-	ontology_go_sdk "github.com/ontio/ontology-go-sdk"
+	"github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology-go-sdk/utils"
 	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ddxf"
@@ -19,7 +20,6 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 )
 
 var (
@@ -272,6 +272,40 @@ func PublishMPItemMetaService(input io.MPEndpointPublishItemMetaInput, ontId str
 			return
 		}
 	}
+	return
+}
+
+func DeleteService(input DeleteInput) (output DeleteOutput) {
+	//TODO
+	//send to mp
+	bs, err := json.Marshal(input)
+	if err != nil {
+		return
+	}
+	_, _, data, err := forward.PostJSONRequest(config.MpUrl+server.Delete, bs, nil)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	output.Result = data
+	return
+}
+
+func UpdateService(input UpdateInput) (output DeleteOutput) {
+	//TODO
+	//send to mp
+	bs, err := json.Marshal(input)
+	if err != nil {
+		return
+	}
+	_, _, data, err := forward.PostJSONRequest(config.MpUrl+server.Update, bs, nil)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
+	}
+	output.Result = data
 	return
 }
 

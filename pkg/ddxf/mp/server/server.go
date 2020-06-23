@@ -20,6 +20,8 @@ const (
 	getItemMeta        = "/ddxf/mp/getItemMeta"
 	queryItemMetas     = "/ddxf/mp/queryItemMetas"
 	PublishItemMeta    = "/ddxf/mp/publishItemMeta"
+	Delete             = "/ddxf/mp/delete"
+	Update             = "/ddxf/mp/update"
 )
 
 func StartMpServer() {
@@ -32,6 +34,8 @@ func StartMpServer() {
 	r.POST(removeRegistry, RemoveRegistryHandler)
 	r.POST(PublishItemMeta, PublishItemMetaHandler)
 	r.POST(getItemMeta, GetItemMetaHandler)
+	r.POST(Delete, DeleteHandler)
+	r.POST(Update, UpdateHandler)
 	r.GET(getAuditRule, GetAuditRuleHandler)
 	r.GET(getFee, GetFeeHandler)
 	r.GET(getChallengePeriod, GetChallengePeriodHandler)

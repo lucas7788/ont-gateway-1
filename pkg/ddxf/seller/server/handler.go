@@ -169,6 +169,48 @@ func PublishMPItemMetaHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, output)
 }
 
+func DeleteHandler(c *gin.Context) {
+	data, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		instance.Logger().Error("UseTokenHandler:", zap.Error(err))
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusBadRequest, err))
+		return
+	}
+	param := DeleteInput{}
+	err = json.Unmarshal(data, &param)
+	if err != nil {
+		instance.Logger().Error("UseTokenHandler:", zap.Error(err))
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusBadRequest, err))
+		return
+	}
+	output := DeleteService(param)
+	if output.Code == 0 {
+		output.Code = http.StatusOK
+	}
+	c.JSON(output.Code, output)
+}
+
+func UpdateHandler(c *gin.Context) {
+	data, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		instance.Logger().Error("UseTokenHandler:", zap.Error(err))
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusBadRequest, err))
+		return
+	}
+	param := UpdateInput{}
+	err = json.Unmarshal(data, &param)
+	if err != nil {
+		instance.Logger().Error("UseTokenHandler:", zap.Error(err))
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(http.StatusBadRequest, err))
+		return
+	}
+	output := UpdateService(param)
+	if output.Code == 0 {
+		output.Code = http.StatusOK
+	}
+	c.JSON(output.Code, output)
+}
+
 func UseTokenHandler(c *gin.Context) {
 	data, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {

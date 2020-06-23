@@ -80,6 +80,48 @@ func PublishItemMetaHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, output)
 }
 
+func DeleteHandler(ctx *gin.Context) {
+	paramsBs, err := ioutil.ReadAll(ctx.Request.Body)
+	if err != nil {
+		instance.Logger().Error("[DeleteHandler] read post param error:", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, err)
+		return
+	}
+	param := DeleteInput{}
+	err = json.Unmarshal(paramsBs, &param)
+	if err != nil {
+		instance.Logger().Error("[DeleteHandler] parse post param error:", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, err)
+		return
+	}
+	output := DeleteService(param)
+	if output.Code == 0 {
+		output.Code = http.StatusOK
+	}
+	ctx.JSON(output.Code, output)
+}
+
+func UpdateHandler(ctx *gin.Context) {
+	paramsBs, err := ioutil.ReadAll(ctx.Request.Body)
+	if err != nil {
+		instance.Logger().Error("[UpdateHandler] read post param error:", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, err)
+		return
+	}
+	param := UpdateInput{}
+	err = json.Unmarshal(paramsBs, &param)
+	if err != nil {
+		instance.Logger().Error("[UpdateHandler] parse post param error:", zap.Error(err))
+		ctx.JSON(http.StatusBadRequest, err)
+		return
+	}
+	output := UpdateService(param)
+	if output.Code == 0 {
+		output.Code = http.StatusOK
+	}
+	ctx.JSON(output.Code, output)
+}
+
 func GetAuditRuleHandler(ctx *gin.Context) {
 	output := GetAuditRuleService(io.MPEndpointGetAuditRuleInput{})
 	if output.Code != 0 {

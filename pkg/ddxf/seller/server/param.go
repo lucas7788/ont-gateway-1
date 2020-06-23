@@ -29,3 +29,20 @@ type DataIdAndDataMetaHash struct {
 	DataId       string
 	DataMetaHash string
 }
+
+type DeleteInput struct {
+	SignedTx string
+}
+
+type DeleteOutput struct {
+	io2.BaseResp
+	Result interface{}
+}
+
+type UpdateInput struct {
+	SignedTx string
+}
+
+type UpdateOutput struct {
+	io2.BaseResp
+}
