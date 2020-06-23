@@ -7,6 +7,6 @@ import (
 
 // MVP for openkg
 func main() {
-	common.ConsortiumAddr = "120.92.83.147:20336"
+	common.ConsortiumAddr = "113.31.112.154:20336"
 	server.StartServer()
 }
