@@ -57,6 +57,7 @@ func (this *BaseContract) Invoke(contractAddr common.Address, signer *ontology_g
 	}
 	return txhash, nil
 }
+
 func (this *BaseContract) BuildTx(contractAddr common.Address, method string, param []interface{}) (*types.MutableTransaction, error) {
 	tx, err := this.sdk.WasmVM.NewInvokeWasmVmTransaction(this.gasPrice, this.gasLimit, contractAddr, method, param)
 	if err != nil {

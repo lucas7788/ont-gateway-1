@@ -14,6 +14,7 @@ import (
 	"github.com/ont-bizsuite/ddxf-sdk/data_id_contract"
 	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 	"github.com/ont-bizsuite/ddxf-sdk/split_policy_contract"
+	common3 "github.com/ontio/ontology-go-sdk/common"
 	common2 "github.com/ontio/ontology/common"
 	"github.com/ontio/ontology/core/types"
 	"github.com/zhiqiangxu/ddxf"
@@ -31,13 +32,14 @@ import (
 
 func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput) {
 	output.ReqID = input.ReqID
-	callback(output)
-	return
+	// callback(output)
+	// return
 	var err error
 	defer func() {
 		if err != nil {
 			output.Code = http.StatusInternalServerError
 			output.Msg = err.Error()
+			fmt.Println("err", err)
 		}
 		callback(output)
 	}()
@@ -64,7 +66,8 @@ func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput)
 	if err != nil {
 		return
 	}
-	evt, err := instance.DDXFSdk().GetSmartCodeEvent(txHash.ToHexString())
+	var evt *common3.SmartContactEvent
+	evt, err = instance.DDXFSdk().GetSmartCodeEvent(txHash.ToHexString())
 	if err != nil {
 		return
 	}
@@ -74,6 +77,7 @@ func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput)
 	}
 
 	ui.OntId = ontid
+	ui.UserId = input.UserId
 	err = InsertElt(UserInfoCollection, ui)
 	if err == nil {
 		output.OntId = ontid
@@ -84,7 +88,6 @@ func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput)
 
 func PublishService(input PublishInput) (output PublishOutput) {
 	output.ReqID = input.ReqID
-	//callback(output)
 	var err error
 	defer func() {
 		if err != nil {
@@ -382,11 +385,14 @@ func deleteService(input DeleteInput) (output DeleteOutput) {
 }
 
 func buyAndUseService(input BuyAndUseInput) (output BuyAndUseOutput) {
-	callback(output)
-	return
+	// callback(output)
+	// return
 
-	defer callback(output)
 	output.ReqID = input.ReqID
+	defer func() {
+		callback(output)
+	}()
+
 	user := GetAccount(input.UserID)
 
 	ontID := "did:ont:" + user.Address.ToBase58()
