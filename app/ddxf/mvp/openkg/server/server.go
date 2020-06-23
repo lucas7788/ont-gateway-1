@@ -4,17 +4,18 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/ontio/ontology-crypto/keypair"
-	"github.com/ontio/ontology-go-sdk"
+	ontology_go_sdk "github.com/ontio/ontology-go-sdk"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 )
 
 const (
 	openkgPort               = "10999"
-	publishURI               = "/publish"
-	buyAndUseURI             = "/buyAndUse"
-	generateOntIdByUserIdURI = "/generateOntIdByUserId"
+	PublishURI               = "/publish"
+	BuyAndUseURI             = "/buyAndUse"
+	GenerateOntIdByUserIdURI = "/generateOntIdByUserId"
 )
 
 var (
@@ -47,8 +48,8 @@ func StartServer() {
 		return
 	}
 	r := gin.Default()
-	r.POST(generateOntIdByUserIdURI, GenerateOntIdByUserId)
-	r.POST(publishURI, Publish)
-	r.POST(buyAndUseURI, BuyAndUse)
+	r.POST(GenerateOntIdByUserIdURI, GenerateOntIdByUserId)
+	r.POST(PublishURI, Publish)
+	r.POST(BuyAndUseURI, BuyAndUse)
 	r.Run(":" + openkgPort)
 }
