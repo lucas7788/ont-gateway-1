@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"github.com/zhiqiangxu/ont-gateway/pkg/rest/middleware"
 )
 
 func JWT() gin.HandlerFunc {
@@ -31,6 +32,7 @@ func JWT() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		c.Set(middleware.TenantIDKey, load.Content.OntId)
 		c.Set(config.Key_OntId, load.Content.OntId)
 		c.Set(config.JWTAud, load.Aud)
 		c.Set(config.JWTAdmin, false)

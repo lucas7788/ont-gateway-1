@@ -61,13 +61,18 @@ func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput)
 
 	account := GetAccount(input.UserId)
 	ontid := "did:ont:" + account.Address.ToBase58()
-	txHash, err := instance.DDXFSdk().GetOntologySdk().Native.OntId.RegIDWithPublicKey(defGasPrice,
-		defGasLimit, payer, ontid, account)
+	tx, err := instance.DDXFSdk().GetOntologySdk().Native.OntId.NewRegIDWithPublicKeyTransaction(defGasPrice,
+		defGasLimit, ontid, account.PublicKey)
 	if err != nil {
 		return
 	}
+	_, err = instance.DDXFSdk().SignTx(tx, account)
+	if err != nil {
+		return
+	}
+	txHash, err := common.SendRawTx(tx)
 	var evt *common3.SmartContactEvent
-	evt, err = instance.DDXFSdk().GetSmartCodeEvent(txHash.ToHexString())
+	evt, err = instance.DDXFSdk().GetSmartCodeEvent(txHash)
 	if err != nil {
 		return
 	}
@@ -327,8 +332,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 			return
 		}
 	} else {
-		tx, err = instance.DDXFSdk().DefMpKit().BuildFreezeAndPublishTx(
-			[]byte(param.OnChainId), []byte(resourceId), ddo, item, split)
+		tx, err = instance.DDXFSdk().DefMpKit().BuildUpdateTx([]byte(resourceId), ddo, item, split)
 		if err != nil {
 			return
 		}
