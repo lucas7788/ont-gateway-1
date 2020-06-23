@@ -73,8 +73,20 @@ func (this *MpKit) Update(seller *ontology_go_sdk.Account, resourceId []byte, dd
 	return this.bc.Invoke(this.contractAddress, seller, "update",
 		[]interface{}{resourceId, ddo.ToBytes(), item.ToBytes(), splitPolicyParam.ToBytes()})
 }
+
+func (this *MpKit) BuildUpdateTx(resourceId []byte, ddo ResourceDDO, item DTokenItem,
+	splitPolicyParam split_policy_contract.SplitPolicyRegisterParam) (*types.MutableTransaction, error) {
+	return this.bc.BuildTx(this.contractAddress, "update",
+		[]interface{}{resourceId, ddo.ToBytes(), item.ToBytes(), splitPolicyParam.ToBytes()})
+}
+
 func (this *MpKit) Delete(seller *ontology_go_sdk.Account, resourceId []byte) (common.Uint256, error) {
 	return this.bc.Invoke(this.contractAddress, seller, "delete",
+		[]interface{}{resourceId})
+}
+
+func (this *MpKit) BuildDeleteTx(resourceId []byte) (*types.MutableTransaction, error) {
+	return this.bc.BuildTx(this.contractAddress, "delete",
 		[]interface{}{resourceId})
 }
 
