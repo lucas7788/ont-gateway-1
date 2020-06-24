@@ -210,7 +210,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		}
 		var hash common2.Uint256
 		hash, err = common2.Uint256ParseFromBytes(dataMetaHash[:])
-		if err !=nil {
+		if err != nil {
 			err = fmt.Errorf("2 Uint256ParseFromBytes error: %s", err)
 			return
 		}
@@ -288,12 +288,12 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		if err != nil {
 			return
 		}
-		u,_ := common2.Uint256ParseFromBytes(dataMetaHash[:])
+		u, _ := common2.Uint256ParseFromBytes(dataMetaHash[:])
 		dataId := res[u.ToHexString()]
 		tt := &market_place_contract.TokenTemplate{
 			DataID:     dataId.(string),
 			TokenHashs: []string{"1"},
-			Endpoint:"aaaa",
+			Endpoint:   "aaaa",
 		}
 		templates = append(templates, tt)
 	}
@@ -321,13 +321,13 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		Templates:   templates,
 	}
 	split := split_policy_contract.SplitPolicyRegisterParam{
-		AddrAmts:[]*split_policy_contract.AddrAmt{
+		AddrAmts: []*split_policy_contract.AddrAmt{
 			&split_policy_contract.AddrAmt{
-				To:seller.Address,
-				Percent:100,
+				To:      seller.Address,
+				Percent: 100,
 			},
 		},
-		TokenTy:split_policy_contract.ONG,
+		TokenTy: split_policy_contract.ONG,
 	}
 	var (
 		tx *types.MutableTransaction
@@ -421,7 +421,7 @@ func buyAndUseService(input BuyAndUseInput) (output BuyAndUseOutput) {
 		"Authorization": jwtToken,
 	}
 
-	filter := bson.M{"open_kg_id": input.OpenKGID}
+	filter := bson.M{"openkg_id": input.OpenKGID}
 	param := PublishInput{}
 	err = FindElt(OpenKgPublishParamCollection, filter, &param)
 	if param.Delete {
