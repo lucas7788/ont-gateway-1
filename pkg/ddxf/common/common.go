@@ -3,6 +3,7 @@ package common
 import (
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 	"github.com/ontio/ontology/common"
 	"github.com/ontio/ontology/core/types"
@@ -160,6 +161,7 @@ func SendRawTx(tx *types.MutableTransaction) (txHash string, err error) {
 	if ConsortiumAddr != "" {
 		addrs = append(addrs, ConsortiumAddr)
 	}
+	fmt.Println("*******addrs: ", addrs)
 	input := io2.SendRawTxInput{Tx: tx, Addrs: addrs}
 	output := service.Instance().SendRawTx(input)
 	txHash, err = output.TxHash, output.Error()

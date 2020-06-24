@@ -61,7 +61,6 @@ func sendTx(tx string) error {
 	if err != nil {
 		return err
 	}
-	instance.OntSdk().WaitForGenerateBlock()
 	event, err := instance.OntSdk().GetSmartCodeEvent(txHash)
 	if err != nil {
 		return err
