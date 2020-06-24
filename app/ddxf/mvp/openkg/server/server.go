@@ -38,7 +38,8 @@ func InitData() error {
 	}
 	instance.DDXFSdk().SetPayer(payer)
 	defPlainSeed = hex.EncodeToString(sha256.New().Sum(keypair.SerializePrivateKey(payer.PrivateKey)))
-	return nil
+
+	return initDb()
 }
 
 // MVP for openkg

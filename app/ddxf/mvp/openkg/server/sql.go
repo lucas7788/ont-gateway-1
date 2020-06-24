@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
@@ -21,7 +22,7 @@ func initDb() (err error) {
 	opts.SetName("u-seller")
 	opts.SetUnique(true)
 	index := mongo.IndexModel{
-		Keys:    bsonx.Doc{{Key: "open_kg_id", Value: bsonx.Int32(1)}},
+		Keys:    bsonx.Doc{{Key: "openkg_id", Value: bsonx.Int32(1)}},
 		Options: opts,
 	}
 	_, err = instance.MongoOfficial().Collection(OpenKgPublishParamCollection).Indexes().CreateOne(context.Background(), index)

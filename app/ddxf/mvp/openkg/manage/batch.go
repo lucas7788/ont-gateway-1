@@ -39,6 +39,7 @@ func main() {
 	fmt.Println(resources)
 
 	for _, r := range resources {
+		fmt.Println("resource", r)
 		if !publish(r) {
 			panic(fmt.Sprintf("publish fail for %s", r.ID))
 		}
@@ -62,7 +63,7 @@ type user struct {
 
 // const domain = "http://openkg-dev.ontfs.io"
 
-const domain = "http://192.168.0.228:10999"
+const domain = "http://localhost:10999"
 
 func publish(r resource) bool {
 	dataMeta := map[string]interface{}{
