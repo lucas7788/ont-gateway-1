@@ -312,9 +312,13 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		ItemMetaHash: itemMetaHash,
 	}
 
+	addr, _ := common2.AddressFromHexString("195d72da6725e8243a52803f6de4cd93df48fc1f")
+
 	item := market_place_contract.DTokenItem{
 		Fee: market_place_contract.Fee{
-			ContractType: split_policy_contract.ONG,
+			ContractAddr: addr,
+			ContractType: split_policy_contract.OEP4,
+			Count:        1,
 		},
 		ExpiredDate: uint64(time.Now().Unix()) + uint64(time.Hour*24*30),
 		Stocks:      10000,
