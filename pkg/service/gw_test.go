@@ -148,10 +148,10 @@ func TestGateway(t *testing.T) {
 
 	}
 
-	{
-		output := gw.CreateWallet(io.CreateWalletInput{WalletName: "testxxx"})
-		assert.Assert(t, output.Error() == nil && output.Content != "")
-	}
+	// {
+	// 	output := gw.CreateWallet(io.CreateWalletInput{WalletName: "testxxx"})
+	// 	assert.Assert(t, output.Error() == nil && output.Content != "")
+	// }
 
 	{
 		id := "testID"
