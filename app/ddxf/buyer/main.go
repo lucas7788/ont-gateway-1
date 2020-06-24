@@ -2,14 +2,17 @@ package main
 
 import (
 	"fmt"
-	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/buyer/server"
-	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/buyer/server"
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
+	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 )
 
 func main() {
+	common.ConsortiumAddr = "113.31.112.154:20336"
 	err := server.StartBuyerServer()
 	if err != nil {
 		fmt.Println("StartBuyerServer error:", err)
