@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	common.ConsortiumAddr = "113.31.112.154:20336"
+	common.ConsortiumAddr = "http://113.31.112.154:20336"
 	err := server.StartBuyerServer()
 	if err != nil {
 		fmt.Println("StartBuyerServer error:", err)
