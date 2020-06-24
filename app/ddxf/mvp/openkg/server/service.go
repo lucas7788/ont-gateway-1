@@ -105,7 +105,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 
 	// 抽取openKGID
 	openKGID := input.OpenKGID
-	filter := bson.M{"open_kg_id": openKGID}
+	filter := bson.M{"openkg_id": openKGID}
 	param := PublishInput{}
 	var findError error
 	findError = FindElt(OpenKgPublishParamCollection, filter, &param)
