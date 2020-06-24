@@ -165,6 +165,5 @@ func SendRawTx(tx *types.MutableTransaction) (txHash string, err error) {
 	input := io2.SendRawTxInput{Tx: tx, Addrs: addrs}
 	output := service.Instance().SendRawTx(input)
 	txHash, err = output.TxHash, output.Error()
-	fmt.Printf("txHash:%s, err:%s \n", txHash, err)
 	return
 }
