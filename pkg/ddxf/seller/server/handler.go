@@ -12,6 +12,7 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"github.com/zhiqiangxu/ont-gateway/pkg/rest/middleware"
 	"go.uber.org/zap"
+	"fmt"
 )
 
 func SaveDataMetaHandler(c *gin.Context) {
@@ -82,6 +83,7 @@ func SaveDataMetaArrayHandler(c *gin.Context) {
 		return
 	}
 	output := SaveDataMetaArrayService(param, ontId.(string))
+	fmt.Println("SaveDataMetaArrayHandler:",output)
 	c.JSON(http.StatusOK, output)
 }
 
