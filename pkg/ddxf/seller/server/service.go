@@ -235,6 +235,7 @@ func PublishMPItemMetaService(input io.MPEndpointPublishItemMetaInput, ontId str
 	}
 	err = InsertElt(ItemMetaCollectionDdxf, input)
 	if err != nil {
+		fmt.Println("seller MPEndpointPublishItemMetaInput:", input)
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
 		return
