@@ -473,7 +473,7 @@ func buyAndUseService(input BuyAndUseInput) (output BuyAndUseOutput) {
 	var tx *types.MutableTransaction
 	contractAddr, _ := common2.AddressFromHexString(config2.BuyAndUseContractAddr)
 	contract := instance.DDXFSdk().DefContract(contractAddr)
-	tx, err = contract.BuildTx("buyAndUseToken", nil,
+	tx, err = contract.BuildTx("buyAndUseToken",
 		[]interface{}{[]byte(param.OnChainId), 1, user.Address, payer.Address, tokenTemplate.ToBytes()})
 	if err != nil {
 		output.Msg = err.Error()
