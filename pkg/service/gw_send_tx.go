@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"net/http"
 
 	osdk "github.com/ontio/ontology-go-sdk"
@@ -23,18 +24,21 @@ func (gw *Gateway) SendTx(input io.SendTxInput) (output io.SendTxOutput) {
 		kit.NewRpcClient().SetAddress(addr)
 		tx, err := utils.TransactionFromHexString(input.SignedTx)
 		if err != nil {
+			fmt.Printf("**********txHash:%s, err:%s \n", txHash.ToHexString(), err)
 			output.Code = http.StatusBadRequest
 			output.Msg = err.Error()
 			continue
 		}
 		mutTx, err := tx.IntoMutable()
 		if err != nil {
+			fmt.Printf("**********txHash:%s, err:%s \n", txHash.ToHexString(), err)
 			output.Code = http.StatusBadRequest
 			output.Msg = err.Error()
 			continue
 		}
 		txHash, err := kit.SendTransaction(mutTx)
 		if err != nil {
+			fmt.Printf("**********txHash:%s, err:%s \n", txHash.ToHexString(), err)
 			output.Code = http.StatusBadRequest
 			output.Msg = err.Error()
 			continue

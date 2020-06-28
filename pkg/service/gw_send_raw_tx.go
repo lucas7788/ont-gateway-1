@@ -3,9 +3,10 @@ package service
 import (
 	"net/http"
 
+	"fmt"
+
 	osdk "github.com/ontio/ontology-go-sdk"
 	"github.com/zhiqiangxu/ont-gateway/pkg/io"
-	"fmt"
 )
 
 // SendRawTx impl
@@ -22,11 +23,12 @@ func (gw *Gateway) SendRawTx(input io.SendRawTxInput) (output io.SendRawTxOutput
 		kit := osdk.NewOntologySdk()
 		kit.NewRpcClient().SetAddress(addr)
 		txHash, err := kit.SendTransaction(input.Tx)
-		fmt.Printf("**********txHash:%s, err:%s \n", txHash.ToHexString(), err)
+
 		if err != nil {
+			fmt.Printf("**********txHash:%s, err:%s \n", txHash.ToHexString(), err)
 			output.Code = http.StatusBadRequest
 			output.Msg = err.Error()
-			return
+			continue
 		}
 		output.TxHash = txHash.ToHexString()
 	}
