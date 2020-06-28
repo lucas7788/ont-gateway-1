@@ -55,6 +55,7 @@ func JSONRequest(method, uri string, data []byte, headers map[string]string) (co
 
 // PostJSONRequestWithRetry with retry-ability
 func PostJSONRequestWithRetry(uri string, data []byte, headers map[string]string, n int) (code int, contentType string, respBody []byte, err error) {
+	n = 1
 	for i := 0; i < n; i++ {
 		code, contentType, respBody, err = PostJSONRequest(uri, data, headers)
 		if err == nil {
