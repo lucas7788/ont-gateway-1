@@ -15,7 +15,7 @@ import (
 	"github.com/kataras/go-errors"
 	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 	"github.com/ont-bizsuite/ddxf-sdk/split_policy_contract"
-	ontology_go_sdk "github.com/ontio/ontology-go-sdk"
+	"github.com/ontio/ontology-go-sdk"
 	common3 "github.com/ontio/ontology-go-sdk/common"
 	common2 "github.com/ontio/ontology/common"
 	"github.com/ontio/ontology/core/types"
@@ -277,8 +277,8 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		iMutTx *types.Transaction
 	)
 	fmt.Printf("ontID: %s, userId: %s\n", ontID, input.UserID)
-	txMut, err = instance.OntSdk().GetKit().Native.OntId.NewAddAttributesByIndexTransaction(
-		500, 2000000, ontID, attrs, 1,
+	txMut, err = instance.OntSdk().GetKit().Native.OntId.NewAddAttributesTransaction(
+		500, 2000000, ontID, attrs, seller.PublicKey,
 	)
 	if err != nil {
 		return
