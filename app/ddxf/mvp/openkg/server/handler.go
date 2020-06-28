@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"fmt"
 )
 
 func GenerateOntIdByUserId(c *gin.Context) {
@@ -18,9 +19,9 @@ func GenerateOntIdByUserId(c *gin.Context) {
 	c.JSON(http.StatusOK, "SUCCESS")
 
 	go func() {
-		GenerateOntIdService(input)
+		output := GenerateOntIdService(input)
+		fmt.Println("GenerateOntIdByUserId output: ", output)
 	}()
-
 }
 
 func Publish(c *gin.Context) {

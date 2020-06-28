@@ -273,8 +273,9 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		txMut  *types.MutableTransaction
 		iMutTx *types.Transaction
 	)
-	txMut, err = instance.DDXFSdk().GetOntologySdk().Native.OntId.NewAddAttributesTransaction(
-		500, 2000000, ontID, attrs, seller.GetPublicKey(),
+	fmt.Printf("ontID: %s, userId: %s\n", ontID, input.UserID)
+	txMut, err = instance.OntSdk().GetKit().Native.OntId.NewAddAttributesByIndexTransaction(
+		500, 2000000, ontID, attrs, 1,
 	)
 	if err != nil {
 		return
@@ -291,6 +292,8 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		DataMetaOneArray: ones,
 		SignedTx:         hex.EncodeToString(common2.SerializeToBytes(iMutTx)),
 	}
+	fmt.Println("txhash:", hex.EncodeToString(common2.SerializeToBytes(iMutTx)))
+
 
 	var bs []byte
 	bs, err = json.Marshal(saveDataMetaArray)

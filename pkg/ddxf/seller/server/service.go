@@ -94,6 +94,8 @@ func SaveDataMetaArrayService(input io.SellerSaveDataMetaArrayInput,
 			DataEndpoint: item.DataEndpoint,
 		}
 		// store meta hash id.
+
+		fmt.Println("dataStore:", dataStore)
 		err = InsertElt(DataMetaCollection, dataStore)
 		if err != nil {
 			output.Code = http.StatusInternalServerError
