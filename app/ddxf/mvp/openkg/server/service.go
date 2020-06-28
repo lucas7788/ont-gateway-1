@@ -294,7 +294,6 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	}
 	fmt.Println("txhash:", hex.EncodeToString(common2.SerializeToBytes(iMutTx)))
 
-
 	var bs []byte
 	bs, err = json.Marshal(saveDataMetaArray)
 	if err != nil {
@@ -396,7 +395,10 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	}
 
 	// send req to seller
+	start := time.Now().Unix()
 	_, _, data, err = forward.PostJSONRequest(config2.SellerUrl+server.PublishMPItemMetaUrl, bs, headers)
+	end := time.Now().Unix()
+	fmt.Printf("openkg publish service cost time:%d\n", end-start)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()

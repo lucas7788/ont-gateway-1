@@ -205,7 +205,10 @@ func PublishItemMetaService(input io.MPEndpointPublishItemMetaInput) (output io.
 		output.Msg = err.Error()
 		return
 	}
+	start := time.Now().Unix()
 	err = sendTx(input.SignedDDXFTx)
+	end := time.Now().Unix()
+	fmt.Printf("mp PublishItemMetaService cost time: %d\n", end-start)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
