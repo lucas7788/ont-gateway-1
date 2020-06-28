@@ -25,19 +25,19 @@ func (gw *Gateway) SendTx(input io.SendTxInput) (output io.SendTxOutput) {
 		if err != nil {
 			output.Code = http.StatusBadRequest
 			output.Msg = err.Error()
-			return
+			continue
 		}
 		mutTx, err := tx.IntoMutable()
 		if err != nil {
 			output.Code = http.StatusBadRequest
 			output.Msg = err.Error()
-			return
+			continue
 		}
 		txHash, err := kit.SendTransaction(mutTx)
 		if err != nil {
 			output.Code = http.StatusBadRequest
 			output.Msg = err.Error()
-			return
+			continue
 		}
 		output.TxHash = txHash.ToHexString()
 	}
