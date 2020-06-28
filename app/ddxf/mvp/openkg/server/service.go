@@ -11,9 +11,9 @@ import (
 	"fmt"
 
 	"github.com/kataras/go-errors"
-	"github.com/ont-bizsuite/ddxf-sdk/data_id_contract"
 	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 	"github.com/ont-bizsuite/ddxf-sdk/split_policy_contract"
+	"github.com/ontio/ontology-go-sdk"
 	common3 "github.com/ontio/ontology-go-sdk/common"
 	common2 "github.com/ontio/ontology/common"
 	"github.com/ontio/ontology/core/types"
@@ -243,7 +243,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		}
 	}
 	// invoke seller saveDataMeta
-	infos := make([]data_id_contract.DataIdInfo, len(ones))
+	attrs := make([]*ontology_go_sdk.DDOAttribute, 0)
 	for i := 0; i < len(ones); i++ {
 		var hash, dataHash common2.Uint256
 		hash, err = common2.Uint256FromHexString(ones[i].DataMetaHash)
@@ -256,18 +256,26 @@ func PublishService(input PublishInput) (output PublishOutput) {
 			err = fmt.Errorf("3 Uint256FromHexString error: %s", err)
 			return
 		}
-		infos[i] = data_id_contract.DataIdInfo{
-			DataId:       ones[i].DataId,
-			DataMetaHash: hash,
-			DataHash:     dataHash,
-			Owners:       []*data_id_contract.OntIdIndex{},
+		attr := &ontology_go_sdk.DDOAttribute{
+			Key:       []byte("DataMetaHash"),
+			Value:     hash[:],
+			ValueType: []byte{},
 		}
+		attr2 := &ontology_go_sdk.DDOAttribute{
+			Key:       []byte("DataHash"),
+			Value:     dataHash[:],
+			ValueType: []byte{},
+		}
+		attrs = append(attrs, attr)
+		attrs = append(attrs, attr2)
 	}
 	var (
 		txMut  *types.MutableTransaction
 		iMutTx *types.Transaction
 	)
-	txMut, err = instance.DDXFSdk().DefDataIdKit().BuildRegisterDataIdInfoArrayTx(infos)
+	txMut, err = instance.DDXFSdk().GetOntologySdk().Native.OntId.NewAddAttributesTransaction(
+		500, 2000000, ontID, attrs, seller.GetPublicKey(),
+	)
 	if err != nil {
 		return
 	}
