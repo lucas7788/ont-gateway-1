@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"net/http"
 
+	"time"
+
 	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 	"github.com/ontio/ontology-crypto/signature"
-	"github.com/ontio/ontology-go-sdk"
+	ontology_go_sdk "github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology-go-sdk/utils"
 	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ddxf"
@@ -20,7 +22,6 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"time"
 )
 
 var (
@@ -39,6 +40,7 @@ const (
 func InitSellerImpl() error {
 	err := initDb()
 	if err != nil {
+		panic(fmt.Sprintf("InitSellerImpl initDb:%v", err))
 		return err
 	}
 	pri, _ := hex.DecodeString("c19f16785b8f3543bbaf5e1dbb5d398dfa6c85aaad54fc9d71203ce83e505c07")

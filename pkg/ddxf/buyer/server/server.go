@@ -2,12 +2,13 @@ package server
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/ontio/ontology-crypto/signature"
-	"github.com/ontio/ontology-go-sdk"
+	ontology_go_sdk "github.com/ontio/ontology-go-sdk"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/middleware/cors"
-	"net/http"
 )
 
 const (
@@ -42,6 +43,7 @@ func StartBuyerServer() error {
 	r.POST(UseDToken, UseTokenHandler)
 	err := initDb()
 	if err != nil {
+		panic(fmt.Sprintf("StartBuyerServer initDb:%v", err))
 		return err
 	}
 	private := make([]byte, 32)
