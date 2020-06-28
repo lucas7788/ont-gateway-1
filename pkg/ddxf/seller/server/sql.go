@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
@@ -29,6 +30,24 @@ func initDb() (err error) {
 		Options: opts,
 	}
 	_, err = instance.MongoOfficial().Collection(DataMetaCollection).Indexes().CreateOne(context.Background(), index)
+	if err != nil {
+		return
+	}
+
+	{
+		opts := &options.IndexOptions{}
+		opts.SetName("u-signed_ddxf_tx")
+		opts.SetUnique(true)
+		index := mongo.IndexModel{
+			Keys:    bsonx.Doc{{Key: "signed_ddxf_tx", Value: bsonx.Int32(1)}},
+			Options: opts,
+		}
+		_, err = instance.MongoOfficial().Collection(ItemMetaCollectionDdxf).Indexes().CreateOne(context.Background(), index)
+		if err != nil {
+			return
+		}
+	}
+
 	return
 }
 

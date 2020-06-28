@@ -6,7 +6,7 @@ import (
 
 // MPEndpointPublishItemMetaInput ...
 type MPEndpointPublishItemMetaInput struct {
-	SignedDDXFTx string
+	SignedDDXFTx string `bson:"signed_ddxf_tx" json:"signed_ddxf_tx"`
 	ItemMeta     PublishItemMeta
 	MPEndpoint   string
 }

@@ -242,7 +242,7 @@ func PublishMPItemMetaService(input io.MPEndpointPublishItemMetaInput, ontId str
 	//TODO send mp
 	if input.MPEndpoint != "" {
 		start := time.Now().Unix()
-		_, _, data, err := forward.JSONRequest("POST", input.MPEndpoint+server.PublishItemMeta, mpParamBs, nil)
+		_, _, data, err := forward.PostJSONRequestWithRetry(input.MPEndpoint+server.PublishItemMeta, mpParamBs, nil, 10)
 		end := time.Now().Unix()
 		fmt.Printf("seller PublishMPItemMetaService cost time: %d\n", end-start)
 		if err != nil {
