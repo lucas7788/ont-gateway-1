@@ -18,14 +18,23 @@ const (
 
 // Init for this collection
 func initDb() (err error) {
+	err = initUniqueIndex("u-seller", "openkg_id", OpenKgPublishParamCollection)
+	if err != nil {
+		return
+	}
+	err = initUniqueIndex("u-user-id", "user_id", UserInfoCollection)
+	return
+}
+
+func initUniqueIndex(name, key string, collectionName string) (err error) {
 	opts := &options.IndexOptions{}
-	opts.SetName("u-seller")
+	opts.SetName(name)
 	opts.SetUnique(true)
 	index := mongo.IndexModel{
-		Keys:    bsonx.Doc{{Key: "openkg_id", Value: bsonx.Int32(1)}},
+		Keys:    bsonx.Doc{{Key: key, Value: bsonx.Int32(1)}},
 		Options: opts,
 	}
-	_, err = instance.MongoOfficial().Collection(OpenKgPublishParamCollection).Indexes().CreateOne(context.Background(), index)
+	_, err = instance.MongoOfficial().Collection(collectionName).Indexes().CreateOne(context.Background(), index)
 	return
 }
 

@@ -28,6 +28,7 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"strings"
 )
 
 func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput) {
@@ -71,6 +72,18 @@ func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput)
 		return
 	}
 	txHash, err := common.SendRawTx(tx)
+	if err != nil && strings.Contains(err.Error(), "already registered") {
+		ui.OntId = ontid
+		ui.UserId = input.UserId
+		err = InsertElt(UserInfoCollection, ui)
+		fmt.Println(err)
+		return
+	}
+	if err != nil {
+		txHas := tx.Hash()
+		fmt.Printf("userId: %s,ontid: %s, txHash: %s\n", input.UserId, ontid, txHas.ToHexString())
+		return
+	}
 	var evt *common3.SmartContactEvent
 	evt, err = instance.DDXFSdk().GetSmartCodeEvent(txHash)
 	if err != nil {
@@ -312,9 +325,13 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		ItemMetaHash: itemMetaHash,
 	}
 
+	addr, _ := common2.AddressFromHexString("195d72da6725e8243a52803f6de4cd93df48fc1f")
+
 	item := market_place_contract.DTokenItem{
 		Fee: market_place_contract.Fee{
-			ContractType: split_policy_contract.ONG,
+			ContractAddr: addr,
+			ContractType: split_policy_contract.OEP4,
+			Count:        1,
 		},
 		ExpiredDate: uint64(time.Now().Unix()) + uint64(time.Hour*24*30),
 		Stocks:      10000,
