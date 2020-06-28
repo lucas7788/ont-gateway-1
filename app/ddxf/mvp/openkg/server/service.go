@@ -301,7 +301,10 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	if err != nil {
 		return
 	}
+	start := time.Now().Unix()
 	_, _, data, err = forward.PostJSONRequest(config2.SellerUrl+server.SaveDataMetaArrayUrl, bs, headers)
+	end := time.Now().Unix()
+	fmt.Printf("openkg send seller SaveDataMetaArrayUrl cost time: %d\n", end-start)
 	if err != nil {
 		return
 	}
