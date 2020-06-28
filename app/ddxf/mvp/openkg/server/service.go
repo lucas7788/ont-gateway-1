@@ -331,7 +331,6 @@ func PublishService(input PublishInput) (output PublishOutput) {
 
 	resourceId := common.GenerateUUId(config.UUID_RESOURCE_ID)
 	input.OnChainId = resourceId
-	InsertElt(OpenKgPublishParamCollection, input)
 	// 2. save data metas and Publish item
 	// send request to seller
 	var itemMetaHash [32]byte
@@ -418,6 +417,10 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	}
 
 	err = publishOutput.Error()
+	if err != nil {
+		return
+	}
+	err = InsertElt(OpenKgPublishParamCollection, input)
 
 	return
 }

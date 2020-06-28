@@ -233,13 +233,6 @@ func PublishMPItemMetaService(input io.MPEndpointPublishItemMetaInput, ontId str
 		output.Msg = err.Error()
 		return
 	}
-	err = InsertElt(ItemMetaCollectionDdxf, input)
-	if err != nil {
-		fmt.Println("seller MPEndpointPublishItemMetaInput:", input)
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-		return
-	}
 	//TODO send mp
 	if input.MPEndpoint != "" {
 		start := time.Now().Unix()
@@ -271,11 +264,17 @@ func PublishMPItemMetaService(input io.MPEndpointPublishItemMetaInput, ontId str
 			output.Msg = err.Error()
 			return
 		}
-		if evt.State == 0 {
+		if evt.State != 1 {
 			output.Code = http.StatusInternalServerError
 			output.Msg = "tx failed"
 			return
 		}
+	}
+	err = InsertElt(ItemMetaCollectionDdxf, input)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		return
 	}
 	return
 }
