@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/kataras/go-errors"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
@@ -12,7 +13,6 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"github.com/zhiqiangxu/ont-gateway/pkg/rest/middleware"
 	"go.uber.org/zap"
-	"fmt"
 )
 
 func SaveDataMetaHandler(c *gin.Context) {
@@ -83,7 +83,7 @@ func SaveDataMetaArrayHandler(c *gin.Context) {
 		return
 	}
 	output := SaveDataMetaArrayService(param, ontId.(string))
-	fmt.Println("SaveDataMetaArrayHandler:",output)
+	fmt.Println("SaveDataMetaArrayHandler:", output)
 	c.JSON(http.StatusOK, output)
 }
 
@@ -164,7 +164,7 @@ func PublishMPItemMetaHandler(c *gin.Context) {
 	}
 	output := PublishMPItemMetaService(param, ontId.(string))
 	if output.Error() != nil {
-		instance.Logger().Error("PublishMPItemMetaHandle:", zap.Error(output.Error()))
+		instance.Logger().Error("seller PublishMPItemMetaHandle:", zap.Error(output.Error()))
 		c.JSON(http.StatusInternalServerError, common.ResponseFailedOnto(http.StatusInternalServerError, output.Error()))
 		return
 	}

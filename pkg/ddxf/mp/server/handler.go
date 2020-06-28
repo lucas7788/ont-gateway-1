@@ -71,9 +71,10 @@ func PublishItemMetaHandler(ctx *gin.Context) {
 		return
 	}
 	fmt.Println("param:", param)
+
 	output := PublishItemMetaService(param)
 	if output.Code != 0 {
-		instance.Logger().Error(output.Msg)
+		instance.Logger().Error("mp PublishItemMetaService:", zap.Error(output.Error()))
 		ctx.JSON(http.StatusInternalServerError, output)
 		return
 	}

@@ -20,6 +20,7 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"time"
 )
 
 var (
@@ -239,7 +240,10 @@ func PublishMPItemMetaService(input io.MPEndpointPublishItemMetaInput, ontId str
 	}
 	//TODO send mp
 	if input.MPEndpoint != "" {
+		start := time.Now().Unix()
 		_, _, data, err := forward.JSONRequest("POST", input.MPEndpoint+server.PublishItemMeta, mpParamBs, nil)
+		end := time.Now().Unix()
+		fmt.Printf("seller PublishMPItemMetaService cost time: %d\n", end-start)
 		if err != nil {
 			output.Code = http.StatusInternalServerError
 			output.Msg = err.Error()

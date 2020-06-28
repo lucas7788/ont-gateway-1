@@ -3,8 +3,8 @@ package server
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"fmt"
+	"github.com/gin-gonic/gin"
 )
 
 func GenerateOntIdByUserId(c *gin.Context) {
@@ -33,7 +33,10 @@ func Publish(c *gin.Context) {
 		return
 	}
 	go func() {
-		PublishService(input)
+		output := PublishService(input)
+		if output.Code != 0 {
+			fmt.Println("openkg Publish:", output)
+		}
 	}()
 	c.JSON(http.StatusOK, "SUCCESS")
 }
