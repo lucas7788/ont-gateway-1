@@ -451,8 +451,10 @@ func buyAndUseService(input BuyAndUseInput) (output BuyAndUseOutput) {
 		TokenHashs: []string{},
 	}
 	var tx *types.MutableTransaction
-	tx, err = instance.DDXFSdk().DefMpKit().BuildBuyAndUseTokenTx(user.Address,
-		payer.Address, []byte(param.OnChainId), 1, tokenTemplate)
+	contractAddr, _ := common2.AddressFromHexString(config2.BuyAndUseContractAddr)
+	contract := instance.DDXFSdk().DefContract(contractAddr)
+	tx, err = contract.BuildTx("buyAndUseToken", nil,
+		[]interface{}{[]byte(param.OnChainId), 1, user.Address, payer.Address, tokenTemplate.ToBytes()})
 	if err != nil {
 		output.Msg = err.Error()
 		output.Code = http.StatusInternalServerError
