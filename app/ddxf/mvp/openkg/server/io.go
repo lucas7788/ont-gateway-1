@@ -3,6 +3,7 @@ package server
 type GenerateOntIdInput struct {
 	ReqID  string `bson:"req_id" json:"req_id"`
 	UserId string `bson:"user_id" json:"user_id"`
+	Party  string `bson:"party" json:"party"`
 }
 
 type GenerateOntIdOutput struct {
@@ -21,6 +22,7 @@ type PublishInput struct {
 	Datas     []map[string]interface{} `bson:"datas" json:"datas"`
 	Delete    bool                     `bson:"delete" json:"delete"`
 	OnChainId string                   `bson:"on_chain_id" json:"on_chain_id"`
+	Party     string                   `bson:"party" json:"party"`
 }
 
 // PublishOutput ...
@@ -36,6 +38,7 @@ type BuyAndUseInput struct {
 	OpenKGID string `bson:"openkg_id" json:"openkg_id"`
 	DataID   string `bson:"data_id" json:"data_id"`
 	UserID   string `bson:"user_id" json:"user_id"` // buyer id
+	Party    string `bson:"party" json:"party"`
 }
 
 // BuyAndUseOutput ...
@@ -51,6 +54,7 @@ type DeleteInput struct {
 	OpenKGID   string `bson:"openkg_id" json:"openkg_id"`
 	ResourceID string `bson:"data_id" json:"data_id"`
 	UserID     string `bson:"user_id" json:"user_id"` // buyer id
+	Party      string `bson:"party" json:"party"`
 }
 
 // BuyAndUseInput ...

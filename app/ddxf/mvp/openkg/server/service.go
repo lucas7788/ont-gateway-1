@@ -33,6 +33,7 @@ import (
 
 func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput) {
 	output.ReqID = input.ReqID
+	input.UserId = input.Party + input.UserId
 	// callback(output)
 	// return
 	var err error
@@ -105,6 +106,7 @@ func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput)
 }
 
 func PublishService(input PublishInput) (output PublishOutput) {
+	input.UserID = input.Party + input.UserID
 	output.ReqID = input.ReqID
 	var err error
 	defer func() {
@@ -417,6 +419,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 }
 
 func deleteService(input DeleteInput) (output DeleteOutput) {
+	input.UserID = input.Party + input.UserID
 	user := GetAccount(input.UserID)
 	tx, err := instance.DDXFSdk().DefMpKit().BuildDeleteTx([]byte(input.ResourceID))
 	if err != nil {
@@ -431,7 +434,7 @@ func deleteService(input DeleteInput) (output DeleteOutput) {
 func buyAndUseService(input BuyAndUseInput) (output BuyAndUseOutput) {
 	// callback(output)
 	// return
-
+	input.UserID = input.Party + input.UserID
 	output.ReqID = input.ReqID
 	defer func() {
 		callback(output)
