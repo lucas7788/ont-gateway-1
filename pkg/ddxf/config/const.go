@@ -12,12 +12,6 @@ const (
 )
 
 const (
-	MpUrl     = "http://127.0.0.1:" + MpPort
-	SellerUrl = "http://127.0.0.1:" + SellerPort
-	BuyerUrl  = "http://127.0.0.1:" + BuyerPort
-)
-
-const (
 	Key_OntId = "OntId"
 	JWTAdmin  = "JWTAdmin"
 	JWTAud    = "JWTAud"
