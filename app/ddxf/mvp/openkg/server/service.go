@@ -10,10 +10,12 @@ import (
 
 	"fmt"
 
+	"strings"
+
 	"github.com/kataras/go-errors"
 	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 	"github.com/ont-bizsuite/ddxf-sdk/split_policy_contract"
-	"github.com/ontio/ontology-go-sdk"
+	ontology_go_sdk "github.com/ontio/ontology-go-sdk"
 	common3 "github.com/ontio/ontology-go-sdk/common"
 	common2 "github.com/ontio/ontology/common"
 	"github.com/ontio/ontology/core/types"
@@ -28,7 +30,6 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"strings"
 )
 
 func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput) {
@@ -165,7 +166,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		if err != nil {
 			return
 		}
-		_, _, data, err = forward.PostJSONRequest(config.SellerUrl+server.FreezeUrl, bs, headers)
+		_, _, data, err = forward.PostJSONRequestWithRetry(config.SellerUrl+server.FreezeUrl, bs, headers, 10)
 		if err != nil {
 			return
 		}
@@ -203,7 +204,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		return
 	}
 	//查询哪些data id需要上链
-	_, _, data, err = forward.PostJSONRequest(config.SellerUrl+server.GetDataIdByDataMetaHashUrl, paramBs, headers)
+	_, _, data, err = forward.PostJSONRequestWithRetry(config.SellerUrl+server.GetDataIdByDataMetaHashUrl, paramBs, headers, 10)
 	if err != nil {
 		return
 	}
@@ -302,7 +303,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		return
 	}
 	start := time.Now().Unix()
-	_, _, data, err = forward.PostJSONRequest(config2.SellerUrl+server.SaveDataMetaArrayUrl, bs, headers)
+	_, _, data, err = forward.PostJSONRequestWithRetry(config2.SellerUrl+server.SaveDataMetaArrayUrl, bs, headers, 10)
 	end := time.Now().Unix()
 	fmt.Printf("openkg send seller SaveDataMetaArrayUrl cost time: %d\n", end-start)
 	if err != nil {
@@ -400,9 +401,9 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	}
 
 	// send req to seller
-	start := time.Now().Unix()
-	_, _, data, err = forward.PostJSONRequest(config2.SellerUrl+server.PublishMPItemMetaUrl, bs, headers)
-	end := time.Now().Unix()
+	start = time.Now().Unix()
+	_, _, data, err = forward.PostJSONRequestWithRetry(config2.SellerUrl+server.PublishMPItemMetaUrl, bs, headers, 10)
+	end = time.Now().Unix()
 	fmt.Printf("openkg publish service cost time:%d\n", end-start)
 	if err != nil {
 		output.Code = http.StatusInternalServerError

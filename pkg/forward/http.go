@@ -3,6 +3,7 @@ package forward
 import (
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"strings"
 	"time"
@@ -49,6 +50,21 @@ func JSONRequest(method, uri string, data []byte, headers map[string]string) (co
 	}
 
 	code, contentType, respBody, err = httpRequest(req)
+	return
+}
+
+// PostJSONRequestWithRetry with retry-ability
+func PostJSONRequestWithRetry(uri string, data []byte, headers map[string]string, n int) (code int, contentType string, respBody []byte, err error) {
+	for i := 0; i < n; i++ {
+		code, contentType, respBody, err = PostJSONRequest(uri, data, headers)
+		if err == nil {
+			return
+		}
+		if errNet, ok := err.(net.Error); ok && errNet.Timeout() {
+			continue
+		}
+		return
+	}
 	return
 }
 
