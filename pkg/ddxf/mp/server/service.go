@@ -196,19 +196,19 @@ func sendTx(txHex string) error {
 }
 
 func PublishItemMetaService(input io.MPEndpointPublishItemMetaInput) (output io.MPEndpointPublishItemMetaOutput) {
-	timeout := config.Load().MongoConfig.Timeout
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-	_, err := instance.MongoOfficial().Collection(endpointCollectionName).InsertOne(ctx, input.ItemMeta)
+	start := time.Now().Unix()
+	err := sendTx(input.SignedDDXFTx)
+	end := time.Now().Unix()
+	fmt.Printf("mp PublishItemMetaService cost time: %d\n", end-start)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
 		return
 	}
-	start := time.Now().Unix()
-	err = sendTx(input.SignedDDXFTx)
-	end := time.Now().Unix()
-	fmt.Printf("mp PublishItemMetaService cost time: %d\n", end-start)
+	timeout := config.Load().MongoConfig.Timeout
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	_, err = instance.MongoOfficial().Collection(endpointCollectionName).InsertOne(ctx, input.ItemMeta)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
