@@ -25,7 +25,7 @@ func (gw *Gateway) SendRawTx(input io.SendRawTxInput) (output io.SendRawTxOutput
 		txHash, err := kit.SendTransaction(input.Tx)
 
 		if err != nil {
-			fmt.Printf("**********txHash:%s, err:%s \n", txHash.ToHexString(), err)
+			fmt.Printf("**********txHash:%s, err:%s addr:%s \n", txHash.ToHexString(), err, addr)
 			output.Code = http.StatusBadRequest
 			output.Msg = err.Error()
 			continue
