@@ -28,6 +28,7 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"strings"
 )
 
 func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput) {
@@ -71,6 +72,18 @@ func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput)
 		return
 	}
 	txHash, err := common.SendRawTx(tx)
+	if err != nil && strings.Contains(err.Error(), "already registered") {
+		ui.OntId = ontid
+		ui.UserId = input.UserId
+		err = InsertElt(UserInfoCollection, ui)
+		fmt.Println(err)
+		return
+	}
+	if err != nil {
+		txHas := tx.Hash()
+		fmt.Printf("userId: %s,ontid: %s, txHash: %s\n", input.UserId, ontid, txHas.ToHexString())
+		return
+	}
 	var evt *common3.SmartContactEvent
 	evt, err = instance.DDXFSdk().GetSmartCodeEvent(txHash)
 	if err != nil {
