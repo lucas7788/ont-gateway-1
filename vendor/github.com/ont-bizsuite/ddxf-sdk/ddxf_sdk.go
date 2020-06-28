@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/ont-bizsuite/ddxf-sdk/any_contract"
 	"github.com/ont-bizsuite/ddxf-sdk/base_contract"
-	"github.com/ont-bizsuite/ddxf-sdk/data_id_contract"
 	"github.com/ont-bizsuite/ddxf-sdk/dtoken_contract"
 	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 	"github.com/ontio/ontology-go-sdk"
@@ -15,8 +14,10 @@ import (
 )
 
 const (
-	mpContractAddress     = "9d0203fc1c1a5019c53fdf62ae3232f5a72f5d80"
-	dataIdContractAddress = "03d07edc239d6c8cd99543bdef7a4bc407f9d44c"
+	mpContractAddressTest     = "9d0203fc1c1a5019c53fdf62ae3232f5a72f5d80"
+	dtokenContractAddressTest = "466b94488bf2ad1b1eec0ae7e49e40708e71a35d"
+
+	mpContractAddress     = "e01d500ed0c1719b7750367ae59b4b2d308d1ceb"
 	dtokenContractAddress = "466b94488bf2ad1b1eec0ae7e49e40708e71a35d"
 )
 
@@ -36,7 +37,6 @@ type DdxfSdk struct {
 	bc           *base_contract.BaseContract
 	rpc          string
 	defDDXFKit   *market_place_contract.MpKit
-	defDataIdKit *data_id_contract.DataIdKit
 	defDTokenKit *dtoken_contract.DTokenKit
 	gasPrice     uint64
 	gasLimit     uint64
@@ -97,15 +97,6 @@ func (sdk *DdxfSdk) SignTx(tx *types.MutableTransaction, signer *ontology_go_sdk
 
 func (sdk *DdxfSdk) SendTx(tx *types.MutableTransaction) (common.Uint256, error) {
 	return sdk.sdk.SendTransaction(tx)
-}
-
-func (sdk *DdxfSdk) DefDataIdKit() *data_id_contract.DataIdKit {
-	if sdk.defDataIdKit == nil {
-		contractAddress, _ := common.AddressFromHexString(dataIdContractAddress)
-		sdk.defDataIdKit = data_id_contract.NewDataIdContractKit(contractAddress,
-			sdk.bc)
-	}
-	return sdk.defDataIdKit
 }
 
 func (sdk *DdxfSdk) DefDTokenKit() *dtoken_contract.DTokenKit {

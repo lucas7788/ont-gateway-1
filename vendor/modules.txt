@@ -119,8 +119,7 @@ github.com/modern-go/concurrent
 github.com/modern-go/reflect2
 # github.com/oklog/run v1.0.0
 github.com/oklog/run
-# github.com/ont-bizsuite/ddxf-sdk v0.0.0-20200623123646-cc8c40c50bdb
-github.com/ont-bizsuite/ddxf-sdk/data_id_contract
+# github.com/ont-bizsuite/ddxf-sdk v0.0.0-20200628133310-9fed3dda57bc
 github.com/ont-bizsuite/ddxf-sdk/market_place_contract
 github.com/ont-bizsuite/ddxf-sdk/split_policy_contract
 github.com/ont-bizsuite/ddxf-sdk

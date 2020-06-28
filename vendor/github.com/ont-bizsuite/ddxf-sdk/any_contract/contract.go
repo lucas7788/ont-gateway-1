@@ -28,7 +28,7 @@ func (this *ContractKit) Invoke(method string, signer *ontology_go_sdk.Account, 
 	return this.bc.Invoke(this.contractAddress, signer, method, args)
 }
 
-func (this *ContractKit) BuildTx(method string, signer *ontology_go_sdk.Account, args []interface{}) (*types.MutableTransaction, error) {
+func (this *ContractKit) BuildTx(method string, args []interface{}) (*types.MutableTransaction, error) {
 	return this.bc.BuildTx(this.contractAddress, method, args)
 }
 

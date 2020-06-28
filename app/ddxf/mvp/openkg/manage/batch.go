@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	uuid "github.com/satori/go.uuid"
 	"github.com/zhiqiangxu/ont-gateway/app/ddxf/mvp/openkg/server"
@@ -28,11 +29,12 @@ func main() {
 	// 	if !ontid(u.ID) {
 	// 		panic(fmt.Sprintf("ontid fail for %s", u.ID))
 	// 	}
-	// 	return
+	// 	fmt.Println("UserID", u.ID)
+	// 	time.Sleep(time.Second)
 	// }
 
 	var resources []resource
-	err = engine.SQL("select a.*, b.creator_user_id from resource a join package b on a.package_id=b.id").Find(&resources)
+	err = engine.SQL("select a.*, b.creator_user_id creatorID from resource a join package b on a.package_id=b.id").Find(&resources)
 	if err != nil {
 		panic(err)
 	}
@@ -40,10 +42,11 @@ func main() {
 
 	for _, r := range resources {
 		fmt.Println("resource", r)
+		// r.CreatorID = "cd85f2c2-4fd1-44a8-82e3-10a7b63ed144"
 		if !publish(r) {
 			panic(fmt.Sprintf("publish fail for %s", r.ID))
 		}
-		return
+		time.Sleep(time.Second)
 	}
 }
 
@@ -61,9 +64,9 @@ type user struct {
 	ID string `xorm:"id"`
 }
 
-// const domain = "http://openkg-dev.ontfs.io"
+const domain = "http://openkg-dev.ontfs.io"
 
-const domain = "http://localhost:10999"
+// const domain = "http://192.168.0.228:10999"
 
 func publish(r resource) bool {
 	dataMeta := map[string]interface{}{
@@ -75,6 +78,7 @@ func publish(r resource) bool {
 		"resource_type": r.ResourceType,
 		"name":          r.Name,
 	}
+	fmt.Println("r.CreatorID", r.CreatorID)
 	input := server.PublishInput{
 		ReqID:     uuid.NewV4().String(),
 		OpenKGID:  r.ID,

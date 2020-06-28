@@ -121,7 +121,7 @@ func (this *TokenTemplate) Deserialize(source *common.ZeroCopySource) error {
 	}
 	this.TokenHashs = tokenHashs
 
-	endpoint,_,irr,eof := source.NextString()
+	endpoint, _, irr, eof := source.NextString()
 	if irr || eof {
 		return fmt.Errorf("read endpoint failed irregular:%v, eof:%v", irregular, eof)
 	}
@@ -180,11 +180,11 @@ func (this *TokenResourceTyEndpoint) Deserialize(source *common.ZeroCopySource) 
 
 // ResourceDDO is ddo for resource
 type ResourceDDO struct {
-	Manager                  common.Address             // data owner id
-	ItemMetaHash             common.Uint256             //
-	DTC                      common.Address             // can be empty
-	MP                       common.Address             // can be empty
-	Split                    common.Address             // can be empty
+	Manager      common.Address // data owner id
+	ItemMetaHash common.Uint256 //
+	DTC          common.Address // can be empty
+	MP           common.Address // can be empty
+	Split        common.Address // can be empty
 }
 
 func (this *ResourceDDO) Serialize(sink *common.ZeroCopySink) {
