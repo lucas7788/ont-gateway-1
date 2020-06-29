@@ -220,9 +220,6 @@ func NewIdentityFromIdentityData(identityData *IdentityData) (*Identity, error) 
 		scrypt:      identityData.scrypt,
 	}
 	for _, ctrData := range identityData.Control {
-		if ctrData.scrypt == nil {
-			ctrData.scrypt = identityData.scrypt
-		}
 		_, ok := identity.ctrsIdMap[ctrData.ID]
 		if ok {
 			return nil, fmt.Errorf("duplicate controller id:%s", ctrData.ID)
@@ -453,8 +450,8 @@ func (this *DDOOwner) GetIndex() uint32 {
 
 type DDOAttribute struct {
 	Key       []byte
-	Value     []byte
 	ValueType []byte
+	Value     []byte
 }
 
 type DDO struct {

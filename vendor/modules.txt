@@ -21,7 +21,7 @@ github.com/emirpasic/gods/lists/singlylinkedlist
 github.com/emirpasic/gods/stacks
 github.com/emirpasic/gods/utils
 github.com/emirpasic/gods/lists
-# github.com/ethereum/go-ethereum v1.9.6
+# github.com/ethereum/go-ethereum v1.9.13
 github.com/ethereum/go-ethereum/common/fdlimit
 # github.com/gin-contrib/pprof v1.2.1
 github.com/gin-contrib/pprof
@@ -131,23 +131,25 @@ github.com/ontio/go-bip32
 # github.com/ontio/ontology v1.8.2
 github.com/ontio/ontology/common
 github.com/ontio/ontology/core/types
+github.com/ontio/ontology/smartcontract/service/native/ontid
 github.com/ontio/ontology/core/signature
 github.com/ontio/ontology/account
 github.com/ontio/ontology/cmd/utils
 github.com/ontio/ontology/common/constants
+github.com/ontio/ontology/common/serialization
 github.com/ontio/ontology/core/payload
 github.com/ontio/ontology/core/utils
 github.com/ontio/ontology/http/base/common
 github.com/ontio/ontology/smartcontract/event
 github.com/ontio/ontology/smartcontract/service/native/global_params
 github.com/ontio/ontology/smartcontract/service/native/ont
-github.com/ontio/ontology/smartcontract/service/native/ontid
-github.com/ontio/ontology/smartcontract/service/native/utils
 github.com/ontio/ontology/core/program
 github.com/ontio/ontology/common/log
+github.com/ontio/ontology/core/states
+github.com/ontio/ontology/smartcontract/service/native
+github.com/ontio/ontology/smartcontract/service/native/utils
 github.com/ontio/ontology/cmd/abi
 github.com/ontio/ontology/common/config
-github.com/ontio/ontology/common/serialization
 github.com/ontio/ontology/http/base/error
 github.com/ontio/ontology/smartcontract/service/neovm
 github.com/ontio/ontology/smartcontract/states
@@ -158,11 +160,9 @@ github.com/ontio/ontology/http/base/actor
 github.com/ontio/ontology/events
 github.com/ontio/ontology/events/message
 github.com/ontio/ontology/vm/neovm/types
-github.com/ontio/ontology/core/states
-github.com/ontio/ontology/smartcontract/service/native
-github.com/ontio/ontology/core/store
 github.com/ontio/ontology/smartcontract/context
 github.com/ontio/ontology/smartcontract/storage
+github.com/ontio/ontology/core/store
 github.com/ontio/ontology/vm/crossvm_codec
 github.com/ontio/ontology/vm/neovm/constants
 github.com/ontio/ontology/vm/neovm/errors
@@ -173,8 +173,8 @@ github.com/ontio/ontology/consensus/actor
 github.com/ontio/ontology/p2pserver/actor/server
 github.com/ontio/ontology/p2pserver/common
 github.com/ontio/ontology/txnpool/common
-github.com/ontio/ontology/core/store/overlaydb
 github.com/ontio/ontology/core/store/common
+github.com/ontio/ontology/core/store/overlaydb
 github.com/ontio/ontology/consensus/vbft/config
 github.com/ontio/ontology/core/store/leveldbstore
 github.com/ontio/ontology/merkle
@@ -196,7 +196,7 @@ github.com/ontio/ontology/p2pserver/peer
 github.com/ontio/ontology/p2pserver/actor/req
 github.com/ontio/ontology/p2pserver/common/set
 github.com/ontio/ontology/p2pserver/link
-# github.com/ontio/ontology-crypto v1.0.7
+# github.com/ontio/ontology-crypto v1.0.9
 github.com/ontio/ontology-crypto/ec
 github.com/ontio/ontology-crypto/keypair
 github.com/ontio/ontology-crypto/signature
@@ -211,7 +211,7 @@ github.com/ontio/ontology-eventbus/log
 github.com/ontio/ontology-eventbus/mailbox
 github.com/ontio/ontology-eventbus/internal/queue/goring
 github.com/ontio/ontology-eventbus/internal/queue/mpsc
-# github.com/ontio/ontology-go-sdk v1.11.2-0.20200615094056-8c296c479e8d
+# github.com/ontio/ontology-go-sdk v1.11.1
 github.com/ontio/ontology-go-sdk
 github.com/ontio/ontology-go-sdk/common
 github.com/ontio/ontology-go-sdk/utils
@@ -260,7 +260,7 @@ github.com/satori/go.uuid
 github.com/shurcooL/sanitized_anchor_name
 # github.com/stretchr/testify v1.4.0
 github.com/stretchr/testify/assert
-# github.com/syndtr/goleveldb v1.0.0
+# github.com/syndtr/goleveldb v1.0.1-0.20190923125748-758128399b1d
 github.com/syndtr/goleveldb/leveldb
 github.com/syndtr/goleveldb/leveldb/filter
 github.com/syndtr/goleveldb/leveldb/opt
@@ -286,7 +286,7 @@ github.com/urfave/cli/v2
 github.com/xdg/scram
 # github.com/xdg/stringprep v1.0.0
 github.com/xdg/stringprep
-# github.com/zhiqiangxu/ddxf v0.0.0-20200615022619-c1233ebf7b95
+# github.com/zhiqiangxu/ddxf v0.0.0-20200623131730-751fa67da775
 github.com/zhiqiangxu/ddxf
 # github.com/zhiqiangxu/tableflip v0.0.0-20190122113937-cebf5858b483
 github.com/zhiqiangxu/tableflip
@@ -338,18 +338,18 @@ go.uber.org/zap/internal/bufferpool
 go.uber.org/zap/buffer
 go.uber.org/zap/internal/color
 go.uber.org/zap/internal/exit
-# golang.org/x/crypto v0.0.0-20191219195013-becbf705a915
+# golang.org/x/crypto v0.0.0-20200311171314-f7b00557c8c4
 golang.org/x/crypto/ripemd160
 golang.org/x/crypto/ed25519
 golang.org/x/crypto/scrypt
 golang.org/x/crypto/sha3
 golang.org/x/crypto/ed25519/internal/edwards25519
 golang.org/x/crypto/pbkdf2
-# golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
+# golang.org/x/net v0.0.0-20200301022130-244492dfa37a
 golang.org/x/net/context
 # golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a
 golang.org/x/sync/semaphore
-# golang.org/x/sys v0.0.0-20200122134326-e047566fdf82
+# golang.org/x/sys v0.0.0-20200302150141-5c8b2ff67527
 golang.org/x/sys/unix
 golang.org/x/sys/cpu
 golang.org/x/sys/windows
