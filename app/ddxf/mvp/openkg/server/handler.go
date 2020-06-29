@@ -5,6 +5,9 @@ import (
 
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/kataras/go-errors"
+	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
+	"go.uber.org/zap"
 )
 
 func GenerateOntIdByUserId(c *gin.Context) {
@@ -51,6 +54,37 @@ func BuyAndUse(c *gin.Context) {
 	}
 	go func() {
 		buyAndUseService(input)
+	}()
+	c.JSON(http.StatusOK, "SUCCESS")
+}
+
+func addAttributesHandler(c *gin.Context) {
+	var (
+		input AddAttributesInput
+	)
+	if err := c.ShouldBind(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	go func() {
+		addAttributesService(input)
+	}()
+	c.JSON(http.StatusOK, "SUCCESS")
+}
+func deleteAttributesHandler(c *gin.Context) {
+	var (
+		input DeleteAttributesInput
+	)
+	if err := c.ShouldBind(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	go func() {
+		output := deleteAttributesService(input)
+		if output.Code != 0 {
+			instance.Logger().Error("deleteAttributesService failed:", zap.Error(errors.New(output.Msg)))
+			return
+		}
 	}()
 	c.JSON(http.StatusOK, "SUCCESS")
 }

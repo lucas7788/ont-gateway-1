@@ -39,6 +39,15 @@ type DeleteOutput struct {
 	Result interface{}
 }
 
+type RegisterOntIdInput struct {
+	SignedTx string
+}
+
+type RegisterOntIdOutput struct {
+	io2.BaseResp
+	Result interface{}
+}
+
 type UpdateInput struct {
 	SignedTx string
 }
