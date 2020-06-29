@@ -78,21 +78,21 @@ func (sdk *DdxfSdk) GetOntologySdk() *ontology_go_sdk.OntologySdk {
 	return sdk.sdk
 }
 
-func (sdk *DdxfSdk) SignTx(tx *types.MutableTransaction, signer *ontology_go_sdk.Account) (*types.MutableTransaction, error) {
+func (sdk *DdxfSdk) SignTx(tx *types.MutableTransaction, signer *ontology_go_sdk.Account) error {
 	if sdk.payer != nil {
 		sdk.sdk.SetPayer(tx, sdk.payer.Address)
 		err := sdk.sdk.SignToTransaction(tx, sdk.payer)
 		if err != nil {
-			return nil, fmt.Errorf("payer sign tx error: %s", err)
+			return fmt.Errorf("payer sign tx error: %s", err)
 		}
 	}
 	if sdk.payer != signer {
 		err := sdk.sdk.SignToTransaction(tx, signer)
 		if err != nil {
-			return nil, err
+			return err
 		}
 	}
-	return tx, nil
+	return nil
 }
 
 func (sdk *DdxfSdk) SendTx(tx *types.MutableTransaction) (common.Uint256, error) {
