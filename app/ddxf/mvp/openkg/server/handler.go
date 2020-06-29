@@ -55,6 +55,20 @@ func BuyAndUse(c *gin.Context) {
 	c.JSON(http.StatusOK, "SUCCESS")
 }
 
+func addAttributesHandler(c *gin.Context) {
+	var (
+		input AddAttributesInput
+	)
+	if err := c.ShouldBind(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	go func() {
+		addAttributesService(input)
+	}()
+	c.JSON(http.StatusOK, "SUCCESS")
+}
+
 func Delete(c *gin.Context) {
 	var input DeleteInput
 	if err := c.ShouldBind(&input); err != nil {

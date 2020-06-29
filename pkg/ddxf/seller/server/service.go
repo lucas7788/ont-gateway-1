@@ -113,6 +113,12 @@ func SaveDataMetaService(input io.SellerSaveDataMetaInput, ontId string) (output
 		output.Msg = "datameta does not contain ISDN"
 		return
 	}
+	filter := bson.M{"dataId": input.DataId}
+	meta := io.SellerSaveDataMeta{}
+	err := FindElt(DataMetaCollection, filter, &meta)
+	if err != nil && err != mongo.ErrNoDocuments {
+		return
+	}
 	// verify hash.
 	txHash, err := common2.SendTx(input.SignedTx)
 	if err != nil {
@@ -276,6 +282,57 @@ func PublishMPItemMetaService(input io.MPEndpointPublishItemMetaInput, ontId str
 		output.Msg = err.Error()
 		return
 	}
+	return
+}
+
+func RegisterOntIdService(input RegisterOntIdInput) (output RegisterOntIdOutput) {
+	var err error
+	defer func() {
+		if err != nil {
+			output.Code = http.StatusInternalServerError
+			output.Msg = err.Error()
+		}
+	}()
+	// reg identity.
+	tx, err := utils.TransactionFromHexString(input.SignedTx)
+	if err != nil {
+		return
+	}
+	imutTx, err := tx.IntoMutable()
+	if err != nil {
+		return
+	}
+	txHash, err := common2.SendRawTx(imutTx)
+	if err != nil {
+		return
+	}
+	evt, err := instance.DDXFSdk().GetSmartCodeEvent(txHash)
+	if err != nil {
+		return
+	}
+	if evt.State != 1 {
+		err = fmt.Errorf("tx failed: %s", txHash)
+		return
+	}
+	var ontid string
+	for _, notify := range evt.Notify {
+		if notify.ContractAddress == "0300000000000000000000000000000000000000" {
+			ss, ok := notify.States.([]interface{})
+			if !ok {
+				err = fmt.Errorf("tx, evt error: %s", txHash)
+				return
+			}
+			if ss[0].(string) != "Register" {
+				err = fmt.Errorf("not register tx: %s", txHash)
+				return
+			}
+			ontid = ss[1].(string)
+		}
+	}
+	dataStore := &io.SellerSaveDataMeta{
+		DataId: ontid,
+	}
+	err = InsertElt(DataMetaCollection, dataStore)
 	return
 }
 

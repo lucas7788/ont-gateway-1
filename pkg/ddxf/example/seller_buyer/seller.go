@@ -4,7 +4,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/ont-bizsuite/ddxf-sdk/data_id_contract"
 	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 	"github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology/common"
@@ -17,7 +16,7 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"math/rand"
 	"strconv"
-	"time"
+	"github.com/ontio/ontology/core/types"
 )
 
 func SaveDataMeta(sellerOntId string, con *ontology_go_sdk.Controller, seller *ontology_go_sdk.Account, bookKey string) (*io.SellerSaveDataMetaOutput, *io.SellerSaveDataMetaInput, error) {
@@ -40,29 +39,23 @@ func SaveDataMeta(sellerOntId string, con *ontology_go_sdk.Controller, seller *o
 		return nil, nil, err
 	}
 
-	dataMetaHashU, err := common.Uint256FromHexString(dataMetaHash)
-	if err != nil {
-		return nil, nil, err
-	}
+	//dataMetaHashU, err := common.Uint256FromHexString(dataMetaHash)
+	//if err != nil {
+	//	return nil, nil, err
+	//}
+	//
+	//dataHash, err := common.Uint256FromHexString(dataMetaHash)
+	//if err != nil {
+	//	return nil, nil, err
+	//}
 
-	dataHash, err := common.Uint256FromHexString(dataMetaHash)
-	if err != nil {
-		return nil, nil, err
-	}
+	dataId := common2.GenerateOntId()
 
-	dataId := common2.GenerateUUId(config.UUID_PRE_DATAID)
-	info := data_id_contract.DataIdInfo{
-		DataId:       dataId,
-		DataType:     0,
-		DataMetaHash: dataMetaHashU,
-		DataHash:     dataHash,
-		Owners:       []*data_id_contract.OntIdIndex{},
-	}
-
-	tx, err := instance.OntSdk().DefaultDataIdContract().BuildTx(seller, "registerDataId", []interface{}{info.ToBytes(), 1})
-	if err != nil {
-		return nil, nil, err
-	}
+	//tx, err := instance.DDXFSdk().GetOntologySdk().Native.OntId.NewRegIDWithControllerTransaction()
+	//if err != nil {
+	//	return nil, nil, err
+	//}
+	var tx *types.MutableTransaction
 	instance.OntSdk().GetKit().SignToTransaction(tx, con)
 	txHash := tx.Hash()
 
@@ -73,8 +66,6 @@ func SaveDataMeta(sellerOntId string, con *ontology_go_sdk.Controller, seller *o
 	input := &io.SellerSaveDataMetaInput{
 		DataMeta:     DataMeta,
 		DataMetaHash: dataMetaHash,
-		ExpiredDate:  uint64(time.Now().Unix() + 24*60*60),
-		Stock:        1000,
 		SignedTx:     hex.EncodeToString(sink.Bytes()),
 		DataId:       dataId,
 	}
@@ -132,12 +123,7 @@ func PublishMeta(seller *ontology_go_sdk.Account, saveDataMetaOut *io.SellerSave
 	itemMetaHash, err := common.Uint256ParseFromBytes(bs[:])
 	resourceDDOBytes, itemBytes := contract.ConstructPublishParam(seller.Address,
 		tokenTemplate,
-		[]*market_place_contract.TokenResourceTyEndpoint{&market_place_contract.TokenResourceTyEndpoint{
-			TokenTemplate: tokenTemplate,
-			ResourceType:  saveDataMetaIn.ResourceType,
-			Endpoint:      saveDataMetaIn.DataEndpoint,
-		}},
-		itemMetaHash, saveDataMetaIn.Fee, saveDataMetaIn.ExpiredDate, saveDataMetaIn.Stock)
+		itemMetaHash, market_place_contract.Fee{}, 0, 0)
 	tx, err := instance.OntSdk().DefaultDDXFContract().BuildTx(seller, "dtokenSellerPublish",
 		[]interface{}{resourceIdBytes, resourceDDOBytes, itemBytes})
 	if err != nil {

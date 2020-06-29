@@ -15,14 +15,13 @@ const (
 	openkgPort               = "10999"
 	PublishURI               = "/publish"
 	BuyAndUseURI             = "/buyAndUse"
+	addAttributes            = "/addAttributes"
 	GenerateOntIdByUserIdURI = "/generateOntIdByUserId"
 )
 
 var (
 	payer        *ontology_go_sdk.Account
 	defPlainSeed string
-	defGasPrice  = uint64(500)
-	defGasLimit  = uint64(20000000)
 )
 
 func InitData() error {
@@ -52,5 +51,6 @@ func StartServer() {
 	r.POST(GenerateOntIdByUserIdURI, GenerateOntIdByUserId)
 	r.POST(PublishURI, Publish)
 	r.POST(BuyAndUseURI, BuyAndUse)
+	r.POST(addAttributes, addAttributesHandler)
 	r.Run(":" + openkgPort)
 }

@@ -13,10 +13,20 @@ import (
 	io2 "github.com/zhiqiangxu/ont-gateway/pkg/io"
 	"github.com/zhiqiangxu/ont-gateway/pkg/misc"
 	"github.com/zhiqiangxu/ont-gateway/pkg/service"
+	"github.com/ontio/ontology-go-sdk"
 )
 
 func GenerateUUId(preFix string) string {
 	return preFix + uuid.NewV4().String()
+}
+
+func GenerateOntId() string {
+	dataId,err := ontology_go_sdk.GenerateID()
+	if err != nil {
+		fmt.Println("GenerateOntId error: ", err)
+		return GenerateOntId()
+	}
+	return dataId
 }
 
 func HandleEvent(txHash string, method string) ([]io.EndpointToken, error) {
