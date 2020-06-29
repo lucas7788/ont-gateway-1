@@ -13,6 +13,21 @@ type GenerateOntIdOutput struct {
 	OntId string `bson:"ont_id" json:"ont_id"`
 }
 
+// RegDataInput ...
+type RegDataInput struct {
+	ReqID       string                 `bson:"req_id" json:"req_id"`
+	PartyDataID string                 `bson:"party_data_id" json:"party_data_id"`
+	Data        map[string]interface{} `bson:"data" json:"data"`
+	Party       string                 `bson:"party" json:"party"`
+}
+
+// RegDataOutput ...
+type RegDataOutput struct {
+	Code  int    `bson:"code" json:"code"`
+	Msg   string `bson:"msg" json:"msg"`
+	ReqID string `bson:"req_id" json:"req_id"`
+}
+
 // PublishInput ...
 type PublishInput struct {
 	ReqID     string                   `bson:"req_id" json:"req_id"`
