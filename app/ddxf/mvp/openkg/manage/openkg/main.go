@@ -30,7 +30,7 @@ func main() {
 	// 		panic(fmt.Sprintf("ontid fail for %s", u.ID))
 	// 	}
 	// 	fmt.Println("UserID", u.ID)
-	// 	time.Sleep(time.Second)
+	// 	time.Sleep(time.Millisecond * 100)
 	// }
 
 	var resources []resource
@@ -40,13 +40,17 @@ func main() {
 	}
 	fmt.Println(resources)
 
-	for _, r := range resources {
-		fmt.Println("resource", r)
+	for i, r := range resources {
+		if i <= 690 {
+			continue
+		}
+		fmt.Println("resource", r, "index", i)
 		// r.CreatorID = "cd85f2c2-4fd1-44a8-82e3-10a7b63ed144"
 		if !publish(r) {
 			panic(fmt.Sprintf("publish fail for %s", r.ID))
 		}
-		time.Sleep(time.Second)
+		// return
+		time.Sleep(time.Millisecond * 100)
 	}
 }
 
@@ -65,6 +69,8 @@ type user struct {
 }
 
 const domain = "http://openkg-dev.ontfs.io"
+
+// const domain = "http://openkg-prod.ontfs.io"
 
 // const domain = "http://192.168.0.228:10999"
 
