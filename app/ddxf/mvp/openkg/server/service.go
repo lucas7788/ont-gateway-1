@@ -286,8 +286,11 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		}
 	}
 	// invoke seller saveDataMeta
-	attrs := make([]*ontology_go_sdk.DDOAttribute, 0)
 	for i := 0; i < len(ones); i++ {
+		var (
+			txMut  *types.MutableTransaction
+			iMutTx *types.Transaction
+		)
 		var hash, dataHash common2.Uint256
 		hash, err = common2.Uint256FromHexString(ones[i].DataMetaHash)
 		if err != nil {
@@ -309,33 +312,32 @@ func PublishService(input PublishInput) (output PublishOutput) {
 			Value:     dataHash[:],
 			ValueType: []byte{},
 		}
+		attrs := make([]*ontology_go_sdk.DDOAttribute, 0)
 		attrs = append(attrs, attr)
 		attrs = append(attrs, attr2)
-	}
-	var (
-		txMut  *types.MutableTransaction
-		iMutTx *types.Transaction
-	)
-	fmt.Printf("ontID: %s, userId: %s\n", ontID, input.UserID)
-	txMut, err = instance.OntSdk().GetKit().Native.OntId.NewAddAttributesTransaction(
-		500, 2000000, ontID, attrs, seller.PublicKey,
-	)
-	if err != nil {
-		return
-	}
-	err = instance.DDXFSdk().SignTx(txMut, seller)
-	if err != nil {
-		return
-	}
-	iMutTx, err = txMut.IntoImmutable()
-	if err != nil {
-		return
+
+		txMut, err = instance.OntSdk().GetKit().Native.OntId.NewAddAttributesTransaction(
+			500, 2000000, ontID, attrs, seller.PublicKey,
+		)
+		if err != nil {
+			return
+		}
+		err = instance.DDXFSdk().SignTx(txMut, seller)
+		if err != nil {
+			return
+		}
+		iMutTx, err = txMut.IntoImmutable()
+		if err != nil {
+			return
+		}
+		txHash := txMut.Hash()
+		fmt.Println("txhash:", txHash.ToHexString())
+		ones[i].SignedTx = hex.EncodeToString(common2.SerializeToBytes(iMutTx))
 	}
 	saveDataMetaArray := io.SellerSaveDataMetaArrayInput{
 		DataMetaOneArray: ones,
-		SignedTx:         hex.EncodeToString(common2.SerializeToBytes(iMutTx)),
 	}
-	fmt.Println("txhash:", hex.EncodeToString(common2.SerializeToBytes(iMutTx)))
+	fmt.Printf("ontID: %s, userId: %s\n", ontID, input.UserID)
 
 	var bs []byte
 	bs, err = json.Marshal(saveDataMetaArray)
@@ -494,7 +496,8 @@ func deleteService(input DeleteInput) (output DeleteOutput) {
 	return
 }
 
-func addAttributesService(input AddAttributesInput) (output AddAttributesOutput) {
+func regDataService(input RegDataInput) (output AddAttributesOutput) {
+	GetAccount(input.PartyDataID)
 	return
 }
 

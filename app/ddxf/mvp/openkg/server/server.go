@@ -15,7 +15,7 @@ const (
 	openkgPort               = "10999"
 	PublishURI               = "/publish"
 	BuyAndUseURI             = "/buyAndUse"
-	addAttributes            = "/addAttributes"
+	RegDataURI               = "/regData"
 	deleteAttributes         = "/deleteAttributes"
 	GenerateOntIdByUserIdURI = "/generateOntIdByUserId"
 )
@@ -52,7 +52,7 @@ func StartServer() {
 	r.POST(GenerateOntIdByUserIdURI, GenerateOntIdByUserId)
 	r.POST(PublishURI, Publish)
 	r.POST(BuyAndUseURI, BuyAndUse)
-	r.POST(addAttributes, addAttributesHandler)
+	r.POST(RegDataURI, regDataHandler)
 	r.POST(deleteAttributes, deleteAttributesHandler)
 	r.Run(":" + openkgPort)
 }

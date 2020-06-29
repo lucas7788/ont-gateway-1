@@ -8,9 +8,11 @@ import (
 
 	"time"
 
+	"github.com/kataras/go-errors"
 	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 	"github.com/ontio/ontology-crypto/signature"
-	ontology_go_sdk "github.com/ontio/ontology-go-sdk"
+	"github.com/ontio/ontology-go-sdk"
+	common3 "github.com/ontio/ontology-go-sdk/common"
 	"github.com/ontio/ontology-go-sdk/utils"
 	"github.com/ontio/ontology/common"
 	"github.com/zhiqiangxu/ddxf"
@@ -70,22 +72,28 @@ func GetDataIdByDataMetaHashService(param GetDataIdParam) (map[string]string, er
 
 func SaveDataMetaArrayService(input io.SellerSaveDataMetaArrayInput,
 	ontid string) (output io.SellerSaveDataMetaOutput) {
-	txHash, err := common2.SendTx(input.SignedTx)
-	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-		return
-	}
-	event, err := instance.OntSdk().GetSmartCodeEvent(txHash)
-	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
-		return
-	}
-	if event.State != 1 {
-		output.Code = http.StatusInternalServerError
-		output.Msg = fmt.Sprintf("registerDataId failed, txHash: %s", txHash)
-		return
+	var err error
+	defer func() {
+		if err != nil {
+			output.Code = http.StatusInternalServerError
+			output.Msg = err.Error()
+		}
+	}()
+	for _, one := range input.DataMetaOneArray {
+		var txHash string
+		txHash, err = common2.SendTx(one.SignedTx)
+		if err != nil {
+			return
+		}
+		var event *common3.SmartContactEvent
+		event, err = instance.OntSdk().GetSmartCodeEvent(txHash)
+		if err != nil {
+			return
+		}
+		if event.State != 1 {
+			err = fmt.Errorf("registerDataId failed, txHash: %s", txHash)
+			return
+		}
 	}
 	for _, item := range input.DataMetaOneArray {
 		dataStore := &io.SellerSaveDataMeta{
@@ -93,6 +101,7 @@ func SaveDataMetaArrayService(input io.SellerSaveDataMetaArrayInput,
 			DataMetaHash: item.DataMetaHash,
 			ResourceType: item.ResourceType,
 			OntId:        ontid,
+			SignedTx:     item.SignedTx,
 			DataId:       item.DataId,
 			DataEndpoint: item.DataEndpoint,
 		}
@@ -100,42 +109,50 @@ func SaveDataMetaArrayService(input io.SellerSaveDataMetaArrayInput,
 		fmt.Println("dataStore:", dataStore)
 		err = InsertElt(DataMetaCollection, dataStore)
 		if err != nil {
-			output.Code = http.StatusInternalServerError
-			output.Msg = err.Error()
+			return
 		}
 	}
 	return
 }
 
 func SaveDataMetaService(input io.SellerSaveDataMetaInput, ontId string) (output io.SellerSaveDataMetaOutput) {
+	var err error
+	defer func() {
+		if err != nil {
+			output.Code = http.StatusInternalServerError
+			output.Msg = err.Error()
+		}
+	}()
+
 	if input.DataMeta["ISDN"] == "" {
-		output.Code = http.StatusBadRequest
-		output.Msg = "datameta does not contain ISDN"
+		err = errors.New("datameta does not contain ISDN")
 		return
 	}
 	filter := bson.M{"dataId": input.DataId}
 	meta := io.SellerSaveDataMeta{}
-	err := FindElt(DataMetaCollection, filter, &meta)
-	if err != nil && err != mongo.ErrNoDocuments {
+	err = FindElt(DataMetaCollection, filter, &meta)
+	// if update tx, should not end when find value
+	if err != nil {
+		return
+	}
+	if meta.DataMetaHash != "" {
+		err = fmt.Errorf("datameta exist, dataMetaHash:%s", meta.DataMetaHash)
 		return
 	}
 	// verify hash.
 	txHash, err := common2.SendTx(input.SignedTx)
 	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
 		return
 	}
 	fmt.Printf("[seller] saveDataMeta txhash: %s\n", txHash)
 	event, err := instance.OntSdk().GetSmartCodeEvent(txHash)
 	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
 		return
 	}
+	//parse event TODO
+	//must be update attributes tx
 	if event.State != 1 {
-		output.Code = http.StatusInternalServerError
-		output.Msg = fmt.Sprintf("registerDataId failed, txHash: %s", txHash)
+		err = fmt.Errorf("registerDataId failed, txHash: %s", txHash)
 		return
 	}
 	// reg identity.
@@ -152,8 +169,7 @@ func SaveDataMetaService(input io.SellerSaveDataMetaInput, ontId string) (output
 	// store meta hash id.
 	err = InsertElt(DataMetaCollection, dataStore)
 	if err != nil {
-		output.Code = http.StatusInternalServerError
-		output.Msg = err.Error()
+		return
 	}
 	output.DataId = input.DataId
 	return
