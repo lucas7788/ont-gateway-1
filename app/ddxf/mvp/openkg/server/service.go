@@ -380,8 +380,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		ItemMetaHash: itemMetaHash,
 	}
 
-	addr, _ := common2.AddressFromHexString("195d72da6725e8243a52803f6de4cd93df48fc1f")
-
+	addr, _ := common2.AddressFromHexString(config2.OEP4ContractAddr)
 	item := market_place_contract.DTokenItem{
 		Fee: market_place_contract.Fee{
 			ContractAddr: addr,
@@ -443,7 +442,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	start = time.Now().Unix()
 	_, _, data, err = forward.PostJSONRequestWithRetry(config2.SellerUrl+server.PublishMPItemMetaUrl, bs, headers, 10)
 	end = time.Now().Unix()
-	fmt.Printf("openkg publish service cost time:%d\n", end-start)
+	fmt.Printf("openkg publish service cost time: %d\n", end-start)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -496,6 +495,56 @@ func deleteService(input DeleteInput) (output DeleteOutput) {
 }
 
 func addAttributesService(input AddAttributesInput) (output AddAttributesOutput) {
+	return
+}
+
+func deleteAttributesService(input DeleteAttributesInput) (output AddAttributesOutput) {
+	var err error
+	defer func() {
+		if err != nil {
+			output.Code = http.StatusInternalServerError
+			output.Msg = err.Error()
+		}
+	}()
+	input.UserID = input.Party + input.UserID
+	acc := GetAccount(input.UserID)
+	ontId := config2.PreOntId + acc.Address.ToBase58()
+	key := []byte("DataMetaHash")
+	err = deleteAttribute(ontId, key, acc)
+	if err != nil {
+		return
+	}
+	key2 := []byte("DataHash")
+	err = deleteAttribute(ontId, key2, acc)
+	return
+}
+
+func deleteAttribute(ontId string, key []byte, acc *ontology_go_sdk.Account) (err error) {
+	tx, err := instance.DDXFSdk().GetOntologySdk().Native.OntId.NewRemoveAttributeTransaction(config2.GasPrice,
+		config2.GasLimit, ontId, key, acc.PublicKey)
+	if err != nil {
+		return
+	}
+	err = instance.DDXFSdk().SignTx(tx, payer)
+	if err != nil {
+		return
+	}
+	err = instance.DDXFSdk().SignTx(tx, acc)
+	if err != nil {
+		return
+	}
+	txHash, err := common.SendRawTx(tx)
+	if err != nil {
+		return
+	}
+	evt, err := instance.DDXFSdk().GetSmartCodeEvent(txHash)
+	if err != nil {
+		return
+	}
+	if evt.State != 1 {
+		err = fmt.Errorf("tx failed, txhash: %s", txHash)
+		return
+	}
 	return
 }
 

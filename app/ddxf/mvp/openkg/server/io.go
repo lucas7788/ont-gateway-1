@@ -48,7 +48,6 @@ type BuyAndUseOutput struct {
 	ReqID string `bson:"req_id" json:"req_id"`
 }
 
-
 // BuyAndUseInput ...
 type AddAttributesInput struct {
 	ReqID    string `bson:"req_id" json:"req_id"`
@@ -65,6 +64,19 @@ type AddAttributesOutput struct {
 	ReqID string `bson:"req_id" json:"req_id"`
 }
 
+// BuyAndUseInput ...
+type DeleteAttributesInput struct {
+	ReqID  string `bson:"req_id" json:"req_id"`
+	UserID string `bson:"user_id" json:"user_id"` // buyer id
+	Party  string `bson:"party" json:"party"`
+}
+
+// BuyAndUseOutput ...
+type DeleteAttributesOutput struct {
+	Code  int    `bson:"code" json:"code"`
+	Msg   string `bson:"msg" json:"msg"`
+	ReqID string `bson:"req_id" json:"req_id"`
+}
 
 // BuyAndUseInput ...
 type DeleteInput struct {

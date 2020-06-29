@@ -7,6 +7,7 @@ import (
 	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 	"github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology/common"
+	"github.com/ontio/ontology/core/types"
 	"github.com/zhiqiangxu/ddxf"
 	common2 "github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
@@ -16,7 +17,6 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"math/rand"
 	"strconv"
-	"github.com/ontio/ontology/core/types"
 )
 
 func SaveDataMeta(sellerOntId string, con *ontology_go_sdk.Controller, seller *ontology_go_sdk.Account, bookKey string) (*io.SellerSaveDataMetaOutput, *io.SellerSaveDataMetaInput, error) {
