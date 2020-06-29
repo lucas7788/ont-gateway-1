@@ -39,10 +39,7 @@ func GetPeerPoolMap(native *native.NativeService, contract common.Address, view 
 	peerPoolMap := &PeerPoolMap{
 		PeerPoolMap: make(map[string]*PeerPoolItem),
 	}
-	viewBytes, err := GetUint32Bytes(view)
-	if err != nil {
-		return nil, fmt.Errorf("getUint32Bytes, getUint32Bytes error: %v", err)
-	}
+	viewBytes := GetUint32Bytes(view)
 	peerPoolMapBytes, err := native.CacheDB.Get(utils.ConcatKey(contract, []byte(PEER_POOL), viewBytes))
 	if err != nil {
 		return nil, fmt.Errorf("getPeerPoolMap, get all peerPoolMap error: %v", err)
@@ -67,10 +64,7 @@ func putPeerPoolMap(native *native.NativeService, contract common.Address, view 
 	if err := peerPoolMap.Serialization(sink); err != nil {
 		return fmt.Errorf("serialize, serialize peerPoolMap error: %v", err)
 	}
-	viewBytes, err := GetUint32Bytes(view)
-	if err != nil {
-		return fmt.Errorf("getUint32Bytes, get viewBytes error: %v", err)
-	}
+	viewBytes := GetUint32Bytes(view)
 	native.CacheDB.Put(utils.ConcatKey(contract, []byte(PEER_POOL), viewBytes), cstates.GenRawStorageItem(sink.Bytes()))
 	return nil
 }
@@ -175,6 +169,13 @@ func appCallTransferFrom(native *native.NativeService, contract common.Address, 
 	return nil
 }
 
+func appCallUnboundGovernanceOng(native *native.NativeService) error {
+	if _, err := native.NativeCall(utils.OntContractAddress, ont.UNBOUND_ONG_TO_GOVERNANCE, []byte{}); err != nil {
+		return fmt.Errorf("appCallUnboundGovernanceOng, appCall error: %v", err)
+	}
+	return nil
+}
+
 func getOngBalance(native *native.NativeService, address common.Address) (uint64, error) {
 	sink := common.ZeroCopySink{}
 	utils.EncodeAddress(&sink, address)
@@ -183,7 +184,7 @@ func getOngBalance(native *native.NativeService, address common.Address) (uint64
 	if err != nil {
 		return 0, fmt.Errorf("getOngBalance, appCall error: %v", err)
 	}
-	balance := common.BigIntFromNeoBytes(value.([]byte)).Uint64()
+	balance := common.BigIntFromNeoBytes(value).Uint64()
 	return balance, nil
 }
 
@@ -206,12 +207,10 @@ func splitCurve(native *native.NativeService, contract common.Address, pos uint6
 	return s, nil
 }
 
-func GetUint32Bytes(num uint32) ([]byte, error) {
-	bf := new(bytes.Buffer)
-	if err := serialization.WriteUint32(bf, num); err != nil {
-		return nil, fmt.Errorf("serialization.WriteUint32, serialize uint32 error: %v", err)
-	}
-	return bf.Bytes(), nil
+func GetUint32Bytes(num uint32) []byte {
+	sink := common.NewZeroCopySink(nil)
+	sink.WriteUint32(num)
+	return sink.Bytes()
 }
 
 func GetBytesUint32(b []byte) (uint32, error) {
@@ -301,7 +300,7 @@ func putGlobalParam2(native *native.NativeService, contract common.Address, glob
 func validatePeerPubKeyFormat(pubkey string) error {
 	pk, err := vbftconfig.Pubkey(pubkey)
 	if err != nil {
-		return fmt.Errorf("failed to parse pubkey")
+		return fmt.Errorf("failed to parse pubkey, %s", err)
 	}
 	if !vrf.ValidatePublicKey(pk) {
 		return fmt.Errorf("invalid for VRF")
@@ -364,7 +363,7 @@ func CheckVBFTConfig(configuration *config.VBFTConfig) error {
 		}
 		//check peerPubkey
 		if err := validatePeerPubKeyFormat(peer.PeerPubkey); err != nil {
-			return fmt.Errorf("invalid peer pubkey")
+			return fmt.Errorf("invalid peer pubkey, %s", err)
 		}
 		_, err := common.AddressFromBase58(peer.Address)
 		if err != nil {
@@ -442,10 +441,7 @@ func getCandidateIndex(native *native.NativeService, contract common.Address) (u
 }
 
 func putCandidateIndex(native *native.NativeService, contract common.Address, candidateIndex uint32) error {
-	candidateIndexBytes, err := GetUint32Bytes(candidateIndex)
-	if err != nil {
-		return fmt.Errorf("GetUint32Bytes, get candidateIndexBytes error: %v", err)
-	}
+	candidateIndexBytes := GetUint32Bytes(candidateIndex)
 	native.CacheDB.Put(utils.ConcatKey(contract, []byte(CANDIDITE_INDEX)), cstates.GenRawStorageItem(candidateIndexBytes))
 	return nil
 }
@@ -650,7 +646,7 @@ func appCallVerifyToken(native *native.NativeService, contract common.Address, c
 	if err != nil {
 		return fmt.Errorf("appCallVerifyToken, appCall error: %v", err)
 	}
-	if !bytes.Equal(ok.([]byte), utils.BYTE_TRUE) {
+	if !bytes.Equal(ok, utils.BYTE_TRUE) {
 		return fmt.Errorf("appCallVerifyToken, verifyToken failed")
 	}
 	return nil

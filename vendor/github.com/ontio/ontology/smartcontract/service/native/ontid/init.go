@@ -18,6 +18,7 @@
 package ontid
 
 import (
+	"github.com/ontio/ontology/common/config"
 	"github.com/ontio/ontology/smartcontract/service/native"
 	"github.com/ontio/ontology/smartcontract/service/native/utils"
 )
@@ -53,5 +54,34 @@ func RegisterIDContract(srvc *native.NativeService) {
 	srvc.Register("getKeyState", GetKeyState)
 	srvc.Register("getAttributes", GetAttributes)
 	srvc.Register("getDDO", GetDDO)
+	if srvc.Height < config.GetNewOntIdHeight() {
+		return
+	}
+	srvc.Register("removeRecovery", removeRecovery)
+	srvc.Register("addKeyByIndex", addKeyByIndex)
+	srvc.Register("removeKeyByIndex", removeKeyByIndex)
+	srvc.Register("addAttributesByIndex", addAttributesByIndex)
+	srvc.Register("removeAttributeByIndex", removeAttributeByIndex)
+	srvc.Register("addNewAuthKey", addNewAuthKey)
+	srvc.Register("addNewAuthKeyByRecovery", addNewAuthKeyByRecovery)
+	srvc.Register("addNewAuthKeyByController", addNewAuthKeyByController)
+	srvc.Register("setAuthKey", setAuthKey)
+	srvc.Register("setAuthKeyByRecovery", setAuthKeyByRecovery)
+	srvc.Register("setAuthKeyByController", setAuthKeyByController)
+	srvc.Register("removeAuthKey", removeAuthKey)
+	srvc.Register("removeAuthKeyByRecovery", removeAuthKeyByRecovery)
+	srvc.Register("removeAuthKeyByController", removeAuthKeyByController)
+	srvc.Register("addService", addService)
+	srvc.Register("updateService", updateService)
+	srvc.Register("removeService", removeService)
+	srvc.Register("addContext", addContext)
+	srvc.Register("removeContext", removeContext)
+	srvc.Register("addProof", addProof)
+	srvc.Register("getPublicKeysJson", GetPublicKeysJson)
+	srvc.Register("getAttributesJson", GetAttributesJson)
+	srvc.Register("getAttributeByKey", GetAttributeByKey)
+	srvc.Register("getServiceJson", GetServiceJson)
+	srvc.Register("getControllerJson", GetControllerJson)
+	srvc.Register("getDocumentJson", GetDocumentJson)
 	return
 }

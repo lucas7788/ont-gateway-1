@@ -23,6 +23,10 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
+	"io"
+	"strings"
+	"time"
+
 	"github.com/ontio/ontology-crypto/keypair"
 	"github.com/ontio/ontology/common"
 	"github.com/ontio/ontology/common/constants"
@@ -33,14 +37,12 @@ import (
 	cutils "github.com/ontio/ontology/core/utils"
 	ontErrors "github.com/ontio/ontology/errors"
 	bactor "github.com/ontio/ontology/http/base/actor"
+	common2 "github.com/ontio/ontology/p2pserver/common"
 	"github.com/ontio/ontology/smartcontract/event"
 	"github.com/ontio/ontology/smartcontract/service/native/ont"
 	"github.com/ontio/ontology/smartcontract/service/native/utils"
 	cstate "github.com/ontio/ontology/smartcontract/states"
 	"github.com/ontio/ontology/vm/neovm"
-	"io"
-	"strings"
-	"time"
 )
 
 const MAX_SEARCH_HEIGHT uint32 = 100
@@ -106,6 +108,12 @@ type Sig struct {
 	M       uint16
 	SigData []string
 }
+
+type CrossStatesProof struct {
+	Type      string
+	AuditPath string
+}
+
 type Transactions struct {
 	Version    byte
 	Nonce      uint32
@@ -145,9 +153,8 @@ type BlockInfo struct {
 }
 
 type NodeInfo struct {
-	NodeState   uint   // node status
-	NodePort    uint16 // The nodes's port
-	ID          uint64 // The nodes's id
+	NodePort    uint16         // The nodes's port
+	ID          common2.PeerId // The nodes's id
 	NodeTime    int64
 	NodeVersion uint32   // The network protocol the node used
 	NodeType    uint64   // The services the node supplied
@@ -224,6 +231,20 @@ func TransArryByteToHexString(ptx *types.Transaction) *Transactions {
 	mhash := ptx.Hash()
 	trans.Hash = mhash.ToHexString()
 	return trans
+}
+
+func TransferCrossChainMsg(msg *types.CrossChainMsg, pks []keypair.PublicKey) string {
+	if msg == nil {
+		return ""
+	}
+	sink := common.NewZeroCopySink(nil)
+	msg.Serialization(sink)
+	sink.WriteVarUint(uint64(len(pks)))
+	for _, pk := range pks {
+		key := keypair.SerializePublicKey(pk)
+		sink.WriteVarBytes(key)
+	}
+	return common.ToHexString(sink.Bytes())
 }
 
 func SendTxToPool(txn *types.Transaction) (ontErrors.ErrCode, string) {
@@ -507,15 +528,8 @@ type SyncStatus struct {
 }
 
 func GetSyncStatus() (SyncStatus, error) {
-	var status SyncStatus
-	height, err := bactor.GetMaxPeerBlockHeight()
-	if err != nil {
-		return status, err
-	}
-	cnt, err := bactor.GetConnectionCnt()
-	if err != nil {
-		return status, err
-	}
+	height := bactor.GetMaxPeerBlockHeight()
+	cnt := bactor.GetConnectionCnt()
 	curBlockHeight := bactor.GetCurrentBlockHeight()
 
 	return SyncStatus{

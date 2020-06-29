@@ -23,6 +23,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
+
 	"github.com/ontio/ontology/common"
 	"github.com/ontio/ontology/common/log"
 	"github.com/ontio/ontology/common/serialization"
@@ -117,6 +118,14 @@ func (this *EventStore) GetEventNotifyByBlock(height uint32) ([]*event.ExecuteNo
 		evtNotifies = append(evtNotifies, evtNotify)
 	}
 	return evtNotifies, nil
+}
+
+func (this *EventStore) PruneBlock(height uint32, hashes []common.Uint256) {
+	key := genEventNotifyByBlockKey(height)
+	this.store.BatchDelete(key)
+	for _, hash := range hashes {
+		this.store.BatchDelete(genEventNotifyByTxKey(hash))
+	}
 }
 
 //CommitTo event store batch to store

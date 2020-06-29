@@ -20,9 +20,12 @@ package native
 
 import (
 	"fmt"
+
 	"github.com/ontio/ontology/common"
+	"github.com/ontio/ontology/core/store"
 	"github.com/ontio/ontology/core/types"
 	"github.com/ontio/ontology/errors"
+	"github.com/ontio/ontology/merkle"
 	"github.com/ontio/ontology/smartcontract/context"
 	"github.com/ontio/ontology/smartcontract/event"
 	"github.com/ontio/ontology/smartcontract/states"
@@ -42,6 +45,7 @@ var (
 // Native service struct
 // Invoke a native smart contract, new a native service
 type NativeService struct {
+	Store         store.LedgerStore
 	CacheDB       *storage.CacheDB
 	ServiceMap    map[string]Handler
 	Notifications []*event.NotifyEventInfo
@@ -53,6 +57,7 @@ type NativeService struct {
 	BlockHash     common.Uint256
 	ContextRef    context.ContextRef
 	PreExec       bool
+	CrossHashes   []common.Uint256
 }
 
 func (this *NativeService) Register(methodName string, handler Handler) {
@@ -76,18 +81,22 @@ func (this *NativeService) Invoke() ([]byte, error) {
 	this.ContextRef.PushContext(&context.Context{ContractAddress: contract.Address})
 	notifications := this.Notifications
 	this.Notifications = []*event.NotifyEventInfo{}
+	hashes := this.CrossHashes
+	this.CrossHashes = []common.Uint256{}
 	result, err := service(this)
 	if err != nil {
 		return result, errors.NewDetailErr(err, errors.ErrNoCode, "[Invoke] Native serivce function execute error!")
 	}
 	this.ContextRef.PopContext()
 	this.ContextRef.PushNotifications(this.Notifications)
+	this.ContextRef.PutCrossStateHashes(this.CrossHashes)
 	this.Notifications = notifications
 	this.Input = args
+	this.CrossHashes = hashes
 	return result, nil
 }
 
-func (this *NativeService) NativeCall(address common.Address, method string, args []byte) (interface{}, error) {
+func (this *NativeService) NativeCall(address common.Address, method string, args []byte) ([]byte, error) {
 	c := states.ContractInvokeParam{
 		Address: address,
 		Method:  method,
@@ -95,4 +104,8 @@ func (this *NativeService) NativeCall(address common.Address, method string, arg
 	}
 	this.InvokeParam = c
 	return this.Invoke()
+}
+
+func (this *NativeService) PushCrossState(data []byte) {
+	this.CrossHashes = append(this.CrossHashes, merkle.HashLeaf(data))
 }

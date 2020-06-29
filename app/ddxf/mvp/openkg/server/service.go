@@ -322,6 +322,11 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		if err != nil {
 			return
 		}
+		txMut.Payer = payer.Address
+		err = instance.DDXFSdk().SignTx(txMut, payer)
+		if err != nil {
+			return
+		}
 		err = instance.DDXFSdk().SignTx(txMut, seller)
 		if err != nil {
 			return
@@ -425,7 +430,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		}
 	}
 
-	iMutTx, err = tx.IntoImmutable()
+	iMutTx, err := tx.IntoImmutable()
 	if err != nil {
 		return
 	}

@@ -3,7 +3,6 @@ module github.com/zhiqiangxu/ont-gateway
 go 1.12
 
 require (
-	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/cloudflare/tableflip v1.2.0 // indirect
 	github.com/gin-contrib/pprof v1.2.1
 	github.com/gin-gonic/gin v1.6.2
@@ -18,14 +17,12 @@ require (
 	github.com/oklog/run v1.0.0
 	github.com/ont-bizsuite/ddxf-sdk v0.0.0-20200629053908-de732c1a339b
 	github.com/ontio/go-bip32 v0.0.0-20190520025953-d3cea6894a2b
-	github.com/ontio/ontology v1.8.2
+	github.com/ontio/ontology v1.10.1-0.20200629062808-bb8fe432b332
 	github.com/ontio/ontology-crypto v1.0.9
-	github.com/ontio/ontology-go-sdk v1.11.1
+	github.com/ontio/ontology-go-sdk v1.11.2-0.20200615094056-8c296c479e8d
 	github.com/piprate/json-gold v0.3.0
 	github.com/prometheus/client_golang v1.5.1
 	github.com/satori/go.uuid v1.2.0
-	github.com/scylladb/go-set v1.0.2 // indirect
-	github.com/spf13/pflag v1.0.3 // indirect
 	github.com/stretchr/testify v1.4.0
 	github.com/syndtr/goleveldb v1.0.1-0.20190923125748-758128399b1d
 	github.com/urfave/cli/v2 v2.2.0
@@ -38,5 +35,4 @@ require (
 	golang.org/x/tools v0.0.0-20200408014516-4d14fc9c00ce // indirect
 	gopkg.in/dgrijalva/jwt-go.v3 v3.2.0
 	gotest.tools v2.2.0+incompatible
-	launchpad.net/gocheck v0.0.0-20140225173054-000000000087 // indirect
 )

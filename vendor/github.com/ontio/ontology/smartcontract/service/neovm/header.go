@@ -20,10 +20,22 @@ package neovm
 
 import (
 	"fmt"
+
+	"github.com/ontio/ontology/common"
 	"github.com/ontio/ontology/core/types"
 	"github.com/ontio/ontology/errors"
 	vm "github.com/ontio/ontology/vm/neovm"
 )
+
+type HeaderValue struct {
+	Height    uint32
+	Hash      common.Uint256
+	Timestamp uint32
+}
+
+func (self *HeaderValue) ToArray() []byte {
+	return []byte(fmt.Sprintf("interop value: header %d", self.Height))
+}
 
 // HeaderGetHash put header's hash to vm stack
 func HeaderGetHash(service *NeoVmService, engine *vm.Executor) error {
@@ -31,16 +43,18 @@ func HeaderGetHash(service *NeoVmService, engine *vm.Executor) error {
 	if err != nil {
 		return err
 	}
-	var data *types.Header
-	if b, ok := d.Data.(*types.Block); ok {
-		data = b.Header
-	} else if h, ok := d.Data.(*types.Header); ok {
-		data = h
-	} else {
+	var data common.Uint256
+	switch val := d.Data.(type) {
+	case *types.Block:
+		data = val.Header.Hash()
+	case *types.Header:
+		data = val.Hash()
+	case *HeaderValue:
+		data = val.Hash
+	default:
 		return errors.NewErr("[HeaderGetHash] Wrong type!")
 	}
-	h := data.Hash()
-	return engine.EvalStack.PushBytes(h.ToArray())
+	return engine.EvalStack.PushBytes(data.ToArray())
 }
 
 // HeaderGetVersion put header's version to vm stack
@@ -100,15 +114,19 @@ func HeaderGetIndex(service *NeoVmService, engine *vm.Executor) error {
 	if err != nil {
 		return err
 	}
-	var data *types.Header
-	if b, ok := d.Data.(*types.Block); ok {
-		data = b.Header
-	} else if h, ok := d.Data.(*types.Header); ok {
-		data = h
-	} else {
+	var data uint32
+	switch val := d.Data.(type) {
+	case *types.Block:
+		data = val.Header.Height
+	case *types.Header:
+		data = val.Height
+	case *HeaderValue:
+		data = val.Height
+	default:
 		return fmt.Errorf("[HeaderGetIndex] Wrong type")
 	}
-	return engine.EvalStack.PushUint32(data.Height)
+
+	return engine.EvalStack.PushUint32(data)
 }
 
 // HeaderGetTimestamp put header's timestamp to vm stack
@@ -117,15 +135,19 @@ func HeaderGetTimestamp(service *NeoVmService, engine *vm.Executor) error {
 	if err != nil {
 		return err
 	}
-	var data *types.Header
-	if b, ok := d.Data.(*types.Block); ok {
-		data = b.Header
-	} else if h, ok := d.Data.(*types.Header); ok {
-		data = h
-	} else {
-		return errors.NewErr("[HeaderGetTimestamp] Wrong type")
+	var data uint32
+	switch val := d.Data.(type) {
+	case *types.Block:
+		data = val.Header.Timestamp
+	case *types.Header:
+		data = val.Timestamp
+	case *HeaderValue:
+		data = val.Timestamp
+	default:
+		return fmt.Errorf("[HeaderGetIndex] Wrong type")
 	}
-	return engine.EvalStack.PushUint32(data.Timestamp)
+
+	return engine.EvalStack.PushUint32(data)
 }
 
 // HeaderGetConsensusData put header's consensus data to vm stack

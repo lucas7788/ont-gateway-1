@@ -47,7 +47,6 @@ const (
 	TxActor                  // Actor that handles new transaction
 	TxPoolActor              // Actor that handles consensus msg
 	VerifyRspActor           // Actor that handles the response from valdiators
-	NetActor                 // Actor to send msg to the net actor
 	MaxActor
 )
 
@@ -190,6 +189,16 @@ type GetPendingTxnReq struct {
 // GetPendingTxnRsp returns a transaction list for GetPendingTxnReq.
 type GetPendingTxnRsp struct {
 	Txs []*types.Transaction
+}
+
+// GetPendingTxnHashReq specifies the api that how to get a pending txHash list
+// in the pool.
+type GetPendingTxnHashReq struct {
+}
+
+// GetPendingTxnHashRsp returns a transaction hash list for GetPendingTxnHashReq.
+type GetPendingTxnHashRsp struct {
+	TxHashs []common.Uint256
 }
 
 // consensus messages

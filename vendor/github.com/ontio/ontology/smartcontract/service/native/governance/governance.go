@@ -25,11 +25,14 @@ import (
 	"encoding/hex"
 	"fmt"
 	"math"
+	"sort"
 
+	"github.com/ontio/ontology-crypto/keypair"
 	"github.com/ontio/ontology/common"
 	"github.com/ontio/ontology/common/config"
 	"github.com/ontio/ontology/common/constants"
 	cstates "github.com/ontio/ontology/core/states"
+	"github.com/ontio/ontology/core/types"
 	"github.com/ontio/ontology/smartcontract/service/native"
 	"github.com/ontio/ontology/smartcontract/service/native/global_params"
 	"github.com/ontio/ontology/smartcontract/service/native/utils"
@@ -74,6 +77,9 @@ const (
 	REDUCE_INIT_POS                  = "reduceInitPos"
 	SET_PROMISE_POS                  = "setPromisePos"
 	SET_GAS_ADDRESS                  = "setGasAddress"
+	GET_PEER_POOL                    = "getPeerPool"
+	GET_PEER_INFO                    = "getPeerInfo"
+	GET_PEER_POOL_BY_ADDRESS         = "getPeerPoolByAddress"
 
 	//key prefix
 	GLOBAL_PARAM      = "globalParam"
@@ -150,6 +156,10 @@ func RegisterGovernanceContract(native *native.NativeService) {
 	native.Register(TRANSFER_PENALTY, TransferPenalty)
 	native.Register(SET_PROMISE_POS, SetPromisePos)
 	native.Register(SET_GAS_ADDRESS, SetGasAddress)
+
+	native.Register(GET_PEER_POOL, GetPeerPool)
+	native.Register(GET_PEER_INFO, GetPeerInfo)
+	native.Register(GET_PEER_POOL_BY_ADDRESS, GetPeerPoolByAddress)
 }
 
 //Init governance contract, include vbft config, global param and ontid admin.
@@ -224,10 +234,7 @@ func InitConfig(native *native.NativeService) ([]byte, error) {
 			return utils.BYTE_FALSE, fmt.Errorf("hex.DecodeString, peerPubkey format error: %v", err)
 		}
 		index := peerPoolItem.Index
-		indexBytes, err := GetUint32Bytes(index)
-		if err != nil {
-			return nil, fmt.Errorf("getUint32Bytes, getUint32Bytes error: %v", err)
-		}
+		indexBytes := GetUint32Bytes(index)
 		native.CacheDB.Put(utils.ConcatKey(contract, []byte(PEER_INDEX), peerPubkeyPrefix), cstates.GenRawStorageItem(indexBytes))
 
 		//update total stake
@@ -246,10 +253,7 @@ func InitConfig(native *native.NativeService) ([]byte, error) {
 	if err != nil {
 		return utils.BYTE_FALSE, fmt.Errorf("putPeerPoolMap, put peerPoolMap error: %v", err)
 	}
-	indexBytes, err := GetUint32Bytes(maxId + 1)
-	if err != nil {
-		return nil, fmt.Errorf("getUint32Bytes, get indexBytes error: %v", err)
-	}
+	indexBytes := GetUint32Bytes(maxId + 1)
 	native.CacheDB.Put(utils.ConcatKey(contract, []byte(CANDIDITE_INDEX)), cstates.GenRawStorageItem(indexBytes))
 
 	//init governance view
@@ -329,6 +333,7 @@ func RegisterCandidateTransferFrom(native *native.NativeService) ([]byte, error)
 	return utils.BYTE_TRUE, nil
 }
 
+// Deprecated
 //Unregister a registered candidate node, will remove node from pool, and unfreeze deposit ont.
 func UnRegisterCandidate(native *native.NativeService) ([]byte, error) {
 	params := new(UnRegisterCandidateParam)
@@ -391,6 +396,7 @@ func UnRegisterCandidate(native *native.NativeService) ([]byte, error) {
 	return utils.BYTE_TRUE, nil
 }
 
+// Deprecated
 //Approve a registered candidate node
 //Only approved candidate node can participate in consensus selection and get ong bonus.
 func ApproveCandidate(native *native.NativeService) ([]byte, error) {
@@ -506,10 +512,7 @@ func ApproveCandidate(native *native.NativeService) ([]byte, error) {
 			return nil, fmt.Errorf("putCandidateIndex, put candidateIndex error: %v", err)
 		}
 
-		indexBytes, err := GetUint32Bytes(peerPoolItem.Index)
-		if err != nil {
-			return nil, fmt.Errorf("GetUint32Bytes, get indexBytes error: %v", err)
-		}
+		indexBytes := GetUint32Bytes(peerPoolItem.Index)
 		native.CacheDB.Put(utils.ConcatKey(contract, []byte(PEER_INDEX), peerPubkeyPrefix), cstates.GenRawStorageItem(indexBytes))
 	}
 	peerPoolMap.PeerPoolMap[params.PeerPubkey] = peerPoolItem
@@ -970,6 +973,14 @@ func Withdraw(native *native.NativeService) ([]byte, error) {
 //Go to next consensus epoch
 func CommitDpos(native *native.NativeService) ([]byte, error) {
 	contract := native.ContextRef.CurrentContext().ContractAddress
+
+	if native.Time > config.GetOntHolderUnboundDeadline()+constants.GENESIS_BLOCK_TIMESTAMP {
+		//unbound ong to governance
+		err := appCallUnboundGovernanceOng(native)
+		if err != nil {
+			return utils.BYTE_FALSE, fmt.Errorf("CommitDpos, appCallUnboundGovernanceOng error: %v", err)
+		}
+	}
 
 	// get config
 	config, err := getConfig(native, contract)
@@ -1574,7 +1585,7 @@ func ReduceInitPos(native *native.NativeService) ([]byte, error) {
 	if err != nil {
 		return utils.BYTE_FALSE, fmt.Errorf("getGlobalParam, getGlobalParam error: %v", err)
 	}
-	if newInitPos < peerPoolItem.TotalPos/uint64(globalParam.PosLimit) {
+	if newInitPos < (peerPoolItem.TotalPos+uint64(globalParam.PosLimit)-1)/uint64(globalParam.PosLimit) {
 		return utils.BYTE_FALSE, fmt.Errorf("initPos must more than totalPos/posLimit")
 	}
 	//get promise pos
@@ -1673,4 +1684,142 @@ func SetGasAddress(native *native.NativeService) ([]byte, error) {
 	}
 
 	return utils.BYTE_TRUE, nil
+}
+
+func GetPeerPool(native *native.NativeService) ([]byte, error) {
+	peerPoolListForVm, err := GetPeerPoolForVm(native)
+	if err != nil {
+		return utils.BYTE_FALSE, fmt.Errorf("GetPeerPool, GetPeerPoolForVm error: %s", err)
+	}
+	sink := common.NewZeroCopySink(nil)
+	peerPoolListForVm.Serialization(sink)
+	return sink.Bytes(), nil
+}
+
+func GetPeerInfo(native *native.NativeService) ([]byte, error) {
+	source := common.NewZeroCopySource(native.Input)
+	address, err := utils.DecodeAddress(source)
+	if err != nil {
+		return utils.BYTE_FALSE, fmt.Errorf("GetPeerInfo, get peer address error: %s", err)
+	}
+
+	peerPoolListForVm, err := GetPeerPoolForVm(native)
+	if err != nil {
+		return utils.BYTE_FALSE, fmt.Errorf("GetPeerPool, GetPeerPoolForVm error: %s", err)
+	}
+
+	peerPoolItemForVm := new(PeerPoolItemForVm)
+	for _, v := range peerPoolListForVm.PeerPoolList {
+		if v.PeerAddress == address {
+			peerPoolItemForVm = v
+		}
+	}
+
+	sink := common.NewZeroCopySink(nil)
+	peerPoolItemForVm.Serialization(sink)
+	return sink.Bytes(), nil
+}
+
+func GetPeerPoolByAddress(native *native.NativeService) ([]byte, error) {
+	contract := native.ContextRef.CurrentContext().ContractAddress
+	source := common.NewZeroCopySource(native.Input)
+	address, err := utils.DecodeAddress(source)
+	if err != nil {
+		return utils.BYTE_FALSE, fmt.Errorf("GetPeerPoolByAddress, get public key error: %s", err)
+	}
+	//get current view
+	view, err := GetView(native, contract)
+	if err != nil {
+		return utils.BYTE_FALSE, fmt.Errorf("GetPeerPoolByAddress, get view error: %v", err)
+	}
+
+	//get peerPoolMap
+	peerPoolMap, err := GetPeerPoolMap(native, contract, view)
+	if err != nil {
+		return utils.BYTE_FALSE, fmt.Errorf("GetPeerPoolByAddress, get peerPoolMap error: %v", err)
+	}
+	subPeerPool := make(map[string]*PeerPoolItem)
+	for k, v := range peerPoolMap.PeerPoolMap {
+		if v.Address == address {
+			subPeerPool[k] = v
+		}
+	}
+
+	peerPoolList := make([]*PeerPoolItemForVm, 0)
+	for _, v := range subPeerPool {
+		pkb, err := hex.DecodeString(v.PeerPubkey)
+		if err != nil {
+			return utils.BYTE_FALSE, fmt.Errorf("GetPeerPoolByAddress, hex.DecodeString public key error: %v", err)
+		}
+		pk, err := keypair.DeserializePublicKey(pkb)
+		if err != nil {
+			return utils.BYTE_FALSE, fmt.Errorf("GetPeerPoolByAddress, keypair.DeserializePublicKey error: %v", err)
+		}
+		peerAddress := types.AddressFromPubKey(pk)
+		peerPoolItemForVm := &PeerPoolItemForVm{
+			Index:       v.Index,
+			PeerAddress: peerAddress,
+			Address:     v.Address,
+			Status:      v.Status,
+			InitPos:     v.InitPos,
+			TotalPos:    v.TotalPos,
+		}
+		peerPoolList = append(peerPoolList, peerPoolItemForVm)
+	}
+	sort.SliceStable(peerPoolList, func(i, j int) bool {
+		return peerPoolList[i].PeerAddress.ToHexString() > peerPoolList[j].PeerAddress.ToHexString()
+	})
+
+	peerPoolListForVm := &PeerPoolListForVm{
+		PeerPoolList: peerPoolList,
+	}
+	sink := common.NewZeroCopySink(nil)
+	peerPoolListForVm.Serialization(sink)
+	return sink.Bytes(), nil
+}
+
+func GetPeerPoolForVm(native *native.NativeService) (*PeerPoolListForVm, error) {
+	contract := native.ContextRef.CurrentContext().ContractAddress
+
+	//get current view
+	view, err := GetView(native, contract)
+	if err != nil {
+		return nil, fmt.Errorf("GetPeerPoolForVm, get view error: %v", err)
+	}
+
+	//get peerPoolMap
+	peerPoolMap, err := GetPeerPoolMap(native, contract, view)
+	if err != nil {
+		return nil, fmt.Errorf("GetPeerPoolForVm, get peerPoolMap error: %v", err)
+	}
+
+	peerPoolList := make([]*PeerPoolItemForVm, 0)
+	for _, v := range peerPoolMap.PeerPoolMap {
+		pkb, err := hex.DecodeString(v.PeerPubkey)
+		if err != nil {
+			return nil, fmt.Errorf("GetPeerPoolForVm, hex.DecodeString public key error: %v", err)
+		}
+		pk, err := keypair.DeserializePublicKey(pkb)
+		if err != nil {
+			return nil, fmt.Errorf("GetPeerPoolForVm, keypair.DeserializePublicKey error: %v", err)
+		}
+		peerAddress := types.AddressFromPubKey(pk)
+		peerPoolItemForVm := &PeerPoolItemForVm{
+			Index:       v.Index,
+			PeerAddress: peerAddress,
+			Address:     v.Address,
+			Status:      v.Status,
+			InitPos:     v.InitPos,
+			TotalPos:    v.TotalPos,
+		}
+		peerPoolList = append(peerPoolList, peerPoolItemForVm)
+	}
+	sort.SliceStable(peerPoolList, func(i, j int) bool {
+		return peerPoolList[i].PeerAddress.ToHexString() > peerPoolList[j].PeerAddress.ToHexString()
+	})
+
+	peerPoolListForVm := &PeerPoolListForVm{
+		PeerPoolList: peerPoolList,
+	}
+	return peerPoolListForVm, nil
 }
