@@ -19,6 +19,7 @@ import (
 	common3 "github.com/ontio/ontology-go-sdk/common"
 	common2 "github.com/ontio/ontology/common"
 	"github.com/ontio/ontology/core/types"
+	"github.com/ontio/ontology/smartcontract/service/native/ontid"
 	"github.com/zhiqiangxu/ddxf"
 	config2 "github.com/zhiqiangxu/ont-gateway/app/ddxf/mvp/openkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
@@ -64,12 +65,12 @@ func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput)
 
 	account := GetAccount(input.UserId)
 	ontid := "did:ont:" + account.Address.ToBase58()
-	tx, err := instance.DDXFSdk().GetOntologySdk().Native.OntId.NewRegIDWithPublicKeyTransaction(defGasPrice,
-		defGasLimit, ontid, account.PublicKey)
+	tx, err := instance.DDXFSdk().GetOntologySdk().Native.OntId.NewRegIDWithPublicKeyTransaction(config2.GasPrice,
+		config2.GasLimit, ontid, account.PublicKey)
 	if err != nil {
 		return
 	}
-	_, err = instance.DDXFSdk().SignTx(tx, account)
+	err = instance.DDXFSdk().SignTx(tx, account)
 	if err != nil {
 		return
 	}
@@ -151,7 +152,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		if err != nil {
 			return
 		}
-		tx, err = instance.DDXFSdk().SignTx(tx, seller)
+		err = instance.DDXFSdk().SignTx(tx, seller)
 		if err != nil {
 			return
 		}
@@ -232,7 +233,46 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		}
 		dataId := res[hash.ToHexString()]
 		if dataId == nil {
-			dataId := common.GenerateUUId(config.UUID_PRE_DATAID)
+			dataId := common.GenerateOntId()
+			g := &ontid.Group{
+				Members:   []interface{}{},
+				Threshold: 1,
+			}
+			signers := []ontid.Signer{ontid.Signer{
+				Id:    []byte(dataId),
+				Index: 1,
+			}}
+			tx, err := instance.DDXFSdk().GetOntologySdk().Native.OntId.NewRegIDWithControllerTransaction(config2.GasPrice,
+				config2.GasLimit, dataId, g, signers)
+			if err != nil {
+				return
+			}
+			err = instance.DDXFSdk().SignTx(tx, seller)
+			if err != nil {
+				return
+			}
+			imutTx, err := tx.IntoImmutable()
+			if err != nil {
+				return
+			}
+			//send tx to seller
+			ri := server.RegisterOntIdInput{
+				SignedTx: hex.EncodeToString(common2.SerializeToBytes(imutTx)),
+			}
+			data, err := json.Marshal(ri)
+			if err != nil {
+				return
+			}
+			code, _, _, err := forward.PostJSONRequest(config.SellerUrl+server.RegisterOntId, data, nil)
+			if err != nil {
+				return
+			}
+			txHash := tx.Hash()
+			if code != http.StatusOK {
+				err = fmt.Errorf("register ontid tx failed, txHash: %s", txHash.ToHexString())
+				return
+			}
+
 			one := io.DataMetaOne{
 				DataMeta:     dataMetas[i],
 				DataMetaHash: hash.ToHexString(),
@@ -283,7 +323,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	if err != nil {
 		return
 	}
-	txMut, err = instance.DDXFSdk().SignTx(txMut, seller)
+	err = instance.DDXFSdk().SignTx(txMut, seller)
 	if err != nil {
 		return
 	}
@@ -340,8 +380,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		ItemMetaHash: itemMetaHash,
 	}
 
-	addr, _ := common2.AddressFromHexString("195d72da6725e8243a52803f6de4cd93df48fc1f")
-
+	addr, _ := common2.AddressFromHexString(config2.OEP4ContractAddr)
 	item := market_place_contract.DTokenItem{
 		Fee: market_place_contract.Fee{
 			ContractAddr: addr,
@@ -369,7 +408,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		if err != nil {
 			return
 		}
-		tx, err = instance.DDXFSdk().SignTx(tx, seller)
+		err = instance.DDXFSdk().SignTx(tx, seller)
 		if err != nil {
 			return
 		}
@@ -378,7 +417,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		if err != nil {
 			return
 		}
-		tx, err = instance.DDXFSdk().SignTx(tx, seller)
+		err = instance.DDXFSdk().SignTx(tx, seller)
 		if err != nil {
 			return
 		}
@@ -403,7 +442,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	start = time.Now().Unix()
 	_, _, data, err = forward.PostJSONRequestWithRetry(config2.SellerUrl+server.PublishMPItemMetaUrl, bs, headers, 10)
 	end = time.Now().Unix()
-	fmt.Printf("openkg publish service cost time:%d\n", end-start)
+	fmt.Printf("openkg publish service cost time: %d\n", end-start)
 	if err != nil {
 		output.Code = http.StatusInternalServerError
 		output.Msg = err.Error()
@@ -426,6 +465,12 @@ func PublishService(input PublishInput) (output PublishOutput) {
 }
 
 func deleteService(input DeleteInput) (output DeleteOutput) {
+	var err error
+	defer func() {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+		output.ReqID = input.ReqID
+	}()
 	input.UserID = input.Party + input.UserID
 	user := GetAccount(input.UserID)
 	tx, err := instance.DDXFSdk().DefMpKit().BuildDeleteTx([]byte(input.ResourceID))
@@ -433,8 +478,73 @@ func deleteService(input DeleteInput) (output DeleteOutput) {
 		return
 	}
 	instance.DDXFSdk().SignTx(tx, user)
+	imut, err := tx.IntoImmutable()
+	if err != nil {
+		return
+	}
+	di := server.DeleteInput{
+		SignedTx: hex.EncodeToString(common2.SerializeToBytes(imut)),
+	}
+	data, err := json.Marshal(di)
+	if err != nil {
+		return
+	}
 	//send tx to seller
-	forward.PostJSONRequest(config.SellerUrl+server.DeleteUrl, []byte{}, nil)
+	forward.PostJSONRequest(config.SellerUrl+server.DeleteUrl, data, nil)
+	return
+}
+
+func addAttributesService(input AddAttributesInput) (output AddAttributesOutput) {
+	return
+}
+
+func deleteAttributesService(input DeleteAttributesInput) (output AddAttributesOutput) {
+	var err error
+	defer func() {
+		if err != nil {
+			output.Code = http.StatusInternalServerError
+			output.Msg = err.Error()
+		}
+	}()
+	input.UserID = input.Party + input.UserID
+	acc := GetAccount(input.UserID)
+	ontId := config2.PreOntId + acc.Address.ToBase58()
+	key := []byte("DataMetaHash")
+	err = deleteAttribute(ontId, key, acc)
+	if err != nil {
+		return
+	}
+	key2 := []byte("DataHash")
+	err = deleteAttribute(ontId, key2, acc)
+	return
+}
+
+func deleteAttribute(ontId string, key []byte, acc *ontology_go_sdk.Account) (err error) {
+	tx, err := instance.DDXFSdk().GetOntologySdk().Native.OntId.NewRemoveAttributeTransaction(config2.GasPrice,
+		config2.GasLimit, ontId, key, acc.PublicKey)
+	if err != nil {
+		return
+	}
+	err = instance.DDXFSdk().SignTx(tx, payer)
+	if err != nil {
+		return
+	}
+	err = instance.DDXFSdk().SignTx(tx, acc)
+	if err != nil {
+		return
+	}
+	txHash, err := common.SendRawTx(tx)
+	if err != nil {
+		return
+	}
+	evt, err := instance.DDXFSdk().GetSmartCodeEvent(txHash)
+	if err != nil {
+		return
+	}
+	if evt.State != 1 {
+		err = fmt.Errorf("tx failed, txhash: %s", txHash)
+		return
+	}
 	return
 }
 
@@ -483,13 +593,13 @@ func buyAndUseService(input BuyAndUseInput) (output BuyAndUseOutput) {
 		output.Code = http.StatusInternalServerError
 		return
 	}
-	tx, err = instance.DDXFSdk().SignTx(tx, user)
+	err = instance.DDXFSdk().SignTx(tx, user)
 	if err != nil {
 		output.Msg = err.Error()
 		output.Code = http.StatusInternalServerError
 		return
 	}
-	tx, err = instance.DDXFSdk().SignTx(tx, payer)
+	err = instance.DDXFSdk().SignTx(tx, payer)
 	if err != nil {
 		output.Msg = err.Error()
 		output.Code = http.StatusInternalServerError

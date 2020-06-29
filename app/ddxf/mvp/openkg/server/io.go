@@ -65,6 +65,36 @@ type BuyAndUseOutput struct {
 }
 
 // BuyAndUseInput ...
+type AddAttributesInput struct {
+	ReqID    string `bson:"req_id" json:"req_id"`
+	OpenKGID string `bson:"openkg_id" json:"openkg_id"`
+	DataID   string `bson:"data_id" json:"data_id"`
+	UserID   string `bson:"user_id" json:"user_id"` // buyer id
+	Party    string `bson:"party" json:"party"`
+}
+
+// BuyAndUseOutput ...
+type AddAttributesOutput struct {
+	Code  int    `bson:"code" json:"code"`
+	Msg   string `bson:"msg" json:"msg"`
+	ReqID string `bson:"req_id" json:"req_id"`
+}
+
+// BuyAndUseInput ...
+type DeleteAttributesInput struct {
+	ReqID  string `bson:"req_id" json:"req_id"`
+	UserID string `bson:"user_id" json:"user_id"` // buyer id
+	Party  string `bson:"party" json:"party"`
+}
+
+// BuyAndUseOutput ...
+type DeleteAttributesOutput struct {
+	Code  int    `bson:"code" json:"code"`
+	Msg   string `bson:"msg" json:"msg"`
+	ReqID string `bson:"req_id" json:"req_id"`
+}
+
+// BuyAndUseInput ...
 type DeleteInput struct {
 	ReqID      string `bson:"req_id" json:"req_id"`
 	OpenKGID   string `bson:"openkg_id" json:"openkg_id"`

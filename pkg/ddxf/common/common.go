@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
+	"github.com/ontio/ontology-go-sdk"
 	"github.com/ontio/ontology/common"
 	"github.com/ontio/ontology/core/types"
 	uuid "github.com/satori/go.uuid"
@@ -17,6 +18,15 @@ import (
 
 func GenerateUUId(preFix string) string {
 	return preFix + uuid.NewV4().String()
+}
+
+func GenerateOntId() string {
+	dataId, err := ontology_go_sdk.GenerateID()
+	if err != nil {
+		fmt.Println("GenerateOntId error: ", err)
+		return GenerateOntId()
+	}
+	return dataId
 }
 
 func HandleEvent(txHash string, method string) ([]io.EndpointToken, error) {

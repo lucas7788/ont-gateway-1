@@ -171,6 +171,28 @@ func PublishMPItemMetaHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, output)
 }
 
+func RegisterOntIdHandler(c *gin.Context) {
+	bs, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		instance.Logger().Error("[RegisterOntIdHandler] read param error", zap.Error(err))
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, err))
+		return
+	}
+	input := RegisterOntIdInput{}
+	err = json.Unmarshal(bs, &input)
+	if err != nil {
+		instance.Logger().Error("[RegisterOntIdHandler] parse param error", zap.Error(err))
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, err))
+		return
+	}
+	output := RegisterOntIdService(input)
+	if output.Code != 0 {
+		c.JSON(output.Code, output)
+	} else {
+		c.JSON(http.StatusOK, output)
+	}
+}
+
 func DeleteHandler(c *gin.Context) {
 	data, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
