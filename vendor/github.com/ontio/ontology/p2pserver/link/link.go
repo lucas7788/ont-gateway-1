@@ -23,6 +23,8 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"sync"
+	"sync/atomic"
 	"time"
 
 	comm "github.com/ontio/ontology/common"
@@ -33,40 +35,27 @@ import (
 
 //Link used to establish
 type Link struct {
-	id        uint64
-	addr      string                 // The address of the node
+	id   common.PeerId
+	addr string // The address of the node
+
+	lock      sync.RWMutex
 	conn      net.Conn               // Connect socket with the peer node
-	port      uint16                 // The server port of the node
-	time      time.Time              // The latest time the node activity
+	time      int64                  // The latest time the node activity
 	recvChan  chan *types.MsgPayload //msgpayload channel
 	reqRecord map[string]int64       //Map RequestId to Timestamp, using for rejecting duplicate request in specific time
 }
 
-func NewLink() *Link {
+func NewLink(id common.PeerId, c net.Conn, msgChan chan *types.MsgPayload) *Link {
 	link := &Link{
-		reqRecord: make(map[string]int64, 0),
+		id:        id,
+		addr:      c.RemoteAddr().String(),
+		conn:      c,
+		time:      time.Now().UnixNano(),
+		recvChan:  msgChan,
+		reqRecord: make(map[string]int64),
 	}
+
 	return link
-}
-
-//SetID set peer id to link
-func (this *Link) SetID(id uint64) {
-	this.id = id
-}
-
-//GetID return if from peer
-func (this *Link) GetID() uint64 {
-	return this.id
-}
-
-//If there is connection return true
-func (this *Link) Valid() bool {
-	return this.conn != nil
-}
-
-//set message channel for link layer
-func (this *Link) SetChan(msgchan chan *types.MsgPayload) {
-	this.recvChan = msgchan
 }
 
 //get address
@@ -74,43 +63,32 @@ func (this *Link) GetAddr() string {
 	return this.addr
 }
 
-//set address
-func (this *Link) SetAddr(addr string) {
-	this.addr = addr
-}
-
-//set port number
-func (this *Link) SetPort(p uint16) {
-	this.port = p
-}
-
-//get port number
-func (this *Link) GetPort() uint16 {
-	return this.port
-}
-
 //get connection
 func (this *Link) GetConn() net.Conn {
+	this.lock.RLock()
+	defer this.lock.RUnlock()
 	return this.conn
 }
 
 //set connection
 func (this *Link) SetConn(conn net.Conn) {
+	this.lock.Lock()
+	defer this.lock.Unlock()
 	this.conn = conn
 }
 
 //record latest message time
 func (this *Link) UpdateRXTime(t time.Time) {
-	this.time = t
+	atomic.StoreInt64(&this.time, t.UnixNano())
 }
 
 //GetRXTime return the latest message time
-func (this *Link) GetRXTime() time.Time {
-	return this.time
+func (this *Link) GetRXTime() int64 {
+	return atomic.LoadInt64(&this.time)
 }
 
 func (this *Link) Rx() {
-	conn := this.conn
+	conn := this.GetConn()
 	if conn == nil {
 		return
 	}
@@ -122,6 +100,11 @@ func (this *Link) Rx() {
 		if err != nil {
 			log.Infof("[p2p]error read from %s :%s", this.GetAddr(), err.Error())
 			break
+		}
+
+		if unknown, ok := msg.(*types.UnknownMessage); ok {
+			log.Infof("skip handle unknown msg type:%s from:%d", unknown.CmdType(), this.id)
+			continue
 		}
 
 		t := time.Now()
@@ -142,28 +125,17 @@ func (this *Link) Rx() {
 
 	}
 
-	this.disconnectNotify()
-}
-
-//disconnectNotify push disconnect msg to channel
-func (this *Link) disconnectNotify() {
-	log.Debugf("[p2p]call disconnectNotify for %s", this.GetAddr())
 	this.CloseConn()
-
-	msg, _ := types.MakeEmptyMessage(common.DISCONNECT_TYPE)
-	discMsg := &types.MsgPayload{
-		Id:      this.id,
-		Addr:    this.addr,
-		Payload: msg,
-	}
-	this.recvChan <- discMsg
 }
 
 //close connection
 func (this *Link) CloseConn() {
-	if this.conn != nil {
-		this.conn.Close()
-		this.conn = nil
+	this.lock.Lock()
+	conn := this.conn
+	this.conn = nil
+	this.lock.Unlock()
+	if conn != nil {
+		_ = conn.Close()
 	}
 }
 
@@ -175,11 +147,10 @@ func (this *Link) Send(msg types.Message) error {
 }
 
 func (this *Link) SendRaw(rawPacket []byte) error {
-	conn := this.conn
+	conn := this.GetConn()
 	if conn == nil {
 		return errors.New("[p2p]tx link invalid")
 	}
-
 	nByteCnt := len(rawPacket)
 	log.Tracef("[p2p]TX buf length: %d\n", nByteCnt)
 
@@ -187,11 +158,11 @@ func (this *Link) SendRaw(rawPacket []byte) error {
 	if nCount == 0 {
 		nCount = 1
 	}
-	conn.SetWriteDeadline(time.Now().Add(time.Duration(nCount*common.WRITE_DEADLINE) * time.Second))
+	_ = conn.SetWriteDeadline(time.Now().Add(time.Duration(nCount*common.WRITE_DEADLINE) * time.Second))
 	_, err := conn.Write(rawPacket)
 	if err != nil {
-		log.Infof("[p2p]error sending messge to %s :%s", this.GetAddr(), err.Error())
-		this.disconnectNotify()
+		log.Infof("[p2p] error sending messge to %s :%s", this.GetAddr(), err.Error())
+		this.CloseConn()
 		return err
 	}
 

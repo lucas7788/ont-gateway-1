@@ -33,7 +33,15 @@ import (
 	"github.com/ontio/ontology/errors"
 )
 
-var Version = "" //Set value when build project
+var Version = "v2.0.0" //Set value when build project
+
+type VerifyMethod int
+
+const (
+	InterpVerifyMethod VerifyMethod = iota
+	JitVerifyMethod
+	NoneVerifyMethod
+)
 
 const (
 	DEFAULT_CONFIG_FILE_NAME = "./config.json"
@@ -49,21 +57,18 @@ const (
 	CONSENSUS_TYPE_VBFT = "vbft"
 
 	DEFAULT_LOG_LEVEL                       = log.InfoLog
-	DEFAULT_MAX_LOG_SIZE                    = 100 //MByte
-	DEFAULT_NODE_PORT                       = uint(20338)
-	DEFAULT_CONSENSUS_PORT                  = uint(20339)
-	DEFAULT_RPC_PORT                        = uint(20336)
-	DEFAULT_RPC_LOCAL_PORT                  = uint(20337)
-	DEFAULT_REST_PORT                       = uint(20334)
-	DEFAULT_WS_PORT                         = uint(20335)
-	DEFAULT_REST_MAX_CONN                   = uint(1024)
-	DEFAULT_MAX_CONN_IN_BOUND               = uint(1024)
-	DEFAULT_MAX_CONN_OUT_BOUND              = uint(1024)
-	DEFAULT_MAX_CONN_IN_BOUND_FOR_SINGLE_IP = uint(16)
-	DEFAULT_HTTP_INFO_PORT                  = uint(0)
+	DEFAULT_NODE_PORT                       = 20338
+	DEFAULT_RPC_PORT                        = 20336
+	DEFAULT_RPC_LOCAL_PORT                  = 20337
+	DEFAULT_REST_PORT                       = 20334
+	DEFAULT_WS_PORT                         = 20335
+	DEFAULT_REST_MAX_CONN                   = 1024
+	DEFAULT_MAX_CONN_IN_BOUND               = 1024
+	DEFAULT_MAX_CONN_OUT_BOUND              = 1024
+	DEFAULT_MAX_CONN_IN_BOUND_FOR_SINGLE_IP = 16
+	DEFAULT_HTTP_INFO_PORT                  = 0
 	DEFAULT_MAX_TX_IN_BLOCK                 = 60000
 	DEFAULT_MAX_SYNC_HEADER                 = 500
-	DEFAULT_ENABLE_CONSENSUS                = true
 	DEFAULT_ENABLE_EVENT_LOG                = true
 	DEFAULT_CLI_RPC_PORT                    = uint(20000)
 	DEFUALT_CLI_RPC_ADDRESS                 = "127.0.0.1"
@@ -72,7 +77,7 @@ const (
 	DEFAULT_WASM_GAS_FACTOR                 = uint64(10)
 	DEFAULT_WASM_MAX_STEPCOUNT              = uint64(8000000)
 
-	DEFAULT_DATA_DIR      = "./Chain"
+	DEFAULT_DATA_DIR      = "./Chain/"
 	DEFAULT_RESERVED_FILE = "./peers.rsv"
 )
 
@@ -127,6 +132,106 @@ var OPCODE_HASKEY_ENABLE_HEIGHT = map[uint32]uint32{
 
 func GetOpcodeUpdateCheckHeight(id uint32) uint32 {
 	return OPCODE_HASKEY_ENABLE_HEIGHT[id]
+}
+
+var GAS_ROUND_TUNE_HEIGHT = map[uint32]uint32{
+	NETWORK_ID_MAIN_NET:    constants.GAS_ROUND_TUNE_HEIGHT_MAINNET, //Network main
+	NETWORK_ID_POLARIS_NET: constants.GAS_ROUND_TUNE_HEIGHT_POLARIS, //Network polaris
+	NETWORK_ID_SOLO_NET:    0,                                       //Network solo
+}
+
+func GetGasRoundTuneHeight(id uint32) uint32 {
+	return GAS_ROUND_TUNE_HEIGHT[id]
+}
+
+func GetContractApiDeprecateHeight() uint32 {
+	switch DefConfig.P2PNode.NetworkId {
+	case NETWORK_ID_MAIN_NET:
+		return constants.CONTRACT_DEPRECATE_API_HEIGHT_MAINNET
+	case NETWORK_ID_POLARIS_NET:
+		return constants.CONTRACT_DEPRECATE_API_HEIGHT_POLARIS
+	default:
+		return 0
+	}
+}
+
+func GetSelfGovRegisterHeight() uint32 {
+	switch DefConfig.P2PNode.NetworkId {
+	case NETWORK_ID_MAIN_NET:
+		return constants.BLOCKHEIGHT_SELFGOV_REGISTER_MAINNET
+	case NETWORK_ID_POLARIS_NET:
+		return constants.BLOCKHEIGHT_SELFGOV_REGISTER_POLARIS
+	default:
+		return 0
+	}
+}
+
+func GetOntFsHeight() uint32 {
+	switch DefConfig.P2PNode.NetworkId {
+	case NETWORK_ID_MAIN_NET:
+		return constants.BLOCKHEIGHT_ONTFS_MAINNET
+	case NETWORK_ID_POLARIS_NET:
+		return constants.BLOCKHEIGHT_ONTFS_POLARIS
+	default:
+		return 0
+	}
+}
+
+func GetNewOntIdHeight() uint32 {
+	switch DefConfig.P2PNode.NetworkId {
+	case NETWORK_ID_MAIN_NET:
+		return constants.BLOCKHEIGHT_NEW_ONTID_MAINNET
+	case NETWORK_ID_POLARIS_NET:
+		return constants.BLOCKHEIGHT_NEW_ONTID_POLARIS
+	default:
+		return 0
+	}
+}
+
+func GetCrossChainHeight() uint32 {
+	switch DefConfig.P2PNode.NetworkId {
+	case NETWORK_ID_POLARIS_NET:
+		return constants.BLOCKHEIGHT_CC_POLARIS
+	default:
+		return 0
+	}
+}
+
+func GetOntHolderUnboundDeadline() uint32 {
+	switch DefConfig.P2PNode.NetworkId {
+	case NETWORK_ID_MAIN_NET:
+		return constants.CHANGE_UNBOUND_TIMESTAMP_MAINNET - constants.GENESIS_BLOCK_TIMESTAMP
+	case NETWORK_ID_POLARIS_NET:
+		return constants.CHANGE_UNBOUND_TIMESTAMP_POLARIS - constants.GENESIS_BLOCK_TIMESTAMP
+	default:
+		return 0
+	}
+}
+
+// the end of unbound timestamp offset from genesis block's timestamp
+func GetGovUnboundDeadline() (uint32, uint64) {
+	count := uint64(0)
+	index := int(GetOntHolderUnboundDeadline() / constants.UNBOUND_TIME_INTERVAL)
+	for i := 0; i < index; i++ {
+		count += constants.UNBOUND_GENERATION_AMOUNT[i] * uint64(constants.UNBOUND_TIME_INTERVAL)
+	}
+	gap := uint64(GetOntHolderUnboundDeadline()) - uint64(index)*uint64(constants.UNBOUND_TIME_INTERVAL)
+	count += constants.UNBOUND_GENERATION_AMOUNT[index]*gap +
+		constants.NEW_UNBOUND_GENERATION_AMOUNT[index]*(uint64(constants.UNBOUND_TIME_INTERVAL)-gap)
+
+	for i := index + 1; i < len(constants.NEW_UNBOUND_GENERATION_AMOUNT); i++ {
+		count += constants.NEW_UNBOUND_GENERATION_AMOUNT[i] * uint64(constants.UNBOUND_TIME_INTERVAL)
+	}
+
+	numInterval := len(constants.NEW_UNBOUND_GENERATION_AMOUNT)
+
+	if constants.NEW_UNBOUND_GENERATION_AMOUNT[numInterval-1] != 3 ||
+		!(count-3*uint64(constants.UNBOUND_TIME_INTERVAL) < constants.ONT_TOTAL_SUPPLY && constants.ONT_TOTAL_SUPPLY <= count) {
+		panic("incompatible constants setting")
+	}
+
+	return constants.UNBOUND_TIME_INTERVAL*uint32(numInterval) - uint32(count-uint64(constants.ONT_TOTAL_SUPPLY))/3 - 1,
+		uint64(3 - (count-uint64(constants.ONT_TOTAL_SUPPLY))%3)
 }
 
 func GetNetworkName(id uint32) string {
@@ -480,13 +585,14 @@ type SOLOConfig struct {
 }
 
 type CommonConfig struct {
-	LogLevel       uint
-	NodeType       string
-	EnableEventLog bool
-	SystemFee      map[string]int64
-	GasLimit       uint64
-	GasPrice       uint64
-	DataDir        string
+	LogLevel         uint
+	NodeType         string
+	EnableEventLog   bool
+	SystemFee        map[string]int64
+	GasLimit         uint64
+	GasPrice         uint64
+	DataDir          string
+	WasmVerifyMethod VerifyMethod
 }
 
 type ConsensusConfig struct {
@@ -505,12 +611,12 @@ type P2PNodeConfig struct {
 	NetworkMagic              uint32
 	NetworkId                 uint32
 	NetworkName               string
-	NodePort                  uint
+	NodePort                  uint16
 	IsTLS                     bool
 	CertPath                  string
 	KeyPath                   string
 	CAPath                    string
-	HttpInfoPort              uint
+	HttpInfoPort              uint16
 	MaxHdrSyncReqs            uint
 	MaxConnInBound            uint
 	MaxConnOutBound           uint
@@ -552,11 +658,12 @@ func NewOntologyConfig() *OntologyConfig {
 	return &OntologyConfig{
 		Genesis: MainNetConfig,
 		Common: &CommonConfig{
-			LogLevel:       DEFAULT_LOG_LEVEL,
-			EnableEventLog: DEFAULT_ENABLE_EVENT_LOG,
-			SystemFee:      make(map[string]int64),
-			GasLimit:       DEFAULT_GAS_LIMIT,
-			DataDir:        DEFAULT_DATA_DIR,
+			LogLevel:         DEFAULT_LOG_LEVEL,
+			EnableEventLog:   DEFAULT_ENABLE_EVENT_LOG,
+			SystemFee:        make(map[string]int64),
+			GasLimit:         DEFAULT_GAS_LIMIT,
+			DataDir:          DEFAULT_DATA_DIR,
+			WasmVerifyMethod: InterpVerifyMethod,
 		},
 		Consensus: &ConsensusConfig{
 			EnableConsensus: true,

@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"github.com/ontio/ontology/common/config"
+	"github.com/ontio/ontology/common/log"
 	"github.com/ontio/ontology/smartcontract/service/neovm"
 	"github.com/urfave/cli"
 )
@@ -48,9 +49,18 @@ var (
 		Name:  "disable-log-file",
 		Usage: "Discard log output to file",
 	}
+	LogDirFlag = cli.StringFlag{
+		Name:  "log-dir",
+		Usage: "log output to the file",
+		Value: log.PATH,
+	}
 	DisableEventLogFlag = cli.BoolFlag{
 		Name:  "disable-event-log",
 		Usage: "Discard event log output by smart contract execution",
+	}
+	WasmVerifyMethodFlag = cli.BoolFlag{
+		Name:  "enable-wasmjit-verifier",
+		Usage: "Enable wasmjit verifier to verify wasm contract",
 	}
 	WalletFileFlag = cli.StringFlag{
 		Name:  "wallet,w",

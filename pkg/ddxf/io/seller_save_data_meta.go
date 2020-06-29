@@ -26,6 +26,7 @@ type SellerSaveDataMeta struct {
 	DataMetaHash string                 `bson:"dataMetaHash" json:"dataMetaHash"`
 	ResourceType byte                   `bson:"resourceType" json:"resourceType"`
 	DataId       string                 `bson:"dataId" json:"dataId"`
+	SignedTx     string                 `bson:"signedTx" json:"signedTx"`
 	// all below this shoudle save in dataId contract. did.
 	OntId        string `bson:"ontId" json:"ontId"`
 	DataEndpoint string `bson:"dataEndpoint" json:"dataEndpoint"`
@@ -33,7 +34,6 @@ type SellerSaveDataMeta struct {
 
 type SellerSaveDataMetaArrayInput struct {
 	DataMetaOneArray []DataMetaOne `json:"dataMetaOne"`
-	SignedTx         string        `json:"signedTx"`
 }
 
 type DataMetaOne struct {
@@ -43,6 +43,7 @@ type DataMetaOne struct {
 	DataEndpoint string                 `json:"dataEndpoint"`
 	DataHash     string                 `json:"dataHash"`
 	DataId       string                 `json:"dataId"`
+	SignedTx     string                 `json:"signedTx"`
 }
 type SellerSaveDataMetaArrayOutput struct {
 	io2.BaseResp

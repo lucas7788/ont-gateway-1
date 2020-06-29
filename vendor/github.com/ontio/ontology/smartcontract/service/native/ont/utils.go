@@ -23,6 +23,7 @@ import (
 
 	"github.com/ontio/ontology/common"
 	"github.com/ontio/ontology/common/config"
+	"github.com/ontio/ontology/common/constants"
 	cstates "github.com/ontio/ontology/core/states"
 	"github.com/ontio/ontology/errors"
 	"github.com/ontio/ontology/smartcontract/event"
@@ -31,18 +32,20 @@ import (
 )
 
 const (
-	UNBOUND_TIME_OFFSET = "unboundTimeOffset"
-	TOTAL_SUPPLY_NAME   = "totalSupply"
-	INIT_NAME           = "init"
-	TRANSFER_NAME       = "transfer"
-	APPROVE_NAME        = "approve"
-	TRANSFERFROM_NAME   = "transferFrom"
-	NAME_NAME           = "name"
-	SYMBOL_NAME         = "symbol"
-	DECIMALS_NAME       = "decimals"
-	TOTALSUPPLY_NAME    = "totalSupply"
-	BALANCEOF_NAME      = "balanceOf"
-	ALLOWANCE_NAME      = "allowance"
+	UNBOUND_TIME_OFFSET       = "unboundTimeOffset"
+	TOTAL_SUPPLY_NAME         = "totalSupply"
+	INIT_NAME                 = "init"
+	TRANSFER_NAME             = "transfer"
+	APPROVE_NAME              = "approve"
+	TRANSFERFROM_NAME         = "transferFrom"
+	NAME_NAME                 = "name"
+	SYMBOL_NAME               = "symbol"
+	DECIMALS_NAME             = "decimals"
+	TOTALSUPPLY_NAME          = "totalSupply"
+	BALANCEOF_NAME            = "balanceOf"
+	ALLOWANCE_NAME            = "allowance"
+	TOTAL_ALLOWANCE_NAME      = "totalAllowance"
+	UNBOUND_ONG_TO_GOVERNANCE = "unboundOngToGovernance"
 )
 
 func AddNotifications(native *native.NativeService, contract common.Address, state *State) {
@@ -55,7 +58,6 @@ func AddNotifications(native *native.NativeService, contract common.Address, sta
 			States:          []interface{}{TRANSFER_NAME, state.From.ToBase58(), state.To.ToBase58(), state.Value},
 		})
 }
-
 func GetToUInt64StorageItem(toBalance, value uint64) *cstates.StorageItem {
 	sink := common.NewZeroCopySink(nil)
 	sink.WriteUint64(toBalance + value)
@@ -93,8 +95,14 @@ func GenApproveKey(contract, from, to common.Address) []byte {
 }
 
 func TransferedFrom(native *native.NativeService, currentContract common.Address, state *TransferFrom) (uint64, uint64, error) {
-	if native.ContextRef.CheckWitness(state.Sender) == false {
-		return 0, 0, errors.NewErr("authentication failed!")
+	if native.Time <= config.GetOntHolderUnboundDeadline()+constants.GENESIS_BLOCK_TIMESTAMP {
+		if !native.ContextRef.CheckWitness(state.Sender) {
+			return 0, 0, errors.NewErr("authentication failed!")
+		}
+	} else {
+		if state.Sender != state.To && !native.ContextRef.CheckWitness(state.Sender) {
+			return 0, 0, errors.NewErr("authentication failed!")
+		}
 	}
 
 	if err := fromApprove(native, genTransferFromKey(currentContract, state), state.Value); err != nil {
@@ -115,6 +123,14 @@ func TransferedFrom(native *native.NativeService, currentContract common.Address
 
 func getUnboundOffset(native *native.NativeService, contract, address common.Address) (uint32, error) {
 	offset, err := utils.GetStorageUInt32(native, genAddressUnboundOffsetKey(contract, address))
+	if err != nil {
+		return 0, err
+	}
+	return offset, nil
+}
+
+func getGovernanceUnboundOffset(native *native.NativeService, contract common.Address) (uint32, error) {
+	offset, err := utils.GetStorageUInt32(native, genGovernanceUnboundOffsetKey(contract))
 	if err != nil {
 		return 0, err
 	}
@@ -170,4 +186,9 @@ func toTransfer(native *native.NativeService, toKey []byte, value uint64) (uint6
 func genAddressUnboundOffsetKey(contract, address common.Address) []byte {
 	temp := append(contract[:], UNBOUND_TIME_OFFSET...)
 	return append(temp, address[:]...)
+}
+
+func genGovernanceUnboundOffsetKey(contract common.Address) []byte {
+	temp := append(contract[:], UNBOUND_TIME_OFFSET...)
+	return temp
 }

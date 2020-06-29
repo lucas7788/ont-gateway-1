@@ -58,16 +58,16 @@ func BuyAndUse(c *gin.Context) {
 	c.JSON(http.StatusOK, "SUCCESS")
 }
 
-func addAttributesHandler(c *gin.Context) {
+func regDataHandler(c *gin.Context) {
 	var (
-		input AddAttributesInput
+		input RegDataInput
 	)
 	if err := c.ShouldBind(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 	go func() {
-		addAttributesService(input)
+		regDataService(input)
 	}()
 	c.JSON(http.StatusOK, "SUCCESS")
 }

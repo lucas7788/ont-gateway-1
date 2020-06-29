@@ -26,6 +26,9 @@ import (
 var (
 	//TODO: modify this when on mainnet
 	GENESIS_BLOCK_TIMESTAMP = uint32(time.Date(2018, time.June, 30, 0, 0, 0, 0, time.UTC).Unix())
+
+	CHANGE_UNBOUND_TIMESTAMP_MAINNET = uint32(time.Date(2020, time.July, 7, 0, 0, 0, 0, time.UTC).Unix())
+	CHANGE_UNBOUND_TIMESTAMP_POLARIS = uint32(time.Date(2020, time.June, 28, 0, 0, 0, 0, time.UTC).Unix())
 )
 
 // ont constants
@@ -48,24 +51,7 @@ const (
 const UNBOUND_TIME_INTERVAL = uint32(31536000)
 
 var UNBOUND_GENERATION_AMOUNT = [18]uint64{5, 4, 3, 3, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-
-// the end of unbound timestamp offset from genesis block's timestamp
-var UNBOUND_DEADLINE = (func() uint32 {
-	count := uint64(0)
-	for _, m := range UNBOUND_GENERATION_AMOUNT {
-		count += m
-	}
-	count *= uint64(UNBOUND_TIME_INTERVAL)
-
-	numInterval := len(UNBOUND_GENERATION_AMOUNT)
-
-	if UNBOUND_GENERATION_AMOUNT[numInterval-1] != 1 ||
-		!(count-uint64(UNBOUND_TIME_INTERVAL) < ONT_TOTAL_SUPPLY && ONT_TOTAL_SUPPLY <= count) {
-		panic("incompatible constants setting")
-	}
-
-	return UNBOUND_TIME_INTERVAL*uint32(numInterval) - uint32(count-uint64(ONT_TOTAL_SUPPLY))
-})()
+var NEW_UNBOUND_GENERATION_AMOUNT = [18]uint64{5, 4, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3}
 
 // multi-sig constants
 const MULTI_SIG_MAX_PUBKEY_SIZE = 16
@@ -86,3 +72,22 @@ const STATE_HASH_HEIGHT_POLARIS = 850000
 // neovm opcode update check height
 const OPCODE_HEIGHT_UPDATE_FIRST_MAINNET = 6300000
 const OPCODE_HEIGHT_UPDATE_FIRST_POLARIS = 2100000
+
+// gas round tune operation height
+const GAS_ROUND_TUNE_HEIGHT_MAINNET = 8500000
+const GAS_ROUND_TUNE_HEIGHT_POLARIS = 10100000
+
+const CONTRACT_DEPRECATE_API_HEIGHT_MAINNET = 8600000
+const CONTRACT_DEPRECATE_API_HEIGHT_POLARIS = 13000000
+
+// self gov register height
+const BLOCKHEIGHT_SELFGOV_REGISTER_MAINNET = 8600000
+const BLOCKHEIGHT_SELFGOV_REGISTER_POLARIS = 12150000
+
+const BLOCKHEIGHT_NEW_ONTID_MAINNET = 9000000
+const BLOCKHEIGHT_NEW_ONTID_POLARIS = 12150000
+
+const BLOCKHEIGHT_ONTFS_MAINNET = 8550000
+const BLOCKHEIGHT_ONTFS_POLARIS = 12250000
+
+const BLOCKHEIGHT_CC_POLARIS = 13130000
