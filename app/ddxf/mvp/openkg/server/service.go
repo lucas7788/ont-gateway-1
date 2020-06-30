@@ -515,6 +515,7 @@ func batchRegDataService(input BatchRegDataInput) (output BatchRegDataOutput) {
 	if err != nil {
 		return
 	}
+	fmt.Printf("gasprice: %d, gaslimit:%d\n", tx.GasPrice, tx.GasLimit)
 	err = instance.DDXFSdk().SignTx(tx, payer)
 	if err != nil {
 		return
