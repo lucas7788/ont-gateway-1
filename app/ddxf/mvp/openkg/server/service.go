@@ -406,7 +406,6 @@ func batchRegDataService(input BatchRegDataInput) (output BatchRegDataOutput) {
 	}
 	regIdParam := make([]interface{}, 0)
 	controllers := make([]*ontology_go_sdk.Account, 0)
-
 	dataMetaArray := make([]io.DataMetaOne, 0)
 	for i, pDataId := range input.PartyDataIDs {
 		if !hasReg[pDataId] {
@@ -445,13 +444,13 @@ func batchRegDataService(input BatchRegDataInput) (output BatchRegDataOutput) {
 						return
 					}
 				}
+				controllers = append(controllers, acc)
 				members = append(members, []byte(ownerOntid))
 				if !init {
 					s = Signer{
 						Id:    []byte(ownerOntid),
 						Index: 1,
 					}
-					controllers = append(controllers, acc)
 					fmt.Printf("ownerOntid: %s\n", ownerOntid)
 					init = true
 				}
@@ -509,7 +508,6 @@ func batchRegDataService(input BatchRegDataInput) (output BatchRegDataOutput) {
 		addr := types.AddressFromPubKey(sig.PubKeys[0])
 		fmt.Printf("sig address: %s\n", addr.ToBase58())
 	}
-	fmt.Println(tx.Sigs)
 	imutTx, err := tx.IntoImmutable()
 	param := server.BatchRegIdAndAddDataMetaInput{
 		DataMetaArray: dataMetaArray,
@@ -535,23 +533,10 @@ func batchRegDataService(input BatchRegDataInput) (output BatchRegDataOutput) {
 		fmt.Println("send seller failed RegIdAndAddDataMetaUrl")
 		return
 	}
-	txhash, err := common.SendRawTx(tx)
-	if err != nil {
-		return
-	}
-	evt, err := instance.DDXFSdk().GetSmartCodeEvent(txhash)
-	if err != nil {
-		return
-	}
-	if evt == nil || evt.State != 1 {
-		err = fmt.Errorf("tx failed, txhash: %s", txhash)
-		return
-	}
-	fmt.Println(regDatas)
 	regDatas = make([]RegDataInfo, 0)
 	for i := 0; i < len(input.Datas); i++ {
 		if !hasReg[input.PartyDataIDs[i]] {
-			regDatas = append(regDatas, RegDataInfo{
+			err = InsertElt(regDataCollection, RegDataInfo{
 				PartyDataID: input.PartyDataIDs[i],
 				Data:        input.Datas[i],
 				DataOwners:  input.DataOwners[i],
@@ -559,7 +544,6 @@ func batchRegDataService(input BatchRegDataInput) (output BatchRegDataOutput) {
 			})
 		}
 	}
-	err = InsertElt(regDataCollection, regDatas)
 	return
 }
 
