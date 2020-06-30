@@ -52,3 +52,16 @@ func FindElt(collectionName string, filter bson.M, data interface{}) error {
 	defer cancel()
 	return instance.MongoOfficial().Collection(collectionName).FindOne(ctx, filter).Decode(data)
 }
+
+func FindManyElt(collectionName string, filter bson.M, data interface{}) (err error) {
+	timeout := config.Load().MongoConfig.Timeout
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	cursor, err := instance.MongoOfficial().Collection(collectionName).Find(ctx, filter)
+	if err != nil {
+		return
+	}
+
+	err = cursor.All(context.Background(), data)
+	return
+}
