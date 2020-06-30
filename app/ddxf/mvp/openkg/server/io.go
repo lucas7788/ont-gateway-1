@@ -96,6 +96,13 @@ type DeleteItemInput struct {
 	Party       string `bson:"party" json:"party"`
 }
 
+func (this *PublishInput) Validate() bool {
+	if this.DataOwners == nil || len(this.DataOwners) == len(this.Datas) {
+		return true
+	}
+	return false
+}
+
 // PublishOutput ...
 type PublishOutput struct {
 	Code  int    `bson:"code" json:"code"`
