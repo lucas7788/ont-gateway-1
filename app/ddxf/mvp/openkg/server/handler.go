@@ -71,7 +71,10 @@ func regDataHandler(c *gin.Context) {
 		return
 	}
 	go func() {
-		regDataService(input)
+		output := regDataService(input)
+		if output.Code != 0 {
+			fmt.Println("openkg regDataService error:", output)
+		}
 	}()
 	c.JSON(http.StatusOK, "SUCCESS")
 }

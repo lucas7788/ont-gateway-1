@@ -363,7 +363,16 @@ func deleteService(input DeleteInput) (output DeleteOutput) {
 }
 
 func regDataService(input RegDataInput) (output AddAttributesOutput) {
-	GetAccount(input.PartyDataID)
+	controllerAccs := make([]*ontology_go_sdk.Account, 0)
+	for _, controller := range input.Controllers {
+		controllerAccs = append(controllerAccs, GetAccount(controller))
+	}
+	dataId := common.GenerateOntId()
+	err := regIdWithController(dataId, controllerAccs)
+	if err != nil {
+		output.Code = http.StatusInternalServerError
+		output.Msg = err.Error()
+	}
 	return
 }
 
