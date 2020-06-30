@@ -122,7 +122,7 @@ func (sdk *DdxfSdk) SetMpContractAddress(ddxf common.Address) {
 }
 
 func (sdk *DdxfSdk) GetSmartCodeEvent(txHash string) (*common2.SmartContactEvent, error) {
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 30; i++ {
 		event, err := sdk.sdk.GetSmartContractEvent(txHash)
 		if event != nil {
 			return event, err

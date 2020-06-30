@@ -15,7 +15,7 @@ require (
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
 	github.com/magiconair/properties v1.8.1
 	github.com/oklog/run v1.0.0
-	github.com/ont-bizsuite/ddxf-sdk v0.0.0-20200629053908-de732c1a339b
+	github.com/ont-bizsuite/ddxf-sdk v0.0.0-20200630091948-6a88162286be
 	github.com/ontio/go-bip32 v0.0.0-20190520025953-d3cea6894a2b
 	github.com/ontio/ontology v1.10.1-0.20200629062808-bb8fe432b332
 	github.com/ontio/ontology-crypto v1.0.9
@@ -23,6 +23,7 @@ require (
 	github.com/piprate/json-gold v0.3.0
 	github.com/prometheus/client_golang v1.5.1
 	github.com/satori/go.uuid v1.2.0
+	github.com/spf13/pflag v1.0.3 // indirect
 	github.com/stretchr/testify v1.4.0
 	github.com/syndtr/goleveldb v1.0.1-0.20190923125748-758128399b1d
 	github.com/urfave/cli/v2 v2.2.0

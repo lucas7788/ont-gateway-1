@@ -417,6 +417,8 @@ github.com/ont-bizsuite/ddxf-sdk v0.0.0-20200628133310-9fed3dda57bc h1:2jXy63Eax
 github.com/ont-bizsuite/ddxf-sdk v0.0.0-20200628133310-9fed3dda57bc/go.mod h1:NjZNvB2gpsW/Em/sboxGSAh0fgGrQjBL0VujAMDFHAo=
 github.com/ont-bizsuite/ddxf-sdk v0.0.0-20200629053908-de732c1a339b h1:egmsCXZE/k8OL/Fq49p/cKUZUTvQIV+KkA5F+0ddD6E=
 github.com/ont-bizsuite/ddxf-sdk v0.0.0-20200629053908-de732c1a339b/go.mod h1:NjZNvB2gpsW/Em/sboxGSAh0fgGrQjBL0VujAMDFHAo=
+github.com/ont-bizsuite/ddxf-sdk v0.0.0-20200630091948-6a88162286be h1:Pnt3nwehCQTC+FTq70SZJK8fbj2MBVSppdtbn13MGM0=
+github.com/ont-bizsuite/ddxf-sdk v0.0.0-20200630091948-6a88162286be/go.mod h1:NjZNvB2gpsW/Em/sboxGSAh0fgGrQjBL0VujAMDFHAo=
 github.com/ontio/go-bip32 v0.0.0-20190520025953-d3cea6894a2b h1:UQDN12BzdWhXQL0t2QcRixHqAIG+JKNvQ20DhrIODtU=
 github.com/ontio/go-bip32 v0.0.0-20190520025953-d3cea6894a2b/go.mod h1:J0eVc7BEMmVVXbGv9PHoxjRSEwOwLr0qfzPk8Rdl5iw=
 github.com/ontio/ontology v0.0.0-20200629062808-bb8fe432b332 h1:xRrtZp0Y/iM1gM5t9jlrHxaoJtHPXR5KQrOwUyLwL24=
