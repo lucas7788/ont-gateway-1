@@ -362,7 +362,42 @@ func deleteService(input DeleteInput) (output DeleteOutput) {
 	return
 }
 
+const (
+	regDataCollection = "regData"
+)
+
+// RegDataInfo ...
+type RegDataInfo struct {
+	PartyDataID string                 `bson:"party_data_id" json:"party_data_id"`
+	Data        map[string]interface{} `bson:"data" json:"data"`
+	DataOwners  []string               `bson:"data_owners" json:"data_owners"`
+	Party       string                 `bson:"party" json:"party"`
+}
+
 func batchRegDataService(input BatchRegDataInput) (output BatchRegDataOutput) {
+
+	var (
+		partyDataIds []string
+		err          error
+	)
+	defer func() {
+		if err != nil {
+			output.Code = http.StatusInternalServerError
+			output.Msg = err.Error()
+		}
+	}()
+	for _, partyDataID := range input.PartyDataIDs {
+		partyDataIds = append(partyDataIds, partyDataID)
+	}
+	filter := bson.M{"party": input.Party, "party_data_id": bson.M{
+		"$in": partyDataIds,
+	}}
+	var regDatas []RegDataInfo
+	err = FindElt(regDataCollection, filter, &regDatas)
+	if err != nil {
+		return
+	}
+	fmt.Println(regDatas)
 	return
 }
 

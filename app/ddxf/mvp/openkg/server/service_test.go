@@ -2,8 +2,9 @@ package server
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMain(m *testing.M) {
@@ -39,4 +40,23 @@ func TestPublishService(t *testing.T) {
 	output2 := PublishService(input2)
 	fmt.Println("output2:", output2)
 	assert.Equal(t, output2.Code, 0)
+}
+
+func TestBatchRegDataService(t *testing.T) {
+	input := BatchRegDataInput{
+		ReqID: "req_id",
+		PartyDataIDs: []string{
+			"test1",
+		},
+		Datas: []map[string]interface{}{
+			map[string]interface{}{"key": "value"},
+		},
+		DataOwners: [][]string{
+			[]string{"test"},
+		},
+		Party: "openbase",
+	}
+	output := batchRegDataService(input)
+	fmt.Println("output:", output)
+	assert.Equal(t, output.Code, 0)
 }
