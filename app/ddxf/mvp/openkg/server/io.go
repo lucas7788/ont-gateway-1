@@ -13,12 +13,26 @@ type GenerateOntIdOutput struct {
 	OntId string `bson:"ont_id" json:"ont_id"`
 }
 
+// PublishInput ...
+type PublishInput struct {
+	ReqID        string                 `bson:"req_id" json:"req_id"`
+	OpenKGID     string                 `bson:"openkg_id" json:"openkg_id"`
+	UserID       string                 `bson:"user_id" json:"user_id"` // seller id
+	Item         map[string]interface{} `bson:"item" json:"item"`
+	DataOwners   [][]string             `bson:"data_owners" json:"data_owners"`
+	PartyDataIds []string
+	Datas        []map[string]interface{} `bson:"datas" json:"datas"`
+	Delete       bool                     `bson:"delete" json:"delete"`
+	OnChainId    string                   `bson:"on_chain_id" json:"on_chain_id"`
+	Party        string                   `bson:"party" json:"party"`
+}
+
 // RegDataInput ...
 type RegDataInput struct {
 	ReqID       string                 `bson:"req_id" json:"req_id"`
 	PartyDataID string                 `bson:"party_data_id" json:"party_data_id"`
 	Data        map[string]interface{} `bson:"data" json:"data"`
-	Controllers []string               `bson:"controllers" json:"controllers"`
+	DataOwners  []string               `bson:"data_owners" json:"data_owners"`
 	Party       string                 `bson:"party" json:"party"`
 }
 
@@ -28,18 +42,41 @@ type RegDataOutput struct {
 	Msg   string `bson:"msg" json:"msg"`
 	ReqID string `bson:"req_id" json:"req_id"`
 }
+type PublishDataInput struct {
+	ReqID        string                 `bson:"req_id" json:"req_id"`
+	PartyItemID  string                 `bson:"party_item_id" json:"party_item_id"`
+	UserID       string                 `bson:"user_id" json:"user_id"` // seller id
+	Item         map[string]interface{} `bson:"item" json:"item"`
+	PartyDataIds []string               `bson:"party_data_ids" json:"party_data_ids"`
+}
 
-// PublishInput ...
-type PublishInput struct {
-	ReqID      string                   `bson:"req_id" json:"req_id"`
-	OpenKGID   string                   `bson:"openkg_id" json:"openkg_id"`
-	UserID     string                   `bson:"user_id" json:"user_id"` // seller id
-	Item       map[string]interface{}   `bson:"item" json:"item"`
-	DataOwners [][]string               `bson:"data_owners" json:"data_owners"`
-	Datas      []map[string]interface{} `bson:"datas" json:"datas"`
-	Delete     bool                     `bson:"delete" json:"delete"`
-	OnChainId  string                   `bson:"on_chain_id" json:"on_chain_id"`
-	Party      string                   `bson:"party" json:"party"`
+type NewItemInput struct {
+	ReqID        string                   `bson:"req_id" json:"req_id"`
+	PartyItemID  string                   `bson:"party_item_id" json:"party_item_id"`
+	UserID       string                   `bson:"user_id" json:"user_id"` // seller id
+	Item         map[string]interface{}   `bson:"item" json:"item"`
+	DataOwners   [][]string               `bson:"data_owners" json:"data_owners"`
+	PartyDataIds []string                 `bson:"party_data_ids" json:"party_data_ids"`
+	Datas        []map[string]interface{} `bson:"datas" json:"datas"`
+	Party        string                   `bson:"party" json:"party"`
+}
+
+type UpdateItemInput struct {
+	ReqID        string                   `bson:"req_id" json:"req_id"`
+	PartyItemID  string                   `bson:"party_item_id" json:"party_item_id"`
+	UserID       string                   `bson:"user_id" json:"user_id"` // seller id
+	Item         map[string]interface{}   `bson:"item" json:"item"`
+	DataOwners   [][]string               `bson:"data_owners" json:"data_owners"`
+	PartyDataIds []string                 `bson:"party_data_ids" json:"party_data_ids"`
+	Datas        []map[string]interface{} `bson:"datas" json:"datas"`
+	Party        string                   `bson:"party" json:"party"`
+}
+
+type DeleteItemInput struct {
+	ReqID       string `bson:"req_id" json:"req_id"`
+	PartyItemID string `bson:"party_item_id" json:"party_item_id"`
+	UserID      string `bson:"user_id" json:"user_id"` // seller id
+	Party       string `bson:"party" json:"party"`
 }
 
 // PublishOutput ...
