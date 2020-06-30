@@ -15,11 +15,11 @@ type GenerateOntIdOutput struct {
 
 // RegDataInput ...
 type RegDataInput struct {
-	ReqID            string                 `bson:"req_id" json:"req_id"`
-	PartyDataID      string                 `bson:"party_data_id" json:"party_data_id"`
-	Data             map[string]interface{} `bson:"data" json:"data"`
-	ControllerOntIDs []string               `bson:"controller_ontids" json:"controller_ontids"`
-	Party            string                 `bson:"party" json:"party"`
+	ReqID       string                 `bson:"req_id" json:"req_id"`
+	PartyDataID string                 `bson:"party_data_id" json:"party_data_id"`
+	Data        map[string]interface{} `bson:"data" json:"data"`
+	Controllers []string               `bson:"controllers" json:"controllers"`
+	Party       string                 `bson:"party" json:"party"`
 }
 
 // RegDataOutput ...
