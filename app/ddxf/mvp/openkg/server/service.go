@@ -397,7 +397,111 @@ func batchRegDataService(input BatchRegDataInput) (output BatchRegDataOutput) {
 	if err != nil {
 		return
 	}
+	hasReg := make(map[string]bool)
+	for _, regD := range regDatas {
+		hasReg[regD.PartyDataID] = true
+	}
+	regIdParam := make([]interface{}, 0)
+	controllers := make([]*ontology_go_sdk.Account, 0)
+	for i, pDataId := range input.PartyDataIDs {
+		if !hasReg[pDataId] {
+			owners := input.DataOwners[i]
+			dataMeta := input.Datas[i]
+			var hash [32]byte
+			hash, err = ddxf.HashObject(dataMeta)
+			if err != nil {
+				return
+			}
+			members := make([][]byte, 0)
+			signers := make([]Signer, 0)
+			for _, owner := range owners {
+				acc := GetAccount(input.Party + owner)
+				ontid := config2.PreOntId + acc.Address.ToBase58()
+				var data []byte
+				data, err = instance.DDXFSdk().GetOntologySdk().Native.OntId.GetDocumentJson(ontid)
+				if err != nil {
+					return
+				}
+				members = append(members, []byte(ontid))
+				signers = append(signers, Signer{
+					Id:    []byte(ontid),
+					Index: 1,
+				})
+				controllers = append(controllers, acc)
+				if data == nil {
+					var txhash common2.Uint256
+					txhash, err = instance.DDXFSdk().GetOntologySdk().Native.OntId.RegIDWithPublicKey(config2.GasPrice,
+						config2.GasLimit, payer, ontid, acc)
+					if err != nil {
+						return
+					}
+					var evt *common3.SmartContactEvent
+					evt, err = instance.DDXFSdk().GetSmartCodeEvent(txhash.ToHexString())
+					if err != nil {
+						return
+					}
+					if evt == nil || evt.State != 1 {
+						err = fmt.Errorf("tx failed, txhash: %s, ontid: %s, owner: %s", txhash.ToHexString(), ontid, owner)
+						return
+					}
+				}
+			}
+			ontid := common.GenerateOntId()
+			rp := RegIdParam{
+				Ontid: []byte(ontid),
+				Group: Group{
+					Members:   members,
+					Threshold: 1,
+				},
+				Signer: signers,
+				Attributes: []DDOAttribute{
+					DDOAttribute{
+						Key:       []byte("dataMetaHash"),
+						Value:     hash[:],
+						ValueType: []byte{},
+					},
+				},
+			}
+			regIdParam = append(regIdParam, rp.ToBytes())
+		}
+	}
+	addr, _ := common2.AddressFromHexString(config2.ReIdArrayContractAddr)
+	con := instance.DDXFSdk().DefContract(addr)
+	tx, err := con.BuildTx("reg_id_add_attribute_array", []interface{}{regIdParam})
+	if err != nil {
+		return
+	}
+	for _, controller := range controllers {
+		err = instance.DDXFSdk().SignTx(tx, controller)
+		if err != nil {
+			return
+		}
+	}
+	txhash, err := common.SendRawTx(tx)
+	if err != nil {
+		return
+	}
+	evt, err := instance.DDXFSdk().GetSmartCodeEvent(txhash)
+	if err != nil {
+		return
+	}
+	if evt == nil || evt.State != 1 {
+		err = fmt.Errorf("tx failed, txhash: %s", txhash)
+		return
+	}
 	fmt.Println(regDatas)
+	regDatas = make([]RegDataInfo, 0)
+	for i := 0; i < len(input.Datas); i++ {
+		if !hasReg[input.PartyDataIDs[i]] {
+			regDatas = append(regDatas, RegDataInfo{
+				PartyDataID: input.PartyDataIDs[i],
+				Data:        input.Datas[i],
+				DataOwners:  input.DataOwners[i],
+				Party:       input.Party,
+			})
+		}
+	}
+	err = InsertElt(regDataCollection, regDatas)
 	return
 }
 
