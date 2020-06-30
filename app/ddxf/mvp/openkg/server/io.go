@@ -31,14 +31,15 @@ type RegDataOutput struct {
 
 // PublishInput ...
 type PublishInput struct {
-	ReqID     string                   `bson:"req_id" json:"req_id"`
-	OpenKGID  string                   `bson:"openkg_id" json:"openkg_id"`
-	UserID    string                   `bson:"user_id" json:"user_id"` // seller id
-	Item      map[string]interface{}   `bson:"item" json:"item"`
-	Datas     []map[string]interface{} `bson:"datas" json:"datas"`
-	Delete    bool                     `bson:"delete" json:"delete"`
-	OnChainId string                   `bson:"on_chain_id" json:"on_chain_id"`
-	Party     string                   `bson:"party" json:"party"`
+	ReqID      string                   `bson:"req_id" json:"req_id"`
+	OpenKGID   string                   `bson:"openkg_id" json:"openkg_id"`
+	UserID     string                   `bson:"user_id" json:"user_id"` // seller id
+	Item       map[string]interface{}   `bson:"item" json:"item"`
+	DataOwners [][]string               `bson:"data_owners" json:"data_owners"`
+	Datas      []map[string]interface{} `bson:"datas" json:"datas"`
+	Delete     bool                     `bson:"delete" json:"delete"`
+	OnChainId  string                   `bson:"on_chain_id" json:"on_chain_id"`
+	Party      string                   `bson:"party" json:"party"`
 }
 
 // PublishOutput ...
