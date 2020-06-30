@@ -441,6 +441,8 @@ github.com/ontio/ontology-go-sdk v1.11.1 h1:tgeZ9IHtR7jiGzsFdgLVEtg4Za9OxLB+S1xz
 github.com/ontio/ontology-go-sdk v1.11.1/go.mod h1:L6W59mkdmShcr8YCu1BZBcDqDTnmee45u/h956UgPtg=
 github.com/ontio/ontology-go-sdk v1.11.2-0.20200615094056-8c296c479e8d h1:15Jb8eE75VRRxFc5bzAhaX/hzLY/+rIi7QkILoaqi7Y=
 github.com/ontio/ontology-go-sdk v1.11.2-0.20200615094056-8c296c479e8d/go.mod h1:IxcIVMvK8TSlfTEYeCieW9uGXI5ZWosw4AXicBUZim8=
+github.com/ontio/ontology-go-sdk v1.11.2-0.20200630123857-e35437b07fa4 h1:zk6T9N0hCLCnHPikqGaqStWmWjCtrGfW18U3Ybj+oFc=
+github.com/ontio/ontology-go-sdk v1.11.2-0.20200630123857-e35437b07fa4/go.mod h1:IxcIVMvK8TSlfTEYeCieW9uGXI5ZWosw4AXicBUZim8=
 github.com/ontio/wagon v0.4.1/go.mod h1:oTPdgWT7WfPlEyzVaHSn1vQPMSbOpQPv+WphxibWlhg=
 github.com/ontio/wagon v0.4.2 h1:1fYUidGXGofVQrquVqmz5CcqbnlcVpr/ni2pGpD6tnI=
 github.com/ontio/wagon v0.4.2/go.mod h1:H8Un8idppnslxRl3HZHXDKCvxodczxyBlIVIsKWl4NI=
