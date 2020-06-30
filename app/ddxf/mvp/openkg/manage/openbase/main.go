@@ -86,7 +86,7 @@ func regData(d map[string]interface{}) {
 	}
 
 	bytes, _ := json.Marshal(input)
-	code, _, _, err := forward.PostJSONRequest(domain+server.PublishURI, bytes, nil)
+	code, _, _, err := forward.PostJSONRequest(domain+server.RegDataURI, bytes, nil)
 	if !(code == 200 && err == nil) {
 		panic(fmt.Sprintf("code:%v err:%v", code, err))
 	}
