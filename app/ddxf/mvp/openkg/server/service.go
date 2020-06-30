@@ -393,7 +393,7 @@ func batchRegDataService(input BatchRegDataInput) (output BatchRegDataOutput) {
 		"$in": partyDataIds,
 	}}
 	var regDatas []RegDataInfo
-	err = FindElt(regDataCollection, filter, &regDatas)
+	err = FindManyElt(regDataCollection, filter, &regDatas)
 	if err == mongo.ErrNoDocuments {
 		err = nil
 	}
