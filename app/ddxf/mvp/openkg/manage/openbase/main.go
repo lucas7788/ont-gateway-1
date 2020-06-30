@@ -20,14 +20,14 @@ const (
 
 	collection = "openbase_research_graph_withID"
 
-	batch = 2
+	batch = 1
 )
 
 var maintainers = map[string][]string{
 	"openbase_research_graph_withID": []string{
 		"陈卓", "吴杨", "邵鑫 (浙江大学药学院)", "杨海宏", "毕祯", "叶宏斌",
-		"方尹", "杨帆", "陈华钧", "华为云语音语义创新Lab: 郑毅", "王鹏", "卢栋才", "章涛", "袁晶",
-		"怀宝兴", "华为云医疗智能体: 张雷", "刘登辉", "徐迟", "乔楠",
+		"方尹", "杨帆", "陈华钧", "华为云语音语义创新Lab: 郑毅", "王鹏", // "卢栋才", "章涛", "袁晶",
+		"华为云医疗智能体: 张雷", // "刘登辉", "徐迟", "乔楠",
 	},
 	"openbase_prevention_graph_withID": []string{
 		"胡丹阳", "王萌", "李秋", "刘宇", "顾进广", "张志振", "胡闰秋", "胡闰秋", "张涛", "史淼", "郭文孜", "黄红蓝",
@@ -123,8 +123,7 @@ func main() {
 
 			fmt.Println("index", total-len(resources)+i)
 			batchRegData(ds)
-			return
-			ds = ds[:0]
+			// return
 
 			// return
 			time.Sleep(time.Millisecond * 1000)
@@ -139,11 +138,11 @@ func main() {
 	fmt.Println("total", total)
 }
 
-// const domain = "http://openkg-dev.ontfs.io"
+const domain = "http://openkg-dev.ontfs.io"
 
 // const domain = "http://openkg-prod.ontfs.io"
 
-const domain = "http://192.168.0.228:10999"
+// const domain = "http://192.168.0.228:10999"
 
 func ontid(userName string) bool {
 	input := server.GenerateOntIdInput{ReqID: uuid.NewV4().String(), UserId: userName, Party: "openbase"}
@@ -164,6 +163,8 @@ func batchRegData(ds []map[string]interface{}) {
 	for i := 0; i < len(ds); i++ {
 		dataOwners = append(dataOwners, owners)
 	}
+	fmt.Println("partyDataIDs", partyDataIDs, "dataOwners", dataOwners)
+
 	input := server.BatchRegDataInput{
 		ReqID:        uuid.NewV4().String(),
 		PartyDataIDs: partyDataIDs,
