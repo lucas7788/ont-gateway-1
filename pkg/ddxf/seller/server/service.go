@@ -301,6 +301,54 @@ func PublishMPItemMetaService(input io.MPEndpointPublishItemMetaInput, ontId str
 	return
 }
 
+func RegIdAndAddDataMetaService(input BatchRegIdAndAddDataMetaInput, ontid string) (output BatchRegIdAndAddDataMetaOutput) {
+	var err error
+	defer func() {
+		if err != nil {
+			output.Code = http.StatusInternalServerError
+			output.Msg = err.Error()
+		}
+	}()
+	tx, err := utils.TransactionFromHexString(input.SignedTx)
+	if err != nil {
+		return
+	}
+	mutTx, err := tx.IntoMutable()
+	if err != nil {
+		return
+	}
+	txhash, err := common2.SendRawTx(mutTx)
+	if err != nil {
+		return
+	}
+	evt, err := instance.DDXFSdk().GetSmartCodeEvent(txhash)
+	if err != nil {
+		return
+	}
+	if evt == nil || evt.State != 1 {
+		err = fmt.Errorf("tx failed, txhash: %s", txhash)
+		return
+	}
+	for _, item := range input.DataMetaArray {
+		dataStore := &io.SellerSaveDataMeta{
+			DataMeta:     item.DataMeta,
+			DataMetaHash: item.DataMetaHash,
+			ResourceType: item.ResourceType,
+			OntId:        ontid,
+			SignedTx:     item.SignedTx,
+			DataId:       item.DataId,
+			DataEndpoint: item.DataEndpoint,
+		}
+		// store meta hash id.
+		fmt.Println("dataStore:", dataStore)
+		err = InsertElt(DataMetaCollection, dataStore)
+		if err != nil {
+			return
+		}
+	}
+	return
+}
+
 func RegisterOntIdService(input RegisterOntIdInput) (output RegisterOntIdOutput) {
 	var err error
 	defer func() {

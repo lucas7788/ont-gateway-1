@@ -7,6 +7,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestPublishInput_Validate(t *testing.T) {
+
+}
+
 func TestMain(m *testing.M) {
 	if err := InitData(); err != nil {
 		fmt.Println("err: ", err)
