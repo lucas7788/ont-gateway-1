@@ -138,12 +138,11 @@ func publish(r resource, owners map[string]bool) bool {
 	}
 
 	input := server.PublishInput{
-		ReqID:      uuid.NewV4().String(),
-		OpenKGID:   r.ID,
-		UserID:     r.CreatorID,
-		OnChainId:  uuid.NewV4().String(),
-		Item:       dataMeta,
-		DataOwners: [][]string{dataOwners},
+		ReqID:     uuid.NewV4().String(),
+		OpenKGID:  r.ID,
+		UserID:    r.CreatorID,
+		OnChainId: uuid.NewV4().String(),
+		Item:      dataMeta,
 		Datas: []map[string]interface{}{
 			dataMeta,
 		},

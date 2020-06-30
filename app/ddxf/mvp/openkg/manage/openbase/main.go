@@ -2,10 +2,14 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
+	uuid "github.com/satori/go.uuid"
+	"github.com/zhiqiangxu/ont-gateway/app/ddxf/mvp/openkg/server"
 	"github.com/zhiqiangxu/ont-gateway/pkg/config"
+	"github.com/zhiqiangxu/ont-gateway/pkg/forward"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -73,16 +77,19 @@ const domain = "http://openkg-dev.ontfs.io"
 // const domain = "http://192.168.0.228:10999"
 
 func regData(d map[string]interface{}) {
-	// input := server.RegDataInput{
-	// 	ReqID:       uuid.NewV4().String(),
-	// 	PartyDataID: d["@id"].(string),
-	// 	Data:        d,
-	// 	Party:       "openbase",
-	// }
+	input := server.RegDataInput{
+		ReqID:       uuid.NewV4().String(),
+		PartyDataID: d["@id"].(string),
+		Data:        d,
+		Controllers: []string{},
+		Party:       "openbase",
+	}
 
-	// bytes, _ := json.Marshal(input)
-	// code, _, _, err := forward.PostJSONRequest(domain+server.PublishURI, bytes, nil)
-	// return code == 200 && err == nil
+	bytes, _ := json.Marshal(input)
+	code, _, _, err := forward.PostJSONRequest(domain+server.PublishURI, bytes, nil)
+	if !(code == 200 && err == nil) {
+		panic(fmt.Sprintf("code:%v err:%v", code, err))
+	}
 }
 
 // func publish(r resource) bool {
