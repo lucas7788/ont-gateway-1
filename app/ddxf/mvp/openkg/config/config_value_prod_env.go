@@ -11,5 +11,5 @@ const (
 	OEP4ContractAddr      = "195d72da6725e8243a52803f6de4cd93df48fc1f"
 	ReIdArrayContractAddr = "2e4e435a02c15729cf1b2b083421ad2674119259"
 	GasPrice              = 500
-	GasLimit              = 2000000
+	GasLimit              = 20000000
 )

@@ -458,17 +458,20 @@ func batchRegDataService(input BatchRegDataInput) (output BatchRegDataOutput) {
 					var txhash string
 					txhash, err = common.SendRawTx(tx)
 					if err != nil {
-						return
+						imutTx, _ := tx.IntoImmutable()
+						fmt.Println("openkg regid failed tx: ", hex.EncodeToString(common2.SerializeToBytes(imutTx)))
+						fmt.Println("openkg regid failed tx error:", err, txhash)
+						err = nil
 					}
-					var evt *common3.SmartContactEvent
-					evt, err = instance.DDXFSdk().GetSmartCodeEvent(txhash)
-					if err != nil {
-						return
-					}
-					if evt == nil || evt.State != 1 {
-						err = fmt.Errorf("tx failed, txhash: %s, ownerOntid: %s, owner: %s", txhash, ownerOntid, owner)
-						return
-					}
+					//var evt *common3.SmartContactEvent
+					//evt, err = instance.DDXFSdk().GetSmartCodeEvent(txhash)
+					//if err != nil {
+					//	return
+					//}
+					//if evt == nil || evt.State != 1 {
+					//	err = fmt.Errorf("tx failed, txhash: %s, ownerOntid: %s, owner: %s", txhash, ownerOntid, owner)
+					//	return
+					//}
 				}
 				members = append(members, []byte(ownerOntid))
 				if !init {
