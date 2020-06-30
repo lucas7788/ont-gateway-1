@@ -46,6 +46,12 @@ type RegIdParam struct {
 	Attributes []DDOAttribute
 }
 
+func (this *RegIdParam) ToBytes() []byte {
+	sink := common.NewZeroCopySink(nil)
+	this.Serialize(sink)
+	return sink.Bytes()
+}
+
 func (this *RegIdParam) Serialize(sink *common.ZeroCopySink) {
 	sink.WriteVarBytes(this.Ontid)
 	this.Group.Serialize(sink)
