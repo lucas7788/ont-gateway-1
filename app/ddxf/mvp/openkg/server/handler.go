@@ -35,6 +35,10 @@ func Publish(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
+	if !input.Validate() {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "invalid parameter"})
+		return
+	}
 	go func() {
 		output := PublishService(input)
 		if output.Code != 0 {
@@ -67,7 +71,10 @@ func regDataHandler(c *gin.Context) {
 		return
 	}
 	go func() {
-		regDataService(input)
+		output := regDataService(input)
+		if output.Code != 0 {
+			fmt.Println("openkg regDataService error:", output)
+		}
 	}()
 	c.JSON(http.StatusOK, "SUCCESS")
 }
