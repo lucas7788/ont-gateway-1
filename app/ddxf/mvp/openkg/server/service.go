@@ -1,16 +1,13 @@
 package server
 
 import (
+	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"net/http"
-	"time"
-
-	"crypto/sha256"
-
 	"fmt"
-
+	"net/http"
 	"strings"
+	"time"
 
 	"github.com/kataras/go-errors"
 	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
@@ -19,7 +16,6 @@ import (
 	common3 "github.com/ontio/ontology-go-sdk/common"
 	common2 "github.com/ontio/ontology/common"
 	"github.com/ontio/ontology/core/types"
-	"github.com/ontio/ontology/smartcontract/service/native/ontid"
 	"github.com/zhiqiangxu/ddxf"
 	config2 "github.com/zhiqiangxu/ont-gateway/app/ddxf/mvp/openkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
@@ -103,7 +99,6 @@ func GenerateOntIdService(input GenerateOntIdInput) (output GenerateOntIdOutput)
 	if err == nil {
 		output.OntId = ontid
 	}
-
 	return
 }
 
@@ -131,7 +126,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		return
 	}
 	seller := GetAccount(input.UserID)
-	ontID := "did:ont:" + seller.Address.ToBase58()
+	ontID := config2.PreOntId + seller.Address.ToBase58()
 	jwtToken, err := jwt.GenerateJwt(ontID)
 	if err != nil {
 		return
@@ -143,88 +138,21 @@ func PublishService(input PublishInput) (output PublishOutput) {
 
 	if input.Delete {
 		// 处理删除
-		var (
-			tx       *types.MutableTransaction
-			iMutTx   *types.Transaction
-			bs, data []byte
-		)
-		tx, err = instance.DDXFSdk().DefMpKit().BuildDeleteTx([]byte(param.OnChainId))
-		if err != nil {
-			return
-		}
-		err = instance.DDXFSdk().SignTx(tx, seller)
-		if err != nil {
-			return
-		}
-
-		iMutTx, err = tx.IntoImmutable()
-		if err != nil {
-			return
-		}
-
-		param := server.DeleteParam{SignedTx: hex.EncodeToString(common2.SerializeToBytes(iMutTx))}
-		bs, err = json.Marshal(param)
-		if err != nil {
-			return
-		}
-		_, _, data, err = forward.PostJSONRequestWithRetry(config.SellerUrl+server.FreezeUrl, bs, headers, 10)
-		if err != nil {
-			return
-		}
-
-		res := server.DeleteOutput{}
-		err = json.Unmarshal(data, &res)
-		if err != nil {
-			return
-		}
-		err = res.Error()
+		err = deletePublish(input.OnChainId, seller, headers)
 		return
 	}
 
 	// 1. 抽取data meta
-	dataMetas := input.Datas
-	dataMetaHashArray := make([]string, len(dataMetas))
-	for i := 0; i < len(dataMetas); i++ {
-		if dataMetas[i]["url"] == nil {
-			err = errors.New("url empty")
-			return
-		}
-		var hash [sha256.Size]byte
-		hash, err = ddxf.HashObject(dataMetas[i])
-		if err != nil {
-			return
-		}
-		dataMetaHashArray[i] = string(hash[:])
-	}
-	getDataIdParam := server.GetDataIdParam{
-		DataMetaHashArray: dataMetaHashArray,
-	}
-	var data, paramBs []byte
-	paramBs, err = json.Marshal(getDataIdParam)
-	if err != nil {
-		return
-	}
-	//查询哪些data id需要上链
-	_, _, data, err = forward.PostJSONRequestWithRetry(config.SellerUrl+server.GetDataIdByDataMetaHashUrl, paramBs, headers, 10)
+	res, dataMetaHashArray, err := queryDataIdFromSeller(input.Datas)
 	if err != nil {
 		return
 	}
 
-	res := make(map[string]interface{})
-	if data != nil {
-		err = json.Unmarshal(data, &res)
-		if err != nil {
-			return
-		}
-	}
+	dataMetas := input.Datas
 	ones := make([]io.DataMetaOne, 0)
 	for i := 0; i < len(dataMetas); i++ {
 		var dataMetaHash [sha256.Size]byte
-		dataMetaHash, err = ddxf.HashObject(dataMetas[i])
-		if err != nil {
-			err = fmt.Errorf("1 HashObject error: %s", err)
-			return
-		}
+		dataMetaHash = dataMetaHashArray[i]
 		var hash common2.Uint256
 		hash, err = common2.Uint256ParseFromBytes(dataMetaHash[:])
 		if err != nil {
@@ -234,45 +162,10 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		dataId := res[hash.ToHexString()]
 		if dataId == nil {
 			dataId := common.GenerateOntId()
-			g := &ontid.Group{
-				Members:   []interface{}{},
-				Threshold: 1,
-			}
-			signers := []ontid.Signer{ontid.Signer{
-				Id:    []byte(dataId),
-				Index: 1,
-			}}
-			tx, err := instance.DDXFSdk().GetOntologySdk().Native.OntId.NewRegIDWithControllerTransaction(config2.GasPrice,
-				config2.GasLimit, dataId, g, signers)
+			err = regIdWithController(dataId, seller)
 			if err != nil {
 				return
 			}
-			err = instance.DDXFSdk().SignTx(tx, seller)
-			if err != nil {
-				return
-			}
-			imutTx, err := tx.IntoImmutable()
-			if err != nil {
-				return
-			}
-			//send tx to seller
-			ri := server.RegisterOntIdInput{
-				SignedTx: hex.EncodeToString(common2.SerializeToBytes(imutTx)),
-			}
-			data, err := json.Marshal(ri)
-			if err != nil {
-				return
-			}
-			code, _, _, err := forward.PostJSONRequest(config.SellerUrl+server.RegisterOntId, data, nil)
-			if err != nil {
-				return
-			}
-			txHash := tx.Hash()
-			if code != http.StatusOK {
-				err = fmt.Errorf("register ontid tx failed, txHash: %s", txHash.ToHexString())
-				return
-			}
-
 			one := io.DataMetaOne{
 				DataMeta:     dataMetas[i],
 				DataMetaHash: hash.ToHexString(),
@@ -287,10 +180,6 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	}
 	// invoke seller saveDataMeta
 	for i := 0; i < len(ones); i++ {
-		var (
-			txMut  *types.MutableTransaction
-			iMutTx *types.Transaction
-		)
 		var hash, dataHash common2.Uint256
 		hash, err = common2.Uint256FromHexString(ones[i].DataMetaHash)
 		if err != nil {
@@ -302,41 +191,12 @@ func PublishService(input PublishInput) (output PublishOutput) {
 			err = fmt.Errorf("3 Uint256FromHexString error: %s", err)
 			return
 		}
-		attr := &ontology_go_sdk.DDOAttribute{
-			Key:       []byte("DataMetaHash"),
-			Value:     hash[:],
-			ValueType: []byte{},
-		}
-		attr2 := &ontology_go_sdk.DDOAttribute{
-			Key:       []byte("DataHash"),
-			Value:     dataHash[:],
-			ValueType: []byte{},
-		}
-		attrs := make([]*ontology_go_sdk.DDOAttribute, 0)
-		attrs = append(attrs, attr)
-		attrs = append(attrs, attr2)
-
-		txMut, err = instance.OntSdk().GetKit().Native.OntId.NewAddAttributesTransaction(
-			500, 2000000, ontID, attrs, seller.PublicKey,
-		)
+		var iMutTx *types.Transaction
+		iMutTx, err = buildAddAttributeTx(hash, dataHash, ontID, seller)
 		if err != nil {
 			return
 		}
-		txMut.Payer = payer.Address
-		err = instance.DDXFSdk().SignTx(txMut, payer)
-		if err != nil {
-			return
-		}
-		err = instance.DDXFSdk().SignTx(txMut, seller)
-		if err != nil {
-			return
-		}
-		iMutTx, err = txMut.IntoImmutable()
-		if err != nil {
-			return
-		}
-		txHash := txMut.Hash()
-		fmt.Println("txhash:", txHash.ToHexString())
+		//TODO
 		ones[i].SignedTx = hex.EncodeToString(common2.SerializeToBytes(iMutTx))
 	}
 	saveDataMetaArray := io.SellerSaveDataMetaArrayInput{
@@ -350,7 +210,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		return
 	}
 	start := time.Now().Unix()
-	_, _, data, err = forward.PostJSONRequestWithRetry(config2.SellerUrl+server.SaveDataMetaArrayUrl, bs, headers, 10)
+	_, _, data, err := forward.PostJSONRequestWithRetry(config2.SellerUrl+server.SaveDataMetaArrayUrl, bs, headers, 10)
 	end := time.Now().Unix()
 	fmt.Printf("openkg send seller SaveDataMetaArrayUrl cost time: %d\n", end-start)
 	if err != nil {
@@ -360,10 +220,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	templates := make([]*market_place_contract.TokenTemplate, 0)
 	for i := 0; i < len(dataMetas); i++ {
 		var dataMetaHash [sha256.Size]byte
-		dataMetaHash, err = ddxf.HashObject(dataMetas[i])
-		if err != nil {
-			return
-		}
+		dataMetaHash = dataMetaHashArray[i]
 		u, _ := common2.Uint256ParseFromBytes(dataMetaHash[:])
 		dataId := res[u.ToHexString()]
 		tt := &market_place_contract.TokenTemplate{
@@ -415,21 +272,16 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		if err != nil {
 			return
 		}
-		err = instance.DDXFSdk().SignTx(tx, seller)
-		if err != nil {
-			return
-		}
 	} else {
 		tx, err = instance.DDXFSdk().DefMpKit().BuildUpdateTx([]byte(resourceId), ddo, item, split)
 		if err != nil {
 			return
 		}
-		err = instance.DDXFSdk().SignTx(tx, seller)
-		if err != nil {
-			return
-		}
 	}
-
+	err = instance.DDXFSdk().SignTx(tx, seller)
+	if err != nil {
+		return
+	}
 	iMutTx, err := tx.IntoImmutable()
 	if err != nil {
 		return
