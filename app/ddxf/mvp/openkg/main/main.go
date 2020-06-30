@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/zhiqiangxu/ont-gateway/app/ddxf/mvp/openkg/server"
-	"fmt"
-	"github.com/ontio/ontology/core/types"
-	"github.com/ontio/ontology-crypto/keypair"
 	"encoding/hex"
+	"fmt"
+	"github.com/ontio/ontology-crypto/keypair"
+	"github.com/ontio/ontology/core/types"
+	"github.com/zhiqiangxu/ont-gateway/app/ddxf/mvp/openkg/server"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 )
 

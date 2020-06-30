@@ -12,12 +12,13 @@ import (
 	"github.com/kataras/go-errors"
 	"github.com/ont-bizsuite/ddxf-sdk/market_place_contract"
 	"github.com/ont-bizsuite/ddxf-sdk/split_policy_contract"
-	ontology_go_sdk "github.com/ontio/ontology-go-sdk"
+	"github.com/ontio/ontology-go-sdk"
 	common3 "github.com/ontio/ontology-go-sdk/common"
 	common2 "github.com/ontio/ontology/common"
 	"github.com/ontio/ontology/core/types"
 	"github.com/zhiqiangxu/ddxf"
 	config2 "github.com/zhiqiangxu/ont-gateway/app/ddxf/mvp/openkg/config"
+	config3 "github.com/zhiqiangxu/ont-gateway/pkg/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
@@ -375,7 +376,6 @@ type RegDataInfo struct {
 }
 
 func batchRegDataService(input BatchRegDataInput) (output BatchRegDataOutput) {
-
 	var (
 		partyDataIds []string
 		err          error
@@ -423,30 +423,56 @@ func batchRegDataService(input BatchRegDataInput) (output BatchRegDataOutput) {
 				acc := GetAccount(input.Party + owner)
 				ownerOntid := config2.PreOntId + acc.Address.ToBase58()
 				var data []byte
-				data, err = instance.DDXFSdk().GetOntologySdk().Native.OntId.GetDocumentJson(ownerOntid)
-				if err != nil {
-					return
+				if config3.Load().Prod {
+					var blockHeight uint32
+					blockHeight, err = instance.DDXFSdk().GetOntologySdk().GetCurrentBlockHeight()
+					if blockHeight < 9000000 {
+						data, err = instance.DDXFSdk().GetOntologySdk().Native.OntId.GetDDO(ownerOntid)
+						if err != nil {
+							return
+						}
+					} else {
+						data, err = instance.DDXFSdk().GetOntologySdk().Native.OntId.GetDocumentJson(ownerOntid)
+						if err != nil {
+							return
+						}
+					}
+				} else {
+					data, err = instance.DDXFSdk().GetOntologySdk().Native.OntId.GetDocumentJson(ownerOntid)
+					if err != nil {
+						return
+					}
 				}
-				if data == nil || len(data) == 0{
-					var txhash common2.Uint256
-					txhash, err = instance.DDXFSdk().GetOntologySdk().Native.OntId.RegIDWithPublicKey(config2.GasPrice,
-						config2.GasLimit, payer, ownerOntid, acc)
+
+				if data == nil || len(data) == 0 {
+					var tx *types.MutableTransaction
+					tx, err = instance.DDXFSdk().GetOntologySdk().Native.OntId.NewRegIDWithPublicKeyTransaction(config2.GasPrice,
+						config2.GasLimit, ownerOntid, acc.PublicKey)
+					if err != nil {
+						return
+					}
+					err = instance.DDXFSdk().SignTx(tx, acc)
+					if err != nil {
+						return
+					}
+					var txhash string
+					txhash, err = common.SendRawTx(tx)
 					if err != nil {
 						return
 					}
 					var evt *common3.SmartContactEvent
-					evt, err = instance.DDXFSdk().GetSmartCodeEvent(txhash.ToHexString())
+					evt, err = instance.DDXFSdk().GetSmartCodeEvent(txhash)
 					if err != nil {
 						return
 					}
 					if evt == nil || evt.State != 1 {
-						err = fmt.Errorf("tx failed, txhash: %s, ownerOntid: %s, owner: %s", txhash.ToHexString(), ownerOntid, owner)
+						err = fmt.Errorf("tx failed, txhash: %s, ownerOntid: %s, owner: %s", txhash, ownerOntid, owner)
 						return
 					}
 				}
-				controllers = append(controllers, acc)
 				members = append(members, []byte(ownerOntid))
 				if !init {
+					controllers = append(controllers, acc)
 					s = Signer{
 						Id:    []byte(ownerOntid),
 						Index: 1,
@@ -480,10 +506,6 @@ func batchRegDataService(input BatchRegDataInput) (output BatchRegDataOutput) {
 					},
 				},
 			}
-			for _,mem := range members {
-				fmt.Printf("RegIdParam members: %s\n", string(mem))
-			}
-			fmt.Printf("RegIdParam signer: %s\n", string(s.Id))
 			regIdParam = append(regIdParam, rp.ToBytes())
 		}
 	}
@@ -497,24 +519,25 @@ func batchRegDataService(input BatchRegDataInput) (output BatchRegDataOutput) {
 	if err != nil {
 		return
 	}
-	fmt.Printf("payer address: %s\n", tx.Payer.ToBase58())
 	for _, controller := range controllers {
 		err = instance.DDXFSdk().SignTx(tx, controller)
 		if err != nil {
 			return
 		}
 	}
-	for _, sig := range tx.Sigs {
-		addr := types.AddressFromPubKey(sig.PubKeys[0])
-		fmt.Printf("sig address: %s\n", addr.ToBase58())
-	}
 	imutTx, err := tx.IntoImmutable()
+	if err != nil {
+		return
+	}
 	param := server.BatchRegIdAndAddDataMetaInput{
 		DataMetaArray: dataMetaArray,
 		SignedTx:      hex.EncodeToString(common2.SerializeToBytes(imutTx)),
 	}
 	parambs, err := json.Marshal(param)
-	ontID := "did:ont:" + controllers[0].Address.ToBase58()
+	if err != nil {
+		return
+	}
+	ontID := config2.PreOntId + payer.Address.ToBase58()
 	jwtToken, err := jwt.GenerateJwt(ontID)
 	if err != nil {
 		output.Msg = err.Error()

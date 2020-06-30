@@ -5,12 +5,13 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/seller/server"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
 )
 
 func main() {
-	//common.ConsortiumAddr = "http://113.31.112.154:20336"
+	common.ConsortiumAddr = "http://113.31.112.154:20336"
 	server.StartSellerServer()
 	waitToExit()
 }
