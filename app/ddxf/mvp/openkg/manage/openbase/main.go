@@ -18,7 +18,7 @@ import (
 const (
 	n = 1000
 
-	collection = "openbase_research_graph_withID"
+	collection = "openbase_goods_graph_withID"
 
 	batch = 1
 )
@@ -92,12 +92,25 @@ type user struct {
 
 func main() {
 
+	// engine, err := storage.NewMySQL(config.Load().MySQLConfig)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
 	// var users []user
 	// err = engine.SQL("select distinct name from tmp").Find(&users)
 	// if err != nil {
 	// 	panic(err)
 	// }
 	// fmt.Println(users)
+
+	// for _, u := range users {
+	// 	if !ontid(u.Name) {
+	// 		panic(fmt.Sprintf("ontid fail for %s", u.Name))
+	// 	}
+	// 	fmt.Println("Name", u.Name)
+	// 	time.Sleep(time.Millisecond * 100)
+	// }
 
 	total := 0
 	page := 0
@@ -123,7 +136,8 @@ func main() {
 
 			fmt.Println("index", total-len(resources)+i)
 			batchRegData(ds)
-			// return
+
+			ds = make([]map[string]interface{}, 0)
 
 			// return
 			time.Sleep(time.Millisecond * 1000)
@@ -138,14 +152,16 @@ func main() {
 	fmt.Println("total", total)
 }
 
-const domain = "http://openkg-dev.ontfs.io"
+const party = "openbase"
 
-// const domain = "http://openkg-prod.ontfs.io"
+// const domain = "http://openkg-dev.ontfs.io"
+
+const domain = "http://openkg-prod.ontfs.io"
 
 // const domain = "http://192.168.0.228:10999"
 
 func ontid(userName string) bool {
-	input := server.GenerateOntIdInput{ReqID: uuid.NewV4().String(), UserId: userName, Party: "openbase"}
+	input := server.GenerateOntIdInput{ReqID: uuid.NewV4().String(), UserId: userName, Party: party}
 	bytes, _ := json.Marshal(input)
 	code, _, _, err := forward.PostJSONRequest(domain+server.GenerateOntIdByUserIdURI, bytes, nil)
 
@@ -170,7 +186,7 @@ func batchRegData(ds []map[string]interface{}) {
 		PartyDataIDs: partyDataIDs,
 		Datas:        ds,
 		DataOwners:   dataOwners,
-		Party:        "openbase",
+		Party:        party,
 	}
 
 	bytes, _ := json.Marshal(input)
