@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/kataras/go-errors"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
@@ -78,6 +79,24 @@ func regDataHandler(c *gin.Context) {
 	}()
 	c.JSON(http.StatusOK, "SUCCESS")
 }
+
+func batchRegDataHandler(c *gin.Context) {
+	var (
+		input BatchRegDataInput
+	)
+	if err := c.ShouldBind(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	go func() {
+		output := batchRegDataService(input)
+		if output.Code != 0 {
+			fmt.Println("openkg regDataService error:", output)
+		}
+	}()
+	c.JSON(http.StatusOK, "SUCCESS")
+}
+
 func deleteAttributesHandler(c *gin.Context) {
 	var (
 		input DeleteAttributesInput
