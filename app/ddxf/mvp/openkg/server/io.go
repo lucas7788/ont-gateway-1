@@ -42,6 +42,23 @@ type RegDataOutput struct {
 	Msg   string `bson:"msg" json:"msg"`
 	ReqID string `bson:"req_id" json:"req_id"`
 }
+
+// BatchRegDataInput ...
+type BatchRegDataInput struct {
+	ReqID        string                   `bson:"req_id" json:"req_id"`
+	PartyDataIDs []string                 `bson:"party_data_ids" json:"party_data_ids"`
+	Datas        []map[string]interface{} `bson:"datas" json:"datas"`
+	DataOwners   [][]string               `bson:"data_owners" json:"data_owners"`
+	Party        string                   `bson:"party" json:"party"`
+}
+
+// BatchRegDataOutput ...
+type BatchRegDataOutput struct {
+	Code  int    `bson:"code" json:"code"`
+	Msg   string `bson:"msg" json:"msg"`
+	ReqID string `bson:"req_id" json:"req_id"`
+}
+
 type PublishDataInput struct {
 	ReqID        string                 `bson:"req_id" json:"req_id"`
 	PartyItemID  string                 `bson:"party_item_id" json:"party_item_id"`
