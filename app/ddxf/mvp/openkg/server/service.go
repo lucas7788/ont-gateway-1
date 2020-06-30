@@ -143,7 +143,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	}
 
 	// 1. 抽取data meta
-	res, dataMetaHashArray, err := queryDataIdFromSeller(input.Datas)
+	res, dataMetaHashArray, err := queryDataIdFromSeller(input.Datas,headers)
 	if err != nil {
 		return
 	}
@@ -416,22 +416,22 @@ func batchRegDataService(input BatchRegDataInput) (output BatchRegDataOutput) {
 			signers := make([]Signer, 0)
 			for _, owner := range owners {
 				acc := GetAccount(input.Party + owner)
-				ontid := config2.PreOntId + acc.Address.ToBase58()
+				ownerOntid := config2.PreOntId + acc.Address.ToBase58()
 				var data []byte
-				data, err = instance.DDXFSdk().GetOntologySdk().Native.OntId.GetDocumentJson(ontid)
+				data, err = instance.DDXFSdk().GetOntologySdk().Native.OntId.GetDocumentJson(ownerOntid)
 				if err != nil {
 					return
 				}
-				members = append(members, []byte(ontid))
+				members = append(members, []byte(ownerOntid))
 				signers = append(signers, Signer{
-					Id:    []byte(ontid),
+					Id:    []byte(ownerOntid),
 					Index: 1,
 				})
 				controllers = append(controllers, acc)
 				if data == nil {
 					var txhash common2.Uint256
 					txhash, err = instance.DDXFSdk().GetOntologySdk().Native.OntId.RegIDWithPublicKey(config2.GasPrice,
-						config2.GasLimit, payer, ontid, acc)
+						config2.GasLimit, payer, ownerOntid, acc)
 					if err != nil {
 						return
 					}
@@ -441,14 +441,14 @@ func batchRegDataService(input BatchRegDataInput) (output BatchRegDataOutput) {
 						return
 					}
 					if evt == nil || evt.State != 1 {
-						err = fmt.Errorf("tx failed, txhash: %s, ontid: %s, owner: %s", txhash.ToHexString(), ontid, owner)
+						err = fmt.Errorf("tx failed, txhash: %s, ownerOntid: %s, owner: %s", txhash.ToHexString(), ownerOntid, owner)
 						return
 					}
 				}
 			}
-			ontid := common.GenerateOntId()
+			dataOntid := common.GenerateOntId()
 			rp := RegIdParam{
-				Ontid: []byte(ontid),
+				Ontid: []byte(dataOntid),
 				Group: Group{
 					Members:   members,
 					Threshold: 1,
