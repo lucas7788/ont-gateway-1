@@ -91,7 +91,7 @@ func batchRegDataHandler(c *gin.Context) {
 	go func() {
 		output := batchRegDataService(input)
 		if output.Code != 0 {
-			fmt.Println("openkg regDataService error:", output)
+			fmt.Println("openkg batchRegDataService error:", output)
 		}
 	}()
 	c.JSON(http.StatusOK, "SUCCESS")
