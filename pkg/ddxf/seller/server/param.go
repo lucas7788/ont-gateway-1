@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/io"
 	io2 "github.com/zhiqiangxu/ont-gateway/pkg/io"
 )
 
@@ -44,6 +45,16 @@ type RegisterOntIdInput struct {
 }
 
 type RegisterOntIdOutput struct {
+	io2.BaseResp
+	Result interface{}
+}
+
+type BatchRegIdAndAddDataMetaInput struct {
+	DataMetaArray []io.DataMetaOne
+	SignedTx      string
+}
+
+type BatchRegIdAndAddDataMetaOutput struct {
 	io2.BaseResp
 	Result interface{}
 }

@@ -171,6 +171,35 @@ func PublishMPItemMetaHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, output)
 }
 
+func RegIdAndAddDataMetaHandler(c *gin.Context) {
+	ontId, ok := c.Get(middleware.TenantIDKey)
+	if !ok {
+		instance.Logger().Error("[SaveDataMetaHandle] read ontId error")
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, errors.New("[SaveDataMetaHandle] read ontId error")))
+		return
+	}
+	bs, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		instance.Logger().Error("[RegisterOntIdHandler] read param error", zap.Error(err))
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, err))
+		return
+	}
+	input := BatchRegIdAndAddDataMetaInput{}
+	err = json.Unmarshal(bs, &input)
+	if err != nil {
+		instance.Logger().Error("[RegisterOntIdHandler] parse param error", zap.Error(err))
+		c.JSON(http.StatusBadRequest, common.ResponseFailedOnto(common.PARA_ERROR, err))
+		return
+	}
+	output := RegIdAndAddDataMetaService(input, ontId.(string))
+	if output.Code != 0 {
+		instance.Logger().Error("seller RegIdAndAddDataMetaHandler error: ", zap.Error(output.Error()))
+		c.JSON(output.Code, output)
+	} else {
+		c.JSON(http.StatusOK, output)
+	}
+}
+
 func RegisterOntIdHandler(c *gin.Context) {
 	bs, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {

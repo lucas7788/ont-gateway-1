@@ -9,6 +9,7 @@ import (
 )
 
 const (
+	RegIdAndAddDataMetaUrl     = "/ddxf/seller/regIdAndAddDataMeta"
 	RegisterOntId              = "/ddxf/seller/registerOntId"
 	SaveDataMetaUrl            = "/ddxf/seller/saveDataMeta"
 	GetDataIdByDataMetaHashUrl = "/ddxf/seller/getDataIdByDataMetaHash"
@@ -33,6 +34,7 @@ func StartSellerServer() {
 	})
 	r.Use(jwt.JWT())
 	//r.Use(middleware.JWT)
+	r.POST(RegIdAndAddDataMetaUrl, RegIdAndAddDataMetaHandler)
 	r.POST(RegisterOntId, RegisterOntIdHandler)
 	r.POST(DeleteUrl, DeleteHandler)
 	r.POST(UpdateUrl, UpdateHandler)

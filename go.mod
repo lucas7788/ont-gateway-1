@@ -19,11 +19,10 @@ require (
 	github.com/ontio/go-bip32 v0.0.0-20190520025953-d3cea6894a2b
 	github.com/ontio/ontology v1.10.1-0.20200629062808-bb8fe432b332
 	github.com/ontio/ontology-crypto v1.0.9
-	github.com/ontio/ontology-go-sdk v1.11.2-0.20200615094056-8c296c479e8d
+	github.com/ontio/ontology-go-sdk v1.11.2-0.20200630123857-e35437b07fa4
 	github.com/piprate/json-gold v0.3.0
 	github.com/prometheus/client_golang v1.5.1
 	github.com/satori/go.uuid v1.2.0
-	github.com/spf13/pflag v1.0.3 // indirect
 	github.com/stretchr/testify v1.4.0
 	github.com/syndtr/goleveldb v1.0.1-0.20190923125748-758128399b1d
 	github.com/urfave/cli/v2 v2.2.0
