@@ -29,34 +29,35 @@ var maintainers = map[string][]string{
 		"方尹", "杨帆", "陈华钧", "华为云语音语义创新Lab: 郑毅", "王鹏", "卢栋才", "章涛", "袁晶",
 		"怀宝兴", "华为云医疗智能体: 张雷", "刘登辉", "徐迟", "乔楠",
 	},
-	"openbase_prevention_graph_withID":[]string{
-		"胡丹阳", "王萌", "李秋", "刘宇", "顾进广","张志振", "胡闰秋", "胡闰秋", "张涛", "史淼", "郭文孜", "黄红蓝"
+	"openbase_prevention_graph_withID": []string{
+		"胡丹阳", "王萌", "李秋", "刘宇", "顾进广", "张志振", "胡闰秋", "胡闰秋", "张涛", "史淼", "郭文孜", "黄红蓝",
 	},
-	"openbase_medical_graph_withID":[]string{
-		"蔡嘉辉","杜会芳"
+	"openbase_medical_graph_withID": []string{
+		"蔡嘉辉", "杜会芳",
 	},
-	"openbase_health_graph":[]string{
-		"许斌","毛亦铭","阎婧雅","凤灵","吴高晨","仝美涵","孙静怡","李子明","陈秋阳","李凯曼","郑晓飞","刘邦长","常德杰","刘朝振","刘红霞","张航飞","姜鹏","闫广庆","季科","袁晓飞"
+	"openbase_health_graph": []string{
+		"许斌", "毛亦铭", "阎婧雅", "凤灵", "吴高晨", "仝美涵", "孙静怡", "李子明", "陈秋阳", "李凯曼", "郑晓飞", "刘邦长", "常德杰", "刘朝振", "刘红霞", "张航飞", "姜鹏", "闫广庆", "季科", "袁晓飞",
 	},
-	"openbase_goods_graph_withID":[]string{
-		"刘宇","徐航","向军毅","顾进广"
+	"openbase_goods_graph_withID": []string{
+		"刘宇", "徐航", "向军毅", "顾进广",
 	},
-	"openbase_event_graph":[]string{
-		"刘作鹏", "王献敏", "彭茜", "戴振","张作为"，"王鲁威","张呈阳","刘杰","唐彦"
+	"openbase_event_graph": []string{
+		"刘作鹏", "王献敏", "彭茜", "戴振", "张作为", "王鲁威", "张呈阳", "刘杰", "唐彦",
 	},
-	"openbase_character_graph_withID":[]string{
-		"王智凤","蔡嘉辉"
+	"openbase_character_graph_withID": []string{
+		"王智凤", "蔡嘉辉",
 	},
-	"openbase_wiki_graph":[]string{
-		"王昊奋","漆桂林"
-	}
+	"openbase_wiki_graph": []string{
+		"王昊奋", "漆桂林",
+	},
 }
 
 var owners []string
+
 func init() {
 	owners = maintainers[collection]
-	if len(owners) ==0 {
-		panic(fmt.Sprintf("no maintainers for %s",collection))
+	if len(owners) == 0 {
+		panic(fmt.Sprintf("no maintainers for %s", collection))
 	}
 }
 
@@ -91,12 +92,12 @@ type user struct {
 
 func main() {
 
-	var users []user
-	err = engine.SQL("select distinct name from tmp").Find(&users)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(users)
+	// var users []user
+	// err = engine.SQL("select distinct name from tmp").Find(&users)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// fmt.Println(users)
 
 	total := 0
 	page := 0
@@ -111,11 +112,10 @@ func main() {
 		fmt.Println("page", page, "total", total)
 		page++
 
-		ds := make([]map[string]interface{})
+		ds := make([]map[string]interface{}, 0)
 		for i, resource := range resources {
-			
 
-			ds = append(ds,resource)
+			ds = append(ds, resource)
 
 			if len(ds) < batch {
 				continue
@@ -123,6 +123,7 @@ func main() {
 
 			fmt.Println("index", total-len(resources)+i)
 			batchRegData(ds)
+			return
 			ds = ds[:0]
 
 			// return
@@ -138,11 +139,11 @@ func main() {
 	fmt.Println("total", total)
 }
 
-const domain = "http://openkg-dev.ontfs.io"
+// const domain = "http://openkg-dev.ontfs.io"
 
 // const domain = "http://openkg-prod.ontfs.io"
 
-// const domain = "http://192.168.0.228:10999"
+const domain = "http://192.168.0.228:10999"
 
 func ontid(userName string) bool {
 	input := server.GenerateOntIdInput{ReqID: uuid.NewV4().String(), UserId: userName, Party: "openbase"}
@@ -154,22 +155,25 @@ func ontid(userName string) bool {
 }
 
 func batchRegData(ds []map[string]interface{}) {
-	
+
 	var partyDataIDs []string
 	for _, d := range ds {
 		partyDataIDs = append(partyDataIDs, d["@id"].(string))
+	}
+	var dataOwners [][]string
+	for i := 0; i < len(ds); i++ {
+		dataOwners = append(dataOwners, owners)
 	}
 	input := server.BatchRegDataInput{
 		ReqID:        uuid.NewV4().String(),
 		PartyDataIDs: partyDataIDs,
 		Datas:        ds,
-		DataOwners:   owners,
+		DataOwners:   dataOwners,
 		Party:        "openbase",
 	}
 
-	
 	bytes, _ := json.Marshal(input)
-	code, _, _, err := forward.PostJSONRequest(domain+server.RegDataURI, bytes, nil)
+	code, _, _, err := forward.PostJSONRequest(domain+server.BatchRegDataURI, bytes, nil)
 	if !(code == 200 && err == nil) {
 		panic(fmt.Sprintf("code:%v err:%v", code, err))
 	}

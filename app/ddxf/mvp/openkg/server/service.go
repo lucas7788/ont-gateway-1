@@ -143,7 +143,7 @@ func PublishService(input PublishInput) (output PublishOutput) {
 	}
 
 	// 1. 抽取data meta
-	res, dataMetaHashArray, err := queryDataIdFromSeller(input.Datas,headers)
+	res, dataMetaHashArray, err := queryDataIdFromSeller(input.Datas, headers)
 	if err != nil {
 		return
 	}
@@ -394,6 +394,9 @@ func batchRegDataService(input BatchRegDataInput) (output BatchRegDataOutput) {
 	}}
 	var regDatas []RegDataInfo
 	err = FindElt(regDataCollection, filter, &regDatas)
+	if err == mongo.ErrNoDocuments {
+		err = nil
+	}
 	if err != nil {
 		return
 	}
