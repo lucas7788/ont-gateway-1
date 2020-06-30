@@ -406,6 +406,8 @@ func batchRegDataService(input BatchRegDataInput) (output BatchRegDataOutput) {
 	}
 	regIdParam := make([]interface{}, 0)
 	controllers := make([]*ontology_go_sdk.Account, 0)
+
+	dataMetaArray := make([]io.DataMetaOne, 0)
 	for i, pDataId := range input.PartyDataIDs {
 		if !hasReg[pDataId] {
 			owners := input.DataOwners[i]
@@ -416,7 +418,8 @@ func batchRegDataService(input BatchRegDataInput) (output BatchRegDataOutput) {
 				return
 			}
 			members := make([][]byte, 0)
-			signers := make([]Signer, 0)
+			var s Signer
+			init := false
 			for _, owner := range owners {
 				acc := GetAccount(input.Party + owner)
 				ownerOntid := config2.PreOntId + acc.Address.ToBase58()
@@ -425,13 +428,7 @@ func batchRegDataService(input BatchRegDataInput) (output BatchRegDataOutput) {
 				if err != nil {
 					return
 				}
-				members = append(members, []byte(ownerOntid))
-				signers = append(signers, Signer{
-					Id:    []byte(ownerOntid),
-					Index: 1,
-				})
-				controllers = append(controllers, acc)
-				if data == nil {
+				if data == nil || len(data) == 0{
 					var txhash common2.Uint256
 					txhash, err = instance.DDXFSdk().GetOntologySdk().Native.OntId.RegIDWithPublicKey(config2.GasPrice,
 						config2.GasLimit, payer, ownerOntid, acc)
@@ -448,15 +445,34 @@ func batchRegDataService(input BatchRegDataInput) (output BatchRegDataOutput) {
 						return
 					}
 				}
+				members = append(members, []byte(ownerOntid))
+				if !init {
+					s = Signer{
+						Id:    []byte(ownerOntid),
+						Index: 1,
+					}
+					controllers = append(controllers, acc)
+					fmt.Printf("ownerOntid: %s\n", ownerOntid)
+					init = true
+				}
 			}
 			dataOntid := common.GenerateOntId()
+			dataMetaArray = append(dataMetaArray, io.DataMetaOne{
+				DataMeta:     dataMeta,
+				DataMetaHash: string(hash[:]),
+				DataEndpoint: config.SellerUrl,
+				ResourceType: 0,
+				DataHash:     common2.UINT256_EMPTY.ToHexString(),
+				DataId:       dataOntid,
+			})
+
 			rp := RegIdParam{
 				Ontid: []byte(dataOntid),
 				Group: Group{
 					Members:   members,
 					Threshold: 1,
 				},
-				Signer: signers,
+				Signer: []Signer{s},
 				Attributes: []DDOAttribute{
 					DDOAttribute{
 						Key:       []byte("dataMetaHash"),
@@ -465,6 +481,10 @@ func batchRegDataService(input BatchRegDataInput) (output BatchRegDataOutput) {
 					},
 				},
 			}
+			for _,mem := range members {
+				fmt.Printf("RegIdParam members: %s\n", string(mem))
+			}
+			fmt.Printf("RegIdParam signer: %s\n", string(s.Id))
 			regIdParam = append(regIdParam, rp.ToBytes())
 		}
 	}
@@ -474,11 +494,46 @@ func batchRegDataService(input BatchRegDataInput) (output BatchRegDataOutput) {
 	if err != nil {
 		return
 	}
+	err = instance.DDXFSdk().SignTx(tx, payer)
+	if err != nil {
+		return
+	}
+	fmt.Printf("payer address: %s\n", tx.Payer.ToBase58())
 	for _, controller := range controllers {
 		err = instance.DDXFSdk().SignTx(tx, controller)
 		if err != nil {
 			return
 		}
+	}
+	for _, sig := range tx.Sigs {
+		addr := types.AddressFromPubKey(sig.PubKeys[0])
+		fmt.Printf("sig address: %s\n", addr.ToBase58())
+	}
+	fmt.Println(tx.Sigs)
+	imutTx, err := tx.IntoImmutable()
+	param := server.BatchRegIdAndAddDataMetaInput{
+		DataMetaArray: dataMetaArray,
+		SignedTx:      hex.EncodeToString(common2.SerializeToBytes(imutTx)),
+	}
+	parambs, err := json.Marshal(param)
+	ontID := "did:ont:" + controllers[0].Address.ToBase58()
+	jwtToken, err := jwt.GenerateJwt(ontID)
+	if err != nil {
+		output.Msg = err.Error()
+		output.Code = http.StatusInternalServerError
+		return
+	}
+
+	headers := map[string]string{
+		"Authorization": jwtToken,
+	}
+	code, _, _, err := forward.PostJSONRequest(config.SellerUrl+server.RegIdAndAddDataMetaUrl, parambs, headers)
+	if err != nil {
+		return
+	}
+	if code != http.StatusOK {
+		fmt.Println("send seller failed RegIdAndAddDataMetaUrl")
+		return
 	}
 	txhash, err := common.SendRawTx(tx)
 	if err != nil {
