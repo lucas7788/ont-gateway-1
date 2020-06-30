@@ -162,7 +162,16 @@ func PublishService(input PublishInput) (output PublishOutput) {
 		dataId := res[hash.ToHexString()]
 		if dataId == nil {
 			dataId := common.GenerateOntId()
-			err = regIdWithController(dataId, seller)
+			var ownerAccs = make([]*ontology_go_sdk.Account, 0)
+			if input.DataOwners == nil {
+				ownerAccs = append(ownerAccs, seller)
+			} else {
+				owners := input.DataOwners[i]
+				for i := 0; i < len(owners); i++ {
+					ownerAccs = append(ownerAccs, GetAccount(owners[i]))
+				}
+			}
+			err = regIdWithController(dataId, ownerAccs)
 			if err != nil {
 				return
 			}

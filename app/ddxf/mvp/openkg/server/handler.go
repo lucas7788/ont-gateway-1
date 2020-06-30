@@ -35,6 +35,10 @@ func Publish(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
+	if !input.Validate() {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "invalid parameter"})
+		return
+	}
 	go func() {
 		output := PublishService(input)
 		if output.Code != 0 {

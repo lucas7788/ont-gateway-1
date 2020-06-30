@@ -32,10 +32,10 @@ func GetAccount(userId string) *ontology_go_sdk.Account {
 	}
 }
 
-func buildAddAttributeTx(hash,dataHash common.Uint256, ontID string,
-	seller *ontology_go_sdk.Account)(iMutTx *types.Transaction, err error) {
+func buildAddAttributeTx(hash, dataHash common.Uint256, ontID string,
+	seller *ontology_go_sdk.Account) (iMutTx *types.Transaction, err error) {
 	var (
-		txMut  *types.MutableTransaction
+		txMut *types.MutableTransaction
 	)
 
 	attr := &ontology_go_sdk.DDOAttribute{
@@ -70,24 +70,31 @@ func buildAddAttributeTx(hash,dataHash common.Uint256, ontID string,
 	fmt.Println("txhash:", txHash.ToHexString())
 	return
 }
-func regIdWithController(dataId string,seller *ontology_go_sdk.Account) (err error) {
+func regIdWithController(dataId string, controllers []*ontology_go_sdk.Account) (err error) {
+	members := make([]interface{}, len(controllers))
+	signers := make([]ontid.Signer, len(controllers))
+	for i := 0; i < len(controllers); i++ {
+		controller := config.PreOntId + controllers[i].Address.ToBase58()
+		members[i] = []byte(controller)
+		signers[i] = ontid.Signer{
+			Id:    []byte(controller),
+			Index: 1,
+		}
+	}
 	g := &ontid.Group{
-		Members:   []interface{}{},
+		Members:   members,
 		Threshold: 1,
 	}
-	controller := config.PreOntId + seller.Address.ToBase58()
-	signers := []ontid.Signer{ontid.Signer{
-		Id:    []byte(controller),
-		Index: 1,
-	}}
 	tx, err := instance.DDXFSdk().GetOntologySdk().Native.OntId.NewRegIDWithControllerTransaction(config.GasPrice,
 		config.GasLimit, dataId, g, signers)
 	if err != nil {
 		return
 	}
-	err = instance.DDXFSdk().SignTx(tx, seller)
-	if err != nil {
-		return
+	for _, acc := range controllers {
+		err = instance.DDXFSdk().SignTx(tx, acc)
+		if err != nil {
+			return
+		}
 	}
 	imutTx, err := tx.IntoImmutable()
 	if err != nil {
@@ -151,17 +158,17 @@ func deletePublish(resourceId string, seller *ontology_go_sdk.Account, headers m
 	err = res.Error()
 }
 
-func queryDataIdFromSeller(dataMetas []map[string]interface{}) (map[string]interface{},[][sha256.Size]byte, error) {
+func queryDataIdFromSeller(dataMetas []map[string]interface{}) (map[string]interface{}, [][sha256.Size]byte, error) {
 	dataMetaHashArray := make([]string, len(dataMetas))
 	dataMetaHashArray2 := make([][sha256.Size]byte, len(dataMetas))
 	for i := 0; i < len(dataMetas); i++ {
 		if dataMetas[i]["url"] == nil {
-			return nil,nil, errors.New("url empty")
+			return nil, nil, errors.New("url empty")
 		}
 		var hash [sha256.Size]byte
 		hash, err := ddxf.HashObject(dataMetas[i])
 		if err != nil {
-			return nil,nil, err
+			return nil, nil, err
 		}
 		dataMetaHashArray[i] = string(hash[:])
 		dataMetaHashArray2[i] = hash
@@ -172,19 +179,19 @@ func queryDataIdFromSeller(dataMetas []map[string]interface{}) (map[string]inter
 	var data, paramBs []byte
 	paramBs, err := json.Marshal(getDataIdParam)
 	if err != nil {
-		return nil,nil, err
+		return nil, nil, err
 	}
 	//查询哪些data id需要上链
 	_, _, data, err = forward.PostJSONRequestWithRetry(config.SellerUrl+server.GetDataIdByDataMetaHashUrl, paramBs, headers, 10)
 	if err != nil {
-		return nil,nil, err
+		return nil, nil, err
 	}
 	res := make(map[string]interface{})
 	if data != nil {
 		err = json.Unmarshal(data, &res)
 		if err != nil {
-			return nil,nil, err
+			return nil, nil, err
 		}
 	}
-	return res,dataMetaHashArray2, nil
+	return res, dataMetaHashArray2, nil
 }

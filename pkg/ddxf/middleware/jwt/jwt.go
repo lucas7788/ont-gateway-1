@@ -9,10 +9,10 @@ import (
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/common"
 	"github.com/zhiqiangxu/ont-gateway/pkg/ddxf/config"
 	"github.com/zhiqiangxu/ont-gateway/pkg/instance"
+	"github.com/zhiqiangxu/ont-gateway/pkg/rest/middleware"
 	"net/http"
 	"strings"
 	"time"
-	"github.com/zhiqiangxu/ont-gateway/pkg/rest/middleware"
 )
 
 func JWT() gin.HandlerFunc {
