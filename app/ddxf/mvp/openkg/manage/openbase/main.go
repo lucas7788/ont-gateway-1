@@ -123,6 +123,7 @@ func main() {
 
 			fmt.Println("index", total-len(resources)+i)
 			batchRegData(ds)
+			ds = ds[:0]
 
 			// return
 			time.Sleep(time.Millisecond * 1000)
