@@ -113,7 +113,7 @@ func main() {
 	// }
 
 	total := 0
-	page := 0
+	page := 37
 	for {
 
 		resources := getResource(page)
@@ -121,8 +121,12 @@ func main() {
 			break
 		}
 
-		total += len(resources)
-		fmt.Println("page", page, "total", total)
+		if page == 37 {
+			resources = resources[545:]
+		}
+
+		total = (page + 1) * n
+		fmt.Println("total", total, "page", page)
 		page++
 
 		ds := make([]map[string]interface{}, 0)
